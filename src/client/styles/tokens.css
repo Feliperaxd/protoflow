@@ -1,0 +1,67 @@
+:root {
+    /* ===== Primary Palette ===== */
+    --color-primary: #1BD4DF;
+    --color-secondary: #054FB8;
+
+    /* ===== Grayscale Palette =====*/
+    --color-white: #FAFAFA;
+    --color-black: #000000;
+    --color-gray-900: #1C1C1C;
+    --color-gray-700: #363636;
+
+    /* ===== Semantic Colors ===== */
+    --color-success: #73CE96;
+    --color-error: #d82929;
+    --color-warning: #cfc427;
+    --color-info: #1468b6;
+    --color-disabled: var(--color-gray-700);
+
+    /* ===== Backgrounds ===== */
+    --background-body: var(--color-gray-900);
+    --background-surface: var(--color-white);
+    --background-emphasis: linear-gradient(
+        45deg, var(--color-secondary), var(--color-primary)
+    );
+
+    /* ===== Glassmorphism ===== */
+    --glassmorphism-background-clear: linear-gradient(
+        45deg, var(--color-white), rgba(255, 255, 255, 0.3)
+    );
+    --glassmorphism-background-smoke: linear-gradient(
+        45deg, var(--color-black), rgba(0, 0, 0, 0.3)
+    );
+
+    /* ===== Text ===== */
+    --color-text-primary: var(--color-white);
+    --color-text-secondary: var(--color-gray-900);
+    --color-text-accent: var(--color-primary);
+    --color-text-disabled: var(--color-disabled);
+
+    --font-family-base: 'K2D', 'Poppins', sans-serif;
+    --letter-spacing-default: 0.1em;
+
+    --font-size-xs: clamp(0.75rem, 1vw, 0.875rem);
+    --font-size-sm: clamp(0.875rem, 1.2vw, 1rem);
+    --font-size-md: clamp(1rem, 1.5vw, 1.125rem);
+    --font-size-lg: clamp(1.125rem, 2vw, 1.5rem);
+    --font-size-xl: clamp(1.5rem, 3vw, 2rem);
+    --font-size-2xl: clamp(2rem, 4vw, 2.5rem);
+    --font-size-3xl: clamp(2.5rem, 5vw, 3.5rem);
+    --font-size-4xl: clamp(3.5rem, 6vw, 4.5rem);
+
+    /* ===== Sizes ===== */
+    --loading-bar-length: 200px;
+    --loading-bar-thickness: 6px;
+    --border-radius-default: 3%;
+    --border-radius-sm: 4px;
+    --border-radius-lg: 12px;
+
+    /* ===== Shadows ===== */
+    --shadow-default: -8px 8px 12px rgba(0, 0, 0, 0.6);
+    --shadow-md: #000;
+    --shadow-lg: #000;
+
+
+    /* ===== Transitions ===== */
+    --transition-default: all 0.3s ease;
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProtoFlow</title>
+    <link rel="stylesheet" href="../styles/tokens.css">
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/drop-area.css">
+    <link rel="stylesheet" href="../styles/icon-mask.css">
+</head>
+<body>
+    <main class="container">
+        <div class="drop-area-default" id="drag-drop-area">
+            <span class="drop-area-loading-bar"></span>
+            <span class="drop-area-loading-overlay"></span>
+            <div class="icon-mask upload-icon"
+                 style="--icon-mask-url:url(../assets/upload-icon-mask.svg)">
+            </div>
+            <input type="file" id="file-input" style="display:none;">
+        </div>
+    </main>
+    <script type="module" src="../scripts/main.js"></script>
+</body>
+</html>

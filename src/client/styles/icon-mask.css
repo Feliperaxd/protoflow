@@ -1,0 +1,13 @@
+@import url(./tokens.css);
+
+.icon-mask {
+    mask-image: var(--icon-mask-url);
+    mask-size: cover;
+    mask-repeat: no-repeat;
+    mask-position: center;
+
+    -webkit-mask-image: var(--icon-mask-url);
+    -webkit-mask-size: cover;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+}

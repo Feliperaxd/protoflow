@@ -1,0 +1,58 @@
+<input type="range" id="slider" min="0" max="100" value="50" />
+
+<style>
+input[type=range] {
+    -webkit-appearance: none; /* tira o estilo padrão no Chrome/Safari */
+    width: 300px;
+    height: 6px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+/* Trilho (track) - Webkit (Chrome, Safari, Opera) */
+input[type=range]::-webkit-slider-runnable-track {
+    height: 6px;
+    background: #ccc;
+    border-radius: 5px;
+}
+
+/* Botão (thumb) - Webkit */
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #ff5722;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    margin-top: -7px; /* alinha com a trilha */
+    cursor: pointer;
+}
+
+/* Trilho (track) - Firefox */
+input[type=range]::-moz-range-track {
+    height: 6px;
+    background: #ccc;
+    border-radius: 5px;
+}
+
+/* Botão (thumb) - Firefox */
+input[type=range]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #ff5722;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    cursor: pointer;
+}
+
+/* Internet Explorer (só se ainda te interessar) */
+input[type=range]::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    background: #ff5722;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    cursor: pointer;
+}
+</style>

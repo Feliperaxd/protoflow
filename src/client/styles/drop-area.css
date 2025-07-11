@@ -1,0 +1,106 @@
+@import url(./tokens.css);
+
+/* Drop area container for all states */
+.drop-area-default,
+.drop-area-hover,
+.drop-area-filled,
+.drop-area-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+
+  width: 500px;
+  height: 300px;
+  border-radius: 30px;
+
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+/* Default state border */
+.drop-area-default {
+  border: 3px dashed var(--gray-color);
+}
+
+/* Hover state border */
+.drop-area-hover,
+.drop-area-default:hover {
+  border: 3px dashed var(--white-color);
+}
+
+/* Filled state border */
+.drop-area-filled {
+  border: 3px dashed var(--success-color);
+}
+
+/* Upload icon positioning and size */
+.drop-area-default > .upload-icon,
+.drop-area-hover > .upload-icon,
+.drop-area-filled > .upload-icon {
+  position: absolute;
+
+  width: 10%;
+  aspect-ratio: 14 / 17;
+
+  transition: 0.3s ease-in-out;
+}
+
+/* Upload icon colors by state */
+.drop-area-default > .upload-icon {
+  background-color: var(--gray-color);
+}
+
+.drop-area-hover > .upload-icon,
+.drop-area-default:hover > .upload-icon {
+  background-color: var(--white-color);
+}
+
+.drop-area-filled > .upload-icon {
+  background-color: var(--success-color);
+}
+
+/* Hide loading bar for non-loading states */
+.drop-area-default .drop-area-loading-bar,
+.drop-area-hover .drop-area-loading-bar,
+.drop-area-filled .drop-area-loading-bar {
+  display: none;
+}
+
+/* Show loading bar in loading state */
+.drop-area-loading .drop-area-loading-bar {
+  display: block;
+}
+
+/* Animated loading bar */
+.drop-area-loading-bar {
+  position: absolute;
+
+  width: 150%;
+  height: var(--loading-bar-length);
+
+  background-color: var(--loading-bar-color);
+  animation: drop-area-loading-animation 3s infinite linear;
+}
+
+/* Overlay shown in loading state */
+.drop-area-loading-overlay {
+  position: absolute;
+
+  width: calc(100% - var(--loading-bar-thickness));
+  height: calc(100% - var(--loading-bar-thickness));
+  border-radius: calc(var(--box-border-radius));
+
+  background-color: var(--primary-background-color);
+}
+
+/* Spinner rotation animation */
+@keyframes drop-area-loading-animation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

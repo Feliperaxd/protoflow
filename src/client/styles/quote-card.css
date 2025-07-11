@@ -1,0 +1,36 @@
+.quote-card {
+    width: 900px;
+    aspect-ratio: 16 / 9;
+
+    display: flex;
+    align-items: flex-end;
+
+    position: relative;
+}
+
+.quote-card > .model-side,
+.quote-card > .print-settings-background,
+.quote-card > .print-settings-side {
+    height: 95%;
+}
+
+.quote-card > .model-side {
+    aspect-ratio: 1 / 1;
+    border-radius: var(--border-radius-default) 0 0 var(--border-radius-default);
+    background-color: var(--background-surface);
+}
+
+.quote-card > .print-settings-background {
+    aspect-ratio: 50 / 61;
+    border-radius: 0 var(--border-radius-default) var(--border-radius-default) 0 ;
+    background: var(--background-emphasis);
+}
+
+.quote-card > .print-settings-side {
+    top: 0;
+    right: 0;
+    position: absolute;
+    aspect-ratio: 50 / 61;
+    border-radius: var(--border-radius-default);
+    box-shadow: var(--shadow-default)
+}
