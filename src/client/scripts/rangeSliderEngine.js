@@ -34,7 +34,11 @@ class RangeSlider {
         this.defaultValue = this.getCssNumberValue('--default-value');
         this.symbol = this.style.getPropertyValue('--symbol').trim() || '';
         this.numberOfDecimalPlaces = this.style.getPropertyValue('--number-of-decimal-places');
-        this.value = formatValuePrecision(this.clamp(this.defaultValue), this.numberOfDecimalPlaces);
+        this.effectiveTrackWidth = this.track.offsetWidth - this.thumb.offsetWidth;
+        this.value = formatValuePrecision(
+            this.clamp(this.defaultValue),
+            this.numberOfDecimalPlaces,
+        );
         this.isDragging = false;
     }
 
@@ -56,6 +60,11 @@ class RangeSlider {
     bindEvents() {
         this.thumb.addEventListener('mousedown', this.handleThumbMouseDown);
         this.track.addEventListener('click', this.handleTrackClick);
+
+        window.addEventListener('resize', () => {
+            this.effectiveTrackWidth = this.track.offsetWidth - this.thumb.offsetWidth;
+            this.updateUi();
+        });
     }
 
     handleThumbMouseDown(e) {
@@ -82,23 +91,34 @@ class RangeSlider {
 
     updateValueFromPosition(cursorPositionX) {
         const rect = this.track.getBoundingClientRect();
-        const offsetX = Math.max(0, Math.min(cursorPositionX - rect.left, rect.width));
-        const filledWidth = offsetX / rect.width;
-        const rawValue = this.minValue + filledWidth * (this.maxValue - this.minValue);
+        const offsetX = Math.max(
+            0,
+            Math.min(
+                cursorPositionX - rect.left,
+                this.effectiveTrackWidth,
+            ),
+        );
+        const ratio = offsetX / this.effectiveTrackWidth;
+        const rawValue = this.minValue + ratio * (this.maxValue - this.minValue);
 
-        this.value = this.value = formatValuePrecision(this.clamp(rawValue), this.numberOfDecimalPlaces);
+        this.value = formatValuePrecision(
+            this.clamp(rawValue),
+            this.numberOfDecimalPlaces,
+        );
         this.updateUi();
     }
 
     updateUi() {
-        const filledWidth = this.getFilledWidth(this.value);
-        this.filled.style.width = `${filledWidth}%`;
+        const ratio = this.getFilledRatio(this.value);
+        const pixelLeft = ratio * this.effectiveTrackWidth;
+
+        this.filled.style.width = `${ratio * 100}%`;
         this.valueLabel.textContent = `${this.value}${this.symbol}`;
-        this.thumb.style.left = `${filledWidth}%`;
+        this.thumb.style.left = `${pixelLeft}px`;
     }
 
-    getFilledWidth(value) {
-        return ((value - this.minValue) / (this.maxValue - this.minValue)) * 100;
+    getFilledRatio(value) {
+        return (value - this.minValue) / (this.maxValue - this.minValue);
     }
 
     clamp(value) {
