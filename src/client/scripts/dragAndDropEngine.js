@@ -1,4 +1,4 @@
-import { preventDefaults, setExclusiveStyleClass } from './domUtils.js';
+import { preventDefaults, setExclusiveStyleClass } from './utils.js';
 
 class DropArea {
     constructor(dropAreaId, fileInputId) {

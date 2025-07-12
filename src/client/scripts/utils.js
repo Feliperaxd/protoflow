@@ -31,3 +31,15 @@ export const setExclusiveStyleClass = (element, classToAdd) => {
     element.className = '';
     element.classList.add(classToAdd);
 };
+
+/**
+ * Formats a value with a fixed number of decimal places.
+ * Always returns a string with trailing zeros preserved.
+ *
+ * @param {number} value - The value to format.
+ * @param {number} [numberOfDecimalPlaces=2] - The number of decimal places to keep.
+ * @returns {string} - The formatted value as a string.
+ */
+export const formatValuePrecision = (value, numberOfDecimalPlaces = 2) => {
+    return value.toFixed(numberOfDecimalPlaces);
+};

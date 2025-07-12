@@ -1,4 +1,4 @@
-import { preventDefaults } from './domUtils.js';
+import { formatValuePrecision, preventDefaults } from './utils.js';
 
 class RangeSlider {
     constructor(sliderId) {
@@ -33,7 +33,8 @@ class RangeSlider {
         this.stepValue = this.getCssNumberValue('--step-value');
         this.defaultValue = this.getCssNumberValue('--default-value');
         this.symbol = this.style.getPropertyValue('--symbol').trim() || '';
-        this.value = this.clamp(this.defaultValue);
+        this.numberOfDecimalPlaces = this.style.getPropertyValue('--number-of-decimal-places');
+        this.value = formatValuePrecision(this.clamp(this.defaultValue), this.numberOfDecimalPlaces);
         this.isDragging = false;
     }
 
@@ -82,21 +83,21 @@ class RangeSlider {
     updateValueFromPosition(cursorPositionX) {
         const rect = this.track.getBoundingClientRect();
         const offsetX = Math.max(0, Math.min(cursorPositionX - rect.left, rect.width));
-        const percent = offsetX / rect.width;
-        const rawValue = this.minValue + percent * (this.maxValue - this.minValue);
+        const filledWidth = offsetX / rect.width;
+        const rawValue = this.minValue + filledWidth * (this.maxValue - this.minValue);
 
-        this.value = this.clamp(rawValue);
+        this.value = this.value = formatValuePrecision(this.clamp(rawValue), this.numberOfDecimalPlaces);
         this.updateUi();
     }
 
     updateUi() {
-        const percent = this.getFilledPercent(this.value);
-        this.filled.style.width = `${percent}%`;
+        const filledWidth = this.getFilledWidth(this.value);
+        this.filled.style.width = `${filledWidth}%`;
         this.valueLabel.textContent = `${this.value}${this.symbol}`;
-        this.thumb.style.left = `${percent}%`;
+        this.thumb.style.left = `${filledWidth}%`;
     }
 
-    getFilledPercent(value) {
+    getFilledWidth(value) {
         return ((value - this.minValue) / (this.maxValue - this.minValue)) * 100;
     }
 
@@ -108,6 +109,3 @@ class RangeSlider {
 }
 
 const infillSlider = new RangeSlider('infill');
-
-
-FAZER ADAPTATIVO PRECISAO

@@ -10,12 +10,12 @@
     --step-value: 0;
     --default-value: 0;
     --symbol: '';
+    --number-of-decimal-places: 2;
 }
 
 .range-slider {
-    width: 300px;
-    aspect-ratio: 55 / 8;
-    background-color: rgb(0, 0, 0);
+    width: 400px;
+    aspect-ratio: 229 / 25;
 }
 
 .range-slider > .title-box {
@@ -23,7 +23,6 @@
     height: 50%;
     display: flex;
     align-items: center;
-    background-color: rgb(0, 0, 0);
 }
 
 .range-slider > .title-box > p,
