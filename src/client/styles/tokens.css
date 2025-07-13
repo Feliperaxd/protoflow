@@ -15,6 +15,13 @@
     --color-warning: #cfc427;
     --color-info: #1468b6;
     --color-disabled: var(--color-gray-700);
+    --color-action-hover: #e0e0e0;
+    --color-action-pressed: #cfcfcf;
+
+    /* ===== Interaction States ===== */
+    --color-hover: var(--color-primary);
+    --color-pressed: var();
+    --scale-hover: 1.2;
 
     /* ===== Backgrounds ===== */
     --background-body: var(--color-gray-900);

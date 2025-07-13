@@ -1,0 +1,13 @@
+@import url(tokens.css);
+
+.color-selector {
+  width: 300px;
+  aspect-ratio: 11 / 4;
+  background-color: brown;
+}
+
+.color-selector > .left-arrow {
+  width: 100px;
+  aspect-ratio: 1 / 1;
+  background-color: black;
+}
