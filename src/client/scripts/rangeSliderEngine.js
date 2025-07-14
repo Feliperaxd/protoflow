@@ -116,8 +116,8 @@ class RangeSlider {
   /**
    * Applies the active style to the thumb and sets the cursor to grabbing.
    *
-   * Toggles the 'active' class on the thumb element and changes the
-   * document body cursor to 'grabbing'.
+   * Toggles the 'active' class on the thumb element and changes the track
+   * and document body cursor to 'grabbing'.
    *
    * @returns {void}
    * @private
@@ -125,13 +125,14 @@ class RangeSlider {
   #applyThumbActiveStyle() {
     this.thumb.classList.toggle('active');
     document.body.style.cursor = 'grabbing';
+    this.track.style.cursor = 'grabbing';
   }
 
   /**
    * Removes the active style from the thumb and resets the cursor.
    *
    * Toggles the 'active' class on the thumb element and resets the
-   * document body cursor to 'default'.
+   * track and document body cursor to 'default'.
    *
    * @returns {void}
    * @private
@@ -139,6 +140,7 @@ class RangeSlider {
   #removeThumbActiveStyle() {
     this.thumb.classList.toggle('active');
     document.body.style.cursor = 'default';
+    this.track.style.cursor = 'pointer';
   }
 
   /**
