@@ -1,4 +1,8 @@
-import { formatValuePrecision, getCssPropertyValue, preventDefaults } from './utils.js';
+import {
+  formatValuePrecision,
+  getCssPropertyValue,
+  preventDefaults,
+} from './utils.js';
 
 class RangeSlider {
   constructor(sliderId) {
@@ -28,8 +32,6 @@ class RangeSlider {
   }
 
   #initProperties() {
-    this.thumbActionScale = getCssPropertyValue(this.slider, '--thumb-action-scale');
-
     this.symbol = this.style.getPropertyValue('--symbol').trim() || '';
     this.minValue = getCssPropertyValue(this.slider, '--min-value');
     this.maxValue = getCssPropertyValue(this.slider, '--max-value');
@@ -65,6 +67,7 @@ class RangeSlider {
   #handleThumbMouseDown(event) {
     preventDefaults(event);
     this.isDragging = true;
+    this.#applyThumbActiveStyle();
 
     const handleDrag = e => this.#handleDrag(e);
     const handleStopDrag = () => {
@@ -105,10 +108,46 @@ class RangeSlider {
    */
   #handleStopDrag() {
     this.isDragging = false;
+    this.#removeThumbActiveStyle();
   }
 
   // === Other private methods ===
 
+  /**
+   * Applies the active style to the thumb and sets the cursor to grabbing.
+   *
+   * Toggles the 'active' class on the thumb element and changes the
+   * document body cursor to 'grabbing'.
+   *
+   * @returns {void}
+   * @private
+   */
+  #applyThumbActiveStyle() {
+    this.thumb.classList.toggle('active');
+    document.body.style.cursor = 'grabbing';
+  }
+
+  /**
+   * Removes the active style from the thumb and resets the cursor.
+   *
+   * Toggles the 'active' class on the thumb element and resets the
+   * document body cursor to 'default'.
+   *
+   * @returns {void}
+   * @private
+   */
+  #removeThumbActiveStyle() {
+    this.thumb.classList.toggle('active');
+    document.body.style.cursor = 'default';
+  }
+
+  /**
+   * Updates the slider value based on the cursor's X position.
+   *
+   * @param {number} cursorPositionX - The X position of the cursor relative to the page.
+   * @returns {void}
+   * @private
+   */
   #updateValueFromPosition(cursorPositionX) {
     const rect = this.track.getBoundingClientRect();
     const offsetX = Math.max(
@@ -124,6 +163,14 @@ class RangeSlider {
     this.changeValue(rawValue);
   }
 
+  /**
+   * Updates the UI elements of the slider based on the current value.
+   *
+   * Sets the filled bar width, value label, and thumb position.
+   *
+   * @returns {void}
+   * @private
+   */
   #updateUi() {
     const ratio = this.#getFilledRatio(this.value);
     const pixelLeft = ratio * this.effectiveTrackWidth;
@@ -133,10 +180,24 @@ class RangeSlider {
     this.thumb.style.left = `${pixelLeft}px`;
   }
 
+  /**
+   * Calculates the ratio (between 0 and 1) of the filled track based on the value.
+   *
+   * @param {number} value - The current slider value.
+   * @returns {number} The filled ratio from 0 to 1.
+   * @private
+   */
   #getFilledRatio(value) {
     return (value - this.minValue) / (this.maxValue - this.minValue);
   }
 
+  /**
+   * Clamps a given value to the allowed range and rounds it to the nearest step.
+   *
+   * @param {number|string} value - The value to clamp.
+   * @returns {number} The clamped and stepped value.
+   * @private
+   */
   #clamp(value) {
     const numericValue = Number(value);
     if (Number.isNaN(numericValue)) {
@@ -178,4 +239,3 @@ class RangeSlider {
 }
 
 const infillSlider = new RangeSlider('infill');
-infillSlider.changeValue(infillSlider.defaultValue);

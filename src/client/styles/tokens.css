@@ -70,5 +70,6 @@
 
 
     /* ===== Transitions ===== */
+    --transition-fast: all 0.1s ease;
     --transition-default: all 0.3s ease;
 }

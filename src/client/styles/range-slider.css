@@ -2,86 +2,104 @@
 
 /* Root variables */
 :root {
-    --track-width: 80%;
-    --track-height: 10%;
-    --thumb-diameter: 500%;
-    --thumb-action-scale: var(--scale-hover);
+  --track-width: 80%;
+  --track-height: 10%;
+  --thumb-diameter: 500%;
+  --thumb-action-scale: var(--scale-hover);
 
-    --symbol: '';
-    --min-value: 0;
-    --max-value: 100;
-    --step-value: 0;
-    --default-value: 0;
-    --number-of-decimal-places: 2;
+  --symbol: '';
+  --min-value: 0;
+  --max-value: 100;
+  --step-value: 0;
+  --default-value: 0;
+  --number-of-decimal-places: 2;
 }
 
 /* Main slider container */
 .range-slider {
-    width: 300px;
-    aspect-ratio: 229 / 25;
+  width: 330px;
+  aspect-ratio: 229 / 25;
 }
 
 /* Title box - alignment and size */
 .range-slider > .title-box {
-    width: 100%;
-    height: 50%;
-    display: flex;
-    align-items: center;
+  width: 100%;
+  height: 50%;
+
+  display: flex;
+  align-items: center;
 }
 
 /* Shared styles for title and value text */
-.range-slider > .title-box > p,
-.range-slider > .range-box > p {
-    color: var(--color-text-primary);
-    font-family: var(--font-family-base);
-    letter-spacing: var(--letter-spacing-default);
+.range-slider > .title-box > .title,
+.range-slider > .range-box > .value-label {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-base);
+  letter-spacing: var(--letter-spacing-default);
 }
 
 /* Title text */
-.range-slider > .title-box > p {
-    font-size: var(--font-size-sm);
+.range-slider > .title-box > .title {
+  font-size: var(--font-size-sm);
 }
 
 /* Value text */
-.range-slider > .range-box > p {
-    font-size: var(--font-size-xs);
+.range-slider > .range-box > .value-label {
+  font-size: var(--font-size-xs);
 }
 
 /* Range box - alignment, spacing, and position */
 .range-slider > .range-box {
-    width: 100%;
-    height: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
+  width: 100%;
+  height: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* Track element - size, position, and style */
 .range-slider > .range-box > .track {
-    width: 79%;
-    height: var(--track-height);
-    position: relative;
-    cursor: pointer;
-    border-radius: 1em;
-    background-color: var(--color-disabled);
+  width: 79%;
+  height: var(--track-height);
+  margin-top: 0.8%;
+  border-radius: 1em;
+
+  display: flex;
+  align-items: center;
+
+  cursor: pointer;
+  background-color: var(--color-disabled);
 }
 
 /* Thumb (handle) - size, shape, positioning, and style */
 .range-slider > .range-box > .track > .thumb {
-    height: var(--thumb-diameter);
-    aspect-ratio: 1 / 1;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    border-radius: 50%;
-    cursor: pointer;
-    background-color: var(--background-surface);
+  height: var(--thumb-diameter);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+
+  transition: var(--transition-fast);
+  background-color: var(--background-surface);
+}
+
+.range-slider > .range-box > .track > .thumb:hover,
+.range-slider > .range-box > .track > .thumb.active {
+  scale: var(--scale-hover);
+}
+
+.range-slider > .range-box > .track > .thumb:hover{
+  cursor: grab;
+}
+
+.range-slider > .range-box > .track > .thumb.active {
+  cursor: grabbing;
 }
 
 /* Filled portion of the track - height, rounded corners, and color */
 .range-slider > .range-box > .track > .filled {
-    height: 100%;
-    border-radius: 1em 0 0 1em;
-    background: var(--background-emphasis);
+  height: 100%;
+  border-radius: 1em 0 0 1em;
+
+  transition: var(--transition-fast);
+  background: var(--background-emphasis);
 }
