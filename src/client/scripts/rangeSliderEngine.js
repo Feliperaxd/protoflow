@@ -4,7 +4,7 @@ import {
   preventDefaults,
 } from './utils.js';
 
-class RangeSlider {
+export default class RangeSlider {
   constructor(sliderId) {
     this.slider = document.getElementById(sliderId);
     if (!this.slider) {
@@ -239,5 +239,3 @@ class RangeSlider {
     );
   }
 }
-
-const infillSlider = new RangeSlider('infill');

@@ -1,3 +1,9 @@
-import DropArea from './dragAndDropEngine.js';
+import RangeSlider from './rangeSliderEngine.js';
+import ResponsiveText from './responsiveText.js';
 
-const dropArea = new DropArea('drag-drop-area', 'file-input');
+const infillSlider = new RangeSlider('infill');
+const responsiveText = new ResponsiveText('responsive-text', '--font-scale');
+responsiveText.resizeAllTextElements(responsiveText.getResponsiveTextElements());
+window.addEventListener('resize', () => {
+  responsiveText.resizeAllTextElements(responsiveText.getResponsiveTextElements());
+});

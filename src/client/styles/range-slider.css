@@ -39,13 +39,13 @@
 }
 
 /* Title text */
-.range-slider > .title-box > .title {
-  font-size: var(--font-size-sm);
+.range-slider > .title-box > .title[responsive-text] {
+  --font-scale: 20
 }
 
 /* Value text */
-.range-slider > .range-box > .value-label {
-  font-size: var(--font-size-xs);
+.range-slider > .range-box > .value-label[responsive-text] {
+  --font-scale: 25
 }
 
 /* Range box - alignment, spacing, and position */

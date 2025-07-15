@@ -65,22 +65,3 @@ export const switchStyleClass = (element, classToRemove, classToAdd) => {
   element.classList.remove(classToRemove);
   element.classList.add(classToAdd);
 };
-
-export function applyResponsiveFontsByAttribute(attr = 'data-responsive-font', cssVar = '--font-scale') {
-  const elements = document.querySelectorAll(`[${attr}]`);
-
-  const updateFontSizes = () => {
-    elements.forEach(el => {
-      const computedStyle = getComputedStyle(el);
-      const scale = parseFloat(computedStyle.getPropertyValue(cssVar));
-      if (!isNaN(scale) && scale > 0) {
-        const baseWidth = el.parentElement.offsetWidth;
-        const size = baseWidth / scale;
-        el.style.setProperty('--font-size', `${size}px`);
-      }
-    });
-  };
-
-  window.addEventListener('resize', updateFontSizes);
-  updateFontSizes();
-}
