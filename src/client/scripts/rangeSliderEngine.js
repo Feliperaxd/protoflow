@@ -4,7 +4,18 @@ import {
   preventDefaults,
 } from './utils.js';
 
+/**
+ * RangeSlider class to create a customizable slider input component.
+ */
 export default class RangeSlider {
+  /** @type {() => void} */
+  #onResize;
+
+  /**
+   * Creates a RangeSlider instance.
+   * @param {string} sliderId - The ID of the slider element.
+   * @throws {Error} Throws if the slider element is not found.
+   */
   constructor(sliderId) {
     this.slider = document.getElementById(sliderId);
     if (!this.slider) {
@@ -14,11 +25,47 @@ export default class RangeSlider {
     this.style = getComputedStyle(this.slider);
     this.#initElements();
     this.#initProperties();
+
+    this.#onResize = this.#handleResize.bind(this);
     this.#bindEvents();
+
     this.changeValue(this.defaultValue);
   }
 
-  // === Private methods ===
+  // === Public Methods ===
+
+  /**
+   * Change the slider's value and update the UI.
+   * @param {number} value - The new value to set.
+   */
+  changeValue(value) {
+    this.value = formatValuePrecision(
+      this.#clamp(value),
+      this.numberOfDecimalPlaces,
+    );
+    this.#updateUi();
+  }
+
+  /**
+   * Get the current slider value formatted with decimals.
+   * @returns {string} The formatted value.
+   */
+  getValue() {
+    return formatValuePrecision(
+      this.#clamp(this.value),
+      this.numberOfDecimalPlaces,
+    );
+  }
+
+  /**
+   * Clean up event listeners.
+   */
+  destroy() {
+    window.removeEventListener('resize', this.#onResize);
+  }
+
+  // === Private Methods ===
+
   #initElements() {
     this.title = this.slider.querySelector('.title');
     this.track = this.slider.querySelector('.track');
@@ -47,23 +94,16 @@ export default class RangeSlider {
   }
 
   #bindEvents() {
-    this.thumb.addEventListener('mousedown', event => this.#handleThumbMouseDown(event));
-    this.track.addEventListener('click', event => this.#handleTrackClick(event));
-
-    window.addEventListener('resize', () => {
-      this.effectiveTrackWidth = this.track.offsetWidth - this.thumb.offsetWidth;
-      this.#updateUi();
-    });
+    this.thumb.addEventListener('mousedown', e => this.#handleThumbMouseDown(e));
+    this.track.addEventListener('click', e => this.#handleTrackClick(e));
+    window.addEventListener('resize', this.#onResize);
   }
 
-  // === Private Event Callbacks ===
+  #handleResize() {
+    this.effectiveTrackWidth = this.track.offsetWidth - this.thumb.offsetWidth;
+    this.#updateUi();
+  }
 
-  /**
-   * Handles mouse down event on the thumb.
-   *
-   * @param {MouseEvent} event - The mouse down event.
-   * @returns {void}
-   */
   #handleThumbMouseDown(event) {
     preventDefaults(event);
     this.isDragging = true;
@@ -80,76 +120,32 @@ export default class RangeSlider {
     window.addEventListener('mouseup', handleStopDrag);
   }
 
-  /**
-   * Handles click event on the track.
-   *
-   * @param {MouseEvent} event - The click event.
-   * @returns {void}
-   */
   #handleTrackClick(event) {
     this.#updateValueFromPosition(event.clientX);
   }
 
-  /**
-   * Handles mouse move event during dragging.
-   *
-   * @param {MouseEvent} event - The mouse move event.
-   * @returns {void}
-   */
   #handleDrag(event) {
     if (!this.isDragging) return;
     this.#updateValueFromPosition(event.clientX);
   }
 
-  /**
-   * Handles mouse up event to stop dragging.
-   *
-   * @returns {void}
-   */
   #handleStopDrag() {
     this.isDragging = false;
     this.#removeThumbActiveStyle();
   }
 
-  // === Other private methods ===
-
-  /**
-   * Applies the active style to the thumb and sets the cursor to grabbing.
-   *
-   * Toggles the 'active' class on the thumb element and changes the track
-   * and document body cursor to 'grabbing'.
-   *
-   * @returns {void}
-   * @private
-   */
   #applyThumbActiveStyle() {
     this.thumb.classList.toggle('active');
     document.body.style.cursor = 'grabbing';
     this.track.style.cursor = 'grabbing';
   }
 
-  /**
-   * Removes the active style from the thumb and resets the cursor.
-   *
-   * Toggles the 'active' class on the thumb element and resets the
-   * track and document body cursor to 'default'.
-   *
-   * @returns {void}
-   * @private
-   */
   #removeThumbActiveStyle() {
     this.thumb.classList.toggle('active');
     document.body.style.cursor = 'default';
     this.track.style.cursor = 'pointer';
   }
 
-  /**
-   * Updates the slider value based on the cursor's X position.
-   *
-   * @param {number} cursorPositionX - The X position of the cursor relative to the page.
-   * @returns {void}
-   * @private
-   */
   #updateValueFromPosition(cursorPositionX) {
     const rect = this.track.getBoundingClientRect();
     const offsetX = Math.max(
@@ -165,14 +161,6 @@ export default class RangeSlider {
     this.changeValue(rawValue);
   }
 
-  /**
-   * Updates the UI elements of the slider based on the current value.
-   *
-   * Sets the filled bar width, value label, and thumb position.
-   *
-   * @returns {void}
-   * @private
-   */
   #updateUi() {
     const ratio = this.#getFilledRatio(this.value);
     const pixelLeft = ratio * this.effectiveTrackWidth;
@@ -182,24 +170,10 @@ export default class RangeSlider {
     this.thumb.style.left = `${pixelLeft}px`;
   }
 
-  /**
-   * Calculates the ratio (between 0 and 1) of the filled track based on the value.
-   *
-   * @param {number} value - The current slider value.
-   * @returns {number} The filled ratio from 0 to 1.
-   * @private
-   */
   #getFilledRatio(value) {
     return (value - this.minValue) / (this.maxValue - this.minValue);
   }
 
-  /**
-   * Clamps a given value to the allowed range and rounds it to the nearest step.
-   *
-   * @param {number|string} value - The value to clamp.
-   * @returns {number} The clamped and stepped value.
-   * @private
-   */
   #clamp(value) {
     const numericValue = Number(value);
     if (Number.isNaN(numericValue)) {
@@ -209,33 +183,5 @@ export default class RangeSlider {
     const clamped = Math.min(Math.max(numericValue, this.minValue), this.maxValue);
     const steps = Math.round((clamped - this.minValue) / this.stepValue);
     return this.minValue + steps * this.stepValue;
-  }
-
-  // === Public methods ===
-
-  /**
-   * Changes the slider value and updates the UI.
-   *
-   * @param {number} value - The new value to set.
-   * @returns {void}
-   */
-  changeValue(value) {
-    this.value = formatValuePrecision(
-      this.#clamp(value),
-      this.numberOfDecimalPlaces,
-    );
-    this.#updateUi();
-  }
-
-  /**
-   * Gets the current slider value formatted with decimal places.
-   *
-   * @returns {string} - The formatted slider value.
-   */
-  getValue() {
-    return formatValuePrecision(
-      this.#clamp(this.value),
-      this.numberOfDecimalPlaces,
-    );
   }
 }

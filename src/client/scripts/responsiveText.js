@@ -1,160 +1,130 @@
 /**
- * ResponsiveText - Class for creating responsive text elements that scale based on parent width
- * @class
+ * ResponsiveText - Dynamically resizes text based on parent element size.
  */
 export default class ResponsiveText {
-  /**
-   * Creates a ResponsiveText instance
-   * @param {string} attribute - HTML attribute to identify responsive elements (e.g., 'data-responsive-text')
-   * @param {string} cssVar - CSS variable containing the scale value (e.g., '--text-scale')
-   * @param {Object} [options={}] - Configuration options
-   * @param {string} [options.unit='px'] - Font size unit (px, rem, em)
-   * @param {number} [options.minSize=null] - Minimum font size
-   * @param {number} [options.maxSize=null] - Maximum font size
-   * @param {number} [options.debounceDelay=100] - Resize event debounce delay in ms
-   * @param {Object} [options.breakpoints=null] - Breakpoints for different scales
-   * @param {boolean} [options.observeDOM=false] - Whether to observe DOM changes
-   */
-  constructor(attribute, cssVar, options = {}) {
-    this.attribute = attribute;
-    this.cssVar = cssVar;
+  /** @type {() => void} */
+  #onResize;
 
-    this.options = {
-      unit: 'px',
-      minSize: null,
-      maxSize: null,
-      debounceDelay: 100,
-      breakpoints: null,
-      observeDOM: false,
-      ...options,
-    };
+  /**
+   * @param {string} attribute - Attribute or selector to target responsive elements.
+   * @param {string} ratioVar - CSS variable that holds the font-size ratio.
+   * @param {string} [unit='px'] - Font size unit (e.g., px, rem, em).
+   * @param {number} [debounceDelay=100] - Delay in milliseconds for debouncing resize events.
+   * @param {boolean} [observeDOM=false] - Whether to observe DOM mutations.
+   * @param {string} [baseDimension='width'] - Base dimension used to calculate font size
+   *  ('width' or 'height').
+   */
+  constructor(
+    attribute,
+    ratioVar,
+    unit = 'px',
+    debounceDelay = 100,
+    observeDOM = false,
+    baseDimension = 'width',
+  ) {
+    if (typeof attribute !== 'string' || !attribute) {
+      throw new Error('Attribute must be a non-empty string');
+    }
+
+    if (typeof ratioVar !== 'string' || !ratioVar) {
+      throw new Error('Ratio CSS variable name must be a non-empty string');
+    }
+
+    this.attribute = attribute;
+    this.ratioVar = ratioVar;
+    this.unit = unit;
+    this.debounceDelay = debounceDelay;
+    this.observeDOM = observeDOM;
+    this.baseDimension = ['width', 'height'].includes(baseDimension)
+      ? baseDimension
+      : 'width';
 
     this.elements = [];
     this.debounceTimer = null;
     this.observer = null;
 
-    this.handleResize = this.handleResize.bind(this);
-    this.updateElements = this.updateElements.bind(this);
+    this.#onResize = this.#handleResize.bind(this);
   }
 
+  // === Public Methods ===
+
   /**
-   * Initializes the ResponsiveText instance
-   * @returns {ResponsiveText} The instance for method chaining
+   * Initializes listeners and resizes elements.
+   * @returns {ResponsiveText}
    */
   init() {
     this.updateElements();
-    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('resize', this.#onResize);
 
-    if (this.options.observeDOM) {
-      this.observeDOMChanges();
+    if (this.observeDOM) {
+      this.#observeDOM();
     }
 
     return this;
   }
 
   /**
-   * Cleans up event listeners and observers
+   * Cleans up listeners and observers.
    * @returns {void}
    */
   destroy() {
-    window.removeEventListener('resize', this.handleResize);
-    this.stopObserving();
+    window.removeEventListener('resize', this.#onResize);
+    this.#stopObserving();
     this.elements = [];
   }
 
   /**
-   * Updates the list of responsive elements and resizes them
+   * Finds and resizes all responsive elements.
    * @returns {void}
    */
   updateElements() {
-    this.elements = this.getResponsiveTextElements();
-    this.resizeAllTextElements();
+    this.elements = this.#getResponsiveElements();
+    this.#resizeAll();
   }
 
-  /**
-   * Gets all elements with the responsive attribute
-   * @returns {NodeList} List of responsive elements
-   */
-  getResponsiveTextElements() {
-    return document.querySelectorAll(`${this.attribute}, [${this.attribute}="true"]`);
-  }
+  // === Private Methods ===
 
-  /**
-   * Handles window resize events with debouncing
-   * @returns {void}
-   */
-  handleResize() {
+  #handleResize() {
     clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
-      this.resizeAllTextElements();
-    }, this.options.debounceDelay);
+      this.#resizeAll();
+    }, this.debounceDelay);
   }
 
-  /**
-   * Resizes all registered responsive elements
-   * @returns {void}
-   */
-  resizeAllTextElements() {
-    this.elements.forEach((element) => {
-      this.resizeTextElement(element);
-    });
+  #getResponsiveElements() {
+    return document.querySelectorAll(`${this.attribute}, [${this.attribute}]`);
   }
 
-  /**
-   * Calculates the current scale considering breakpoints
-   * @param {HTMLElement} element - The element to calculate scale for
-   * @returns {number} The calculated scale value
-   */
-  getCurrentScale(element) {
-    let scale = parseFloat(getComputedStyle(element).getPropertyValue(this.cssVar));
-
-    if (this.options.breakpoints) {
-      const windowWidth = window.innerWidth;
-      const sortedBreakpoints = Object.keys(this.options.breakpoints)
-        .map(Number)
-        .sort((a, b) => b - a);
-
-      for (const breakpoint of sortedBreakpoints) {
-        if (windowWidth <= breakpoint) {
-          scale = this.options.breakpoints[breakpoint];
-          break;
-        }
-      }
-    }
-
-    return scale;
+  #resizeAll() {
+    this.elements.forEach(el => this.#resizeOne(el));
   }
 
-  /**
-   * Resizes a single element based on parent width and scale
-   * @param {HTMLElement} element - The element to resize
-   * @returns {void}
-   */
-  resizeTextElement(element) {
-    const scale = this.getCurrentScale(element);
+  #getBaseDimension(element) {
+    const parent = element.parentElement;
+    return this.baseDimension === 'height'
+      ? parent.offsetHeight
+      : parent.offsetWidth;
+  }
 
-    if (!Number.isNaN(scale) && scale > 0) {
-      const baseWidth = element.parentElement.offsetWidth;
-      let fontSize = baseWidth / scale;
+  #getSizeRatio(element) {
+    return parseFloat(getComputedStyle(element).getPropertyValue(this.ratioVar));
+  }
 
-      if (this.options.minSize !== null) {
-        fontSize = Math.max(fontSize, this.options.minSize);
-      }
-      if (this.options.maxSize !== null) {
-        fontSize = Math.min(fontSize, this.options.maxSize);
-      }
+  #resizeOne(element) {
+    const ratio = this.#getSizeRatio(element);
+    const base = this.#getBaseDimension(element);
 
-      element.style.fontSize = `${fontSize}${this.options.unit}`;
+    if (!Number.isNaN(ratio) && ratio > 0) {
+      const fontSize = base / ratio;
+
+      // eslint-disable-next-line no-param-reassign
+      element.style.fontSize = `${fontSize}${this.unit}`;
     }
   }
 
-  /**
-   * Sets up MutationObserver to watch for DOM changes
-   * @returns {void}
-   */
-  observeDOMChanges() {
-    this.observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+  #observeDOM() {
+    this.observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         if (mutation.addedNodes.length) {
           this.updateElements();
         }
@@ -167,11 +137,7 @@ export default class ResponsiveText {
     });
   }
 
-  /**
-   * Stops observing DOM changes
-   * @returns {void}
-   */
-  stopObserving() {
+  #stopObserving() {
     if (this.observer) {
       this.observer.disconnect();
       this.observer = null;

@@ -40,12 +40,12 @@
 
 /* Title text */
 .range-slider > .title-box > .title[responsive-text] {
-  --font-scale: 20
+  --responsive-text-ratio: 20
 }
 
 /* Value text */
 .range-slider > .range-box > .value-label[responsive-text] {
-  --font-scale: 25
+  --responsive-text-ratio: 25
 }
 
 /* Range box - alignment, spacing, and position */
