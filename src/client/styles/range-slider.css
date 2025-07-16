@@ -45,7 +45,7 @@
 
 /* Value text */
 .range-slider > .range-box > .value-label[responsive-text] {
-  --responsive-text-ratio: 25
+  --responsive-text-ratio: 26
 }
 
 /* Range box - alignment, spacing, and position */
@@ -62,7 +62,7 @@
 .range-slider > .range-box > .track {
   width: 79%;
   height: var(--track-height);
-  margin-top: 0.8%;
+  margin-top: 0.7%;
   border-radius: 1em;
 
   display: flex;

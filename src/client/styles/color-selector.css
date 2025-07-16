@@ -13,8 +13,8 @@
 
 .color-selector > .left-arrow,
 .color-selector > .right-arrow {
-  width: 20%;
-  aspect-ratio: 3 / 4.2;
+  width: 500%;
+  aspect-ratio: 3 / 4.58;
   background-color: black;
 }
 .color-selector > .right-arrow {

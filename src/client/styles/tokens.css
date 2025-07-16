@@ -45,7 +45,7 @@
     --color-text-disabled: var(--color-disabled);
 
     --font-family-base: 'K2D', 'Poppins', sans-serif;
-    --letter-spacing-default: 0.1em;
+    --letter-spacing-default: 0.15em;
 
     --font-size-xs: clamp(0.75rem, 1vw, 0.875rem);
     --font-size-sm: clamp(0.875rem, 1.2vw, 1rem);
