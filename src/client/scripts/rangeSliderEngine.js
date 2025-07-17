@@ -13,16 +13,26 @@ export default class RangeSlider {
 
   /**
    * Creates a RangeSlider instance.
-   * @param {string} sliderId - The ID of the slider element.
+   * @param {string} mainElementID - The ID of the slider element.
    * @throws {Error} Throws if the slider element is not found.
    */
-  constructor(sliderId) {
-    this.slider = document.getElementById(sliderId);
-    if (!this.slider) {
-      throw new Error(`Slider element with id "${sliderId}" not found`);
+  constructor(mainElementID) {
+    this.mainElement = document.getElementById(mainElementID);
+    if (!this.mainElement) {
+      throw new Error(`Slider element with id "${mainElementID}" not found`);
     }
 
-    this.style = getComputedStyle(this.slider);
+    // Define os elementos obrigatórios aqui no construtor
+    this.requiredElements = [
+      { selector: '.title', name: 'title' },
+      { selector: '.track', name: 'track' },
+      { selector: '.thumb', name: 'thumb' },
+      { selector: '.filled', name: 'filled' },
+      { selector: '.value-label', name: 'value label' },
+    ];
+
+    this.style = getComputedStyle(this.mainElement);
+    this.#checkRequiredElements();
     this.#initElements();
     this.#initProperties();
 
@@ -66,24 +76,35 @@ export default class RangeSlider {
 
   // === Private Methods ===
 
-  #initElements() {
-    this.title = this.slider.querySelector('.title');
-    this.track = this.slider.querySelector('.track');
-    this.filled = this.slider.querySelector('.filled');
-    this.thumb = this.slider.querySelector('.thumb');
-    this.valueLabel = this.slider.querySelector('.value-label');
+  #checkRequiredElements() {
+    const missingElements = this.requiredElements
+      .map(({ selector, name }) => ({
+        name,
+        element: this.mainElement.querySelector(selector),
+      }))
+      .filter(item => !item.element);
 
-    if (!this.track || !this.thumb) {
-      throw new Error('Required slider elements not found');
+    if (missingElements.length > 0) {
+      throw new Error(`Required slider elements not found: ${
+        missingElements.map(item => item.name).join(', ')
+      }`);
     }
+  }
+
+  #initElements() {
+    this.title = this.mainElement.querySelector('.title');
+    this.track = this.mainElement.querySelector('.track');
+    this.thumb = this.mainElement.querySelector('.thumb');
+    this.filled = this.mainElement.querySelector('.filled');
+    this.valueLabel = this.mainElement.querySelector('.value-label');
   }
 
   #initProperties() {
     this.symbol = this.style.getPropertyValue('--symbol').trim() || '';
-    this.minValue = getCssPropertyValue(this.slider, '--min-value');
-    this.maxValue = getCssPropertyValue(this.slider, '--max-value');
-    this.stepValue = getCssPropertyValue(this.slider, '--step-value');
-    this.defaultValue = getCssPropertyValue(this.slider, '--default-value');
+    this.minValue = getCssPropertyValue(this.mainElement, '--min-value');
+    this.maxValue = getCssPropertyValue(this.mainElement, '--max-value');
+    this.stepValue = getCssPropertyValue(this.mainElement, '--step-value');
+    this.defaultValue = getCssPropertyValue(this.mainElement, '--default-value');
     this.numberOfDecimalPlaces = Number(
       this.style.getPropertyValue('--number-of-decimal-places'),
     ) || 2;

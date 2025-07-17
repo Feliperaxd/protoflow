@@ -65,3 +65,13 @@ export const switchStyleClass = (element, classToRemove, classToAdd) => {
   element.classList.remove(classToRemove);
   element.classList.add(classToAdd);
 };
+
+/**
+ * Fetches the text content from a given URL.
+ *
+ * @param {string} url - The URL to fetch the text content from.
+ * @returns {Promise<string>} A promise that resolves to the fetched text content.
+ */
+export async function getTextContent(url) {
+  return fetch(url).then(res => res.text());
+}

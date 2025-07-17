@@ -1,17 +1,17 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--background-body);
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--color-background-primary-default);
 }
 
 .container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

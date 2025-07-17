@@ -33,7 +33,7 @@
 /* Shared styles for title and value text */
 .range-slider > .title-box > .title,
 .range-slider > .range-box > .value-label {
-  color: var(--color-text-primary);
+  color: var(--color-text-primary-default);
   font-family: var(--font-family-base);
   letter-spacing: var(--letter-spacing-default);
 }
@@ -79,12 +79,12 @@
   border-radius: 50%;
 
   transition: var(--transition-fast);
-  background-color: var(--background-surface);
+  background-color: var(--color-background-secondary-default);
 }
 
 .range-slider > .range-box > .track > .thumb:hover,
 .range-slider > .range-box > .track > .thumb.active {
-  scale: var(--scale-hover);
+  scale: var(--scale-icon-button-hover);
 }
 
 .range-slider > .range-box > .track > .thumb:hover{
@@ -101,5 +101,5 @@
   border-radius: 1em 0 0 1em;
 
   transition: var(--transition-fast);
-  background: var(--background-emphasis);
+  background: var(--color-background-primary-emphasis);
 }

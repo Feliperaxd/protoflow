@@ -1,7 +1,7 @@
 @import url(tokens.css);
 
 .glassmorphism-smoke {
-    background: var(--glassmorphism-background-smoke);;
+    background: var(--gradient-background-glassmorphism-smoke);;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
