@@ -65,7 +65,7 @@
 
     /* ===== Shadows ===== */
     --shadow-default: -8px 8px 12px rgba(0, 0, 0, 0.6);
-    --shadow-md: #000;
+    --shadow-strong:  -8px 8px 12px rgba(0, 0, 0, 1);
     --shadow-lg: #000;
 
 

@@ -1,22 +1,61 @@
 @import url(tokens.css);
 
 .color-selector {
-  width: 300px;
-  aspect-ratio: 11 / 4;
+  width: 330px;
+  aspect-ratio: 2.97 / 1;
 
   display: flex;
   align-items: center;
+  justify-content: center;
 
   background-color: brown;
 }
 
-
 .color-selector > .left-arrow,
 .color-selector > .right-arrow {
-  width: 500%;
-  aspect-ratio: 3 / 4.58;
+  width: 10%;
+  aspect-ratio: 0.59 / 1;
   background-color: black;
 }
-.color-selector > .right-arrow {
+.color-selector > .left-arrow {
   transform: rotateY(180deg);
+}
+
+.color-selector > .carousel {
+  width: 80%;
+  aspect-ratio: 2.376 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  background-color: aqua;
+}
+
+.color-selector > .carousel .color-circle:nth-child(1),
+.color-selector > .carousel .color-circle:nth-child(2),
+.color-selector > .carousel .color-circle:nth-child(3) {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  filter: drop-shadow(var(--shadow-strong));
+}
+
+.color-selector > .carousel .color-circle:nth-child(2) {
+  width: 35%;
+}
+
+.color-selector > .carousel .color-circle:nth-child(1),
+.color-selector > .carousel .color-circle:nth-child(3) {
+  width: 20%;
+}
+
+.color-selector > .carousel .color-circle:nth-child(1) {
+  background-color: blue;
+}
+
+.color-selector > .carousel .color-circle:nth-child(2) {
+  background-color: red;
+}
+
+.color-selector > .carousel .color-circle:nth-child(3) {
+  background-color: green;
 }
