@@ -7,7 +7,7 @@
 body {
   width: 100vw;
   height: 100vh;
-  background-color: var(--color-background-primary-default);
+  background-color: var(--color-background-secondary-default);
 }
 
 .container {

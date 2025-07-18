@@ -7,7 +7,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgb(190, 135, 135);
 }
 
 .color-selector > .left-arrow,
@@ -37,26 +36,52 @@
   aspect-ratio: 2.376 / 1;
 
   overflow: hidden;
-  position: relative;
+  display: flex;
+}
+
+.color-selector > .carousel > .track {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  will-change: transform;
+  transition: var(--transition-default);
+}
+
+.color-selector > .carousel > .track:has(:only-child) {
+  justify-content: center;
+}
+
+.color-selector > .carousel > .track:has(:nth-child(2)) {
+  justify-content: flex-end;
+}
+
+.color-selector > .carousel > .track:has(:nth-child(3)) {
+  justify-content: flex-start;
+}
+
+.color-selector > .carousel > .track .wrapper {
+  height: 100%;
+  width: 33.33%;
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
-
-  background-color: aquamarine;
+  justify-content: center;
 }
 
-.color-selector > .carousel .color-circle {
-  width: 20%;
+.color-selector > .carousel > .track .wrapper > .color-circle {
+  width: 50%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   background-color: var(--color);
+  transition: var(--transition-default);
   filter: drop-shadow(var(--shadow-strong));
-
-  position: absolute;
 }
 
-.color-selector > .carousel .color-circle.active {
+.color-selector > .carousel > .track .wrapper > .hidden-color {
+  transform: scale(var(--scale-hidden));
+}
+
+.color-selector > .carousel > .track .wrapper > .selected-color {
   transform: scale(var(--scale-selected));
-  z-index: 1;
 }
-
