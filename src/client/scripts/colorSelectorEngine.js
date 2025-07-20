@@ -1,4 +1,4 @@
-import { getTextContent } from './utils.js';
+import { setExclusiveStyleClass, loadTemplateAsElement } from './utils.js';
 
 class ColorSelector {
   constructor(mainElementID) {
@@ -7,9 +7,9 @@ class ColorSelector {
       throw new Error(`Slider element with id "${mainElementID}" not found`);
     }
 
-    this.selectedColor = null;
     this.allColors = [];
     this.isSliding = false;
+    this.selectedColorIndex = null;
 
     this.requiredElements = [
       { selector: '.carousel', name: 'carousel' },
@@ -17,43 +17,45 @@ class ColorSelector {
       { selector: '.left-arrow', name: 'left arrow' },
       { selector: '.right-arrow', name: 'right arrow' },
     ];
+  }
 
+  // === Public Methods ===
+
+  async init() {
+    this.colorCircleTemplate = await loadTemplateAsElement(
+      '../templates/color-circle.html',
+      'div',
+    );
     this.#checkRequiredElements();
     this.#initElements();
     this.#bindEvents();
   }
 
-  // === Public Methods ===
+  addColor(id, name, hexCode) {
+    const colorCircleTemplateClone = this.colorCircleTemplate.cloneNode(true);
+    const colorCircleElement = colorCircleTemplateClone.firstElementChild;
+    colorCircleElement.style.setProperty('--color', hexCode);
 
-  async addColor(id, name, hexCode) {
-    const temp = document.createElement('div');
-    temp.innerHTML = (await getTextContent('../templates/color-circle.html')).trim();
-
-    const wrapper = temp.firstElementChild;
-    const colorCircle = wrapper.querySelector('.color-circle');
-
-    colorCircle.style.setProperty('--color', hexCode);
-
-    this.carouselTrack.appendChild(wrapper);
+    this.carouselTrack.appendChild(colorCircleTemplateClone);
     this.allColors.push({
       id,
       name,
       hexCode,
-      element: colorCircle,
+      element: colorCircleElement,
     });
 
     this.#selectColorByIndex(
       this.#getDefaultColorIndex(),
     );
+    this.#setColorsClasses();
   }
 
   slideLeft() {
     if (this.isSliding) return;
 
     if (this.#selectLeftColor()) {
-      const stepOffset = this.#getStepOffset();
-      const currentOffset = this.#getCurrentOffset();
-      this.carouselTrack.style.transform = `translateX(${currentOffset + stepOffset}px)`;
+      this.#setColorsClasses();
+      this.#updateTrackPosition();
       this.isSliding = true;
     }
   }
@@ -62,9 +64,8 @@ class ColorSelector {
     if (this.isSliding) return;
 
     if (this.#selectRightColor()) {
-      const stepOffset = this.#getStepOffset();
-      const currentOffset = this.#getCurrentOffset();
-      this.carouselTrack.style.transform = `translateX(${currentOffset - stepOffset}px)`;
+      this.#setColorsClasses();
+      this.#updateTrackPosition();
       this.isSliding = true;
     }
   }
@@ -72,37 +73,114 @@ class ColorSelector {
   // === Private Methods ===
 
   #getStepOffset() {
-    return this.carousel.getBoundingClientRect().width / 3;
+    if (!this.carousel) return 0;
+
+    const style = window.getComputedStyle(this.carousel);
+    const paddingLeft = parseFloat(style.paddingLeft) || 0;
+    const paddingRight = parseFloat(style.paddingRight) || 0;
+    const usableWidth = this.carousel.clientWidth - paddingLeft - paddingRight;
+
+    return usableWidth / 3;
   }
 
-  #getCurrentOffset() {
-    return (
-      this.carouselTrack.getBoundingClientRect().left
-      - this.carousel.getBoundingClientRect().left
+  #updateTrackPosition() {
+    const offset = this.#getStepOffset();
+    this.carouselTrack.style.transform = `translateX(${-(this.selectedColorIndex - 1) * offset}px)`;
+  }
+
+  #setColorClassForIndexes(indexes, styleClass) {
+    indexes.forEach(index => {
+      if (index >= 0 && index < this.allColors.length) {
+        const colorElement = this.allColors[index]?.element;
+
+        if (colorElement) {
+          setExclusiveStyleClass(colorElement, styleClass);
+        }
+      }
+    });
+  }
+
+  #setColorsClasses() {
+    const {
+      leftColorIndex,
+      rightColorIndex,
+    } = this.#getVisibleColorsIndexes();
+
+    this.#setColorClassForIndexes(
+      [this.selectedColorIndex],
+      'color-circle-selected',
+    );
+
+    this.#setColorClassForIndexes(
+      [leftColorIndex, rightColorIndex],
+      'color-circle-default',
+    );
+
+    this.#setColorClassForIndexes(
+      this.#getHideColorsIndexes(),
+      'color-circle-hidden',
     );
   }
 
   #selectLeftColor() {
-    const newIndex = Math.max(0, this.selectedColor - 1);
-    if (newIndex === this.selectedColor) {
+    const newIndex = this.#getVisibleColorsIndexes().leftColorIndex;
+    if (newIndex === null) {
       return false;
     }
     this.#selectColorByIndex(newIndex);
-    this.selectedColor = newIndex;
+    this.selectedColorIndex = newIndex;
     return true;
   }
 
   #selectRightColor() {
-    const newIndex = Math.min(
-      this.allColors.length - 1,
-      this.selectedColor + 1,
-    );
-    if (newIndex === this.selectedColor) {
+    const newIndex = this.#getVisibleColorsIndexes().rightColorIndex;
+    if (newIndex === null) {
       return false;
     }
     this.#selectColorByIndex(newIndex);
-    this.selectedColor = newIndex;
+    this.selectedColorIndex = newIndex;
     return true;
+  }
+
+  #selectColorByIndex(index) {
+    this.#checkColorIndex(index);
+    this.#deselectColor();
+
+    this.selectedColorIndex = index;
+    const { element } = this.allColors[index];
+    element.classList.add('selected-color');
+  }
+
+  #deselectColor() {
+    if (this.selectedColorIndex !== null && this.allColors[this.selectedColorIndex]) {
+      const { element } = this.allColors[this.selectedColorIndex];
+      element.classList.remove('selected-color');
+    }
+  }
+
+  #getVisibleColorsIndexes() {
+    let leftColorIndex = null;
+    let rightColorIndex = null;
+
+    if (this.selectedColorIndex > 0) {
+      leftColorIndex = this.selectedColorIndex - 1;
+    }
+    if (this.selectedColorIndex < this.allColors.length - 1) {
+      rightColorIndex = this.selectedColorIndex + 1;
+    }
+    return {
+      leftColorIndex,
+      selectedColorIndex: this.selectedColorIndex,
+      rightColorIndex,
+    };
+  }
+
+  #getHideColorsIndexes() {
+    return this.allColors
+      .map((_, i) => i)
+      .filter(i => i !== this.selectedColorIndex
+        && i !== this.selectedColorIndex - 1
+        && i !== this.selectedColorIndex + 1);
   }
 
   #getDefaultColorIndex() {
@@ -110,22 +188,6 @@ class ColorSelector {
       return 0;
     }
     return 1;
-  }
-
-  #selectColorByIndex(index) {
-    this.#checkColorIndex(index);
-    this.#deselectColor();
-
-    this.selectedColor = index;
-    const { element } = this.allColors[index];
-    element.classList.add('selected-color');
-  }
-
-  #deselectColor() {
-    if (this.selectedColor !== null && this.allColors[this.selectedColor]) {
-      const { element } = this.allColors[this.selectedColor];
-      element.classList.remove('selected-color');
-    }
   }
 
   #checkColorIndex(index) {
@@ -167,8 +229,35 @@ class ColorSelector {
 }
 
 const clr = new ColorSelector('model-color-selector');
+await clr.init();
 clr.addColor('cor1', 'Laranja Solar', '#FF6F00');
-clr.addColor('cor2', 'Verde Menta', '#3EB489');
-clr.addColor('cor3', 'Azul Céu', '#00BFFF');
-clr.addColor('cor4', 'Amarelo Pastel', '#FFF176');
-clr.addColor('cor5', 'Roxo Cósmico', '#7E57C2');
+clr.addColor('cor2', 'Vermelho Fogo', '#D32F2F');
+clr.addColor('cor3', 'Azul Céu', '#2196F3');
+clr.addColor('cor4', 'Verde Limão', '#CDDC39');
+clr.addColor('cor5', 'Roxo Névoa', '#9C27B0');
+clr.addColor('cor6', 'Amarelo Ouro', '#FFEB3B');
+clr.addColor('cor7', 'Rosa Bebê', '#F8BBD0');
+clr.addColor('cor8', 'Cinza Urbano', '#9E9E9E');
+clr.addColor('cor9', 'Azul Petróleo', '#004D40');
+clr.addColor('cor10', 'Verde Esmeralda', '#2E7D32');
+clr.addColor('cor11', 'Marrom Terra', '#795548');
+clr.addColor('cor12', 'Branco Neve', '#FFFFFF');
+clr.addColor('cor13', 'Preto Sombra', '#000000');
+clr.addColor('cor14', 'Coral Suave', '#FF8A65');
+clr.addColor('cor15', 'Turquesa Mar', '#00BCD4');
+clr.addColor('cor16', 'Lavanda', '#E1BEE7');
+clr.addColor('cor17', 'Azul Noite', '#1A237E');
+clr.addColor('cor18', 'Verde Menta', '#A5D6A7');
+clr.addColor('cor19', 'Dourado Antigo', '#FFD700');
+clr.addColor('cor20', 'Cobre', '#B87333');
+clr.addColor('cor21', 'Bege Areia', '#F5F5DC');
+clr.addColor('cor22', 'Salmão Claro', '#FFA07A');
+clr.addColor('cor23', 'Magenta Neon', '#FF00FF');
+clr.addColor('cor24', 'Azul Bebê', '#B3E5FC');
+clr.addColor('cor25', 'Verde Floresta', '#388E3C');
+clr.addColor('cor26', 'Rosa Forte', '#E91E63');
+clr.addColor('cor27', 'Cinza Chumbo', '#455A64');
+clr.addColor('cor28', 'Laranja Pastel', '#FFCC80');
+clr.addColor('cor29', 'Violeta Profundo', '#673AB7');
+clr.addColor('cor30', 'Marfim', '#FFFFF0');
+

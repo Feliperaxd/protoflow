@@ -34,7 +34,8 @@
     --scale-icon-button-hover: 1.2;
     --scale-icon-button-pressed: 0.9;
     --scale-selected: 2;
-    --scale-hidden: 0.1;
+    --scale-default: 1;
+    --scale-hidden: 0.001;
 
     /* ===== Backgrounds ===== */
     --color-background-primary-default: var(--color-gray-900);
