@@ -84,6 +84,12 @@ export default class ResponsiveText {
 
   // === Private Methods ===
 
+  /**
+   * Handles window resize events with debouncing to optimize performance.
+   * @private
+   * @method #handleResize
+   * @listens window:resize
+   */
   #handleResize() {
     clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
@@ -91,14 +97,32 @@ export default class ResponsiveText {
     }, this.debounceDelay);
   }
 
+  /**
+   * Gets all DOM elements that should have responsive sizing.
+   * @private
+   * @method #getResponsiveElements
+   * @returns {NodeList} List of responsive elements
+   */
   #getResponsiveElements() {
     return document.querySelectorAll(`${this.attribute}, [${this.attribute}]`);
   }
 
+  /**
+   * Resizes all responsive elements.
+   * @private
+   * @method #resizeAll
+   */
   #resizeAll() {
     this.elements.forEach(el => this.#resizeOne(el));
   }
 
+  /**
+   * Gets the base dimension (width/height) of the parent element.
+   * @private
+   * @method #getBaseDimension
+   * @param {HTMLElement} element - The child element
+   * @returns {number} Parent's dimension in pixels
+   */
   #getBaseDimension(element) {
     const parent = element.parentElement;
     return this.baseDimension === 'height'
@@ -106,10 +130,23 @@ export default class ResponsiveText {
       : parent.offsetWidth;
   }
 
+  /**
+   * Gets the size ratio from the element's CSS variable.
+   * @private
+   * @method #getSizeRatio
+   * @param {HTMLElement} element - The element to check
+   * @returns {number} Size ratio value
+   */
   #getSizeRatio(element) {
     return parseFloat(getComputedStyle(element).getPropertyValue(this.ratioVar));
   }
 
+  /**
+   * Resizes a single element based on its ratio and parent dimension.
+   * @private
+   * @method #resizeOne
+   * @param {HTMLElement} element - Element to resize
+   */
   #resizeOne(element) {
     const ratio = this.#getSizeRatio(element);
     const base = this.#getBaseDimension(element);
@@ -122,6 +159,12 @@ export default class ResponsiveText {
     }
   }
 
+  /**
+   * Observes DOM changes to detect new responsive elements.
+   * @private
+   * @method #observeDOM
+   * @listens MutationObserver
+   */
   #observeDOM() {
     this.observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
@@ -137,6 +180,11 @@ export default class ResponsiveText {
     });
   }
 
+  /**
+   * Stops observing DOM changes.
+   * @private
+   * @method #stopObserving
+   */
   #stopObserving() {
     if (this.observer) {
       this.observer.disconnect();

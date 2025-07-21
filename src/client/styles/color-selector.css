@@ -2,66 +2,67 @@
 
 .color-selector {
   width: 330px;
-  aspect-ratio: 2.97 / 1;
-  position: relative;
+  aspect-ratio: 2.2 / 1;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  position: relative;
 }
 
-.color-selector > .left-arrow,
-.color-selector > .right-arrow {
+.color-selector__left-arrow,
+.color-selector__right-arrow {
   width: 6%;
   aspect-ratio: 0.59 / 1;
   z-index: 1;
   transition: var(--transition-fast);
   background-color: var(--color-icon-button-secondary-default);
 }
-.color-selector > .left-arrow {
+.color-selector__left-arrow {
   transform: rotateY(180deg);
 }
 
-.color-selector > .left-arrow:hover,
-.color-selector > .right-arrow:hover {
+.color-selector__left-arrow:hover,
+.color-selector__right-arrow:hover {
   cursor: pointer;
   scale: var(--scale-icon-button-hover);
 }
 
-.color-selector > .left-arrow:active,
-.color-selector > .right-arrow:active {
+.color-selector__left-arrow:active,
+.color-selector__right-arrow:active {
   scale: var(--scale-icon-button-pressed);
 }
 
-.color-selector > .carousel {
+.color-selector__carousel {
   width: 100%;
   height: 100%;
   position: absolute;
-  padding: 0 5% 0 5%;
+  padding: 0 8% 0 8%;
   overflow: hidden;
   display: flex;
 }
 
-.color-selector > .carousel > .track {
+.color-selector__train {
   width: 100%;
   display: flex;
   align-items: center;
-  will-change: transform;
   transition: var(--transition-default);
 }
 
-.color-selector > .carousel > .track:has(:only-child) {
+.color-selector__train:has(:only-child) {
   justify-content: center;
 }
 
-.color-selector > .carousel > .track:has(:nth-child(2)) {
+.color-selector__train:has(:nth-child(2)) {
   justify-content: flex-end;
 }
 
-.color-selector > .carousel > .track:has(:nth-child(3)) {
+.color-selector__train:has(:nth-child(3)) {
   justify-content: flex-start;
 }
 
-.color-selector > .carousel > .track .wrapper {
+.color-selector__train .wrapper {
   height: 100%;
   width: 33.33%;
   flex-shrink: 0;
@@ -71,9 +72,9 @@
   justify-content: center;
 }
 
-.color-circle-hidden,
-.color-circle-default,
-.color-circle-selected {
+.color-circle--hidden,
+.color-circle--default,
+.color-circle--selected {
   width: 50%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
@@ -82,15 +83,15 @@
   filter: drop-shadow(var(--shadow-strong));
 }
 
-.color-circle-hidden {
+.color-circle--hidden {
   opacity: 0;
   transform: scale(var(--scale-hidden));
 }
 
-.color-circle-default {
+.color-circle--default {
   transform: scale(var(--scale-default));
 }
 
-.color-circle-selected {
+.color-circle--selected {
   transform: scale(var(--scale-selected));
 }

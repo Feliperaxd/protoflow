@@ -1,42 +1,63 @@
+import RequiredElements from './requiredElements.js';
 import { setExclusiveStyleClass, loadTemplateAsElement } from './utils.js';
 
-class ColorSelector {
-  constructor(mainElementID) {
+/**
+ * ColorSelector class to create a carousel of selectable colors.
+ */
+export default class ColorSelector {
+  /**
+   * Creates an instance of ColorSelector.
+   *
+   * @param {string} mainElementID - The ID of the main container element.
+   * @param {function|null} [onChangeCallback=null] - Optional callback
+   *  called when the selected color changes.
+   *
+   * @throws {Error} Throws if the main element is not found or if the
+   *  callback is not a function or null.
+   */
+  constructor(mainElementID, onChangeCallback = null) {
     this.mainElement = document.getElementById(mainElementID);
+    this.onChangeCallback = onChangeCallback;
+
     if (!this.mainElement) {
       throw new Error(`Slider element with id "${mainElementID}" not found`);
+    }
+
+    if (typeof this.onChangeCallback !== 'function'
+        && this.onChangeCallback !== null) {
+      throw new Error('Expected "onChangeCallback" to be a function');
     }
 
     this.allColors = [];
     this.isSliding = false;
     this.selectedColorIndex = null;
 
-    this.requiredElements = [
-      { selector: '.carousel', name: 'carousel' },
-      { selector: '.track', name: 'carousel track' },
-      { selector: '.left-arrow', name: 'left arrow' },
-      { selector: '.right-arrow', name: 'right arrow' },
-    ];
+    this.requiredElements = new RequiredElements(
+      [
+        { selector: '.color-selector__carousel', name: 'carousel' },
+        { selector: '.color-selector__train', name: 'train' },
+        { selector: '.color-selector__left-arrow', name: 'left arrow' },
+        { selector: '.color-selector__right-arrow', name: 'right arrow' },
+      ],
+      this.mainElement,
+    );
   }
 
   // === Public Methods ===
 
-  async init() {
-    this.colorCircleTemplate = await loadTemplateAsElement(
-      '../templates/color-circle.html',
-      'div',
-    );
-    this.#checkRequiredElements();
-    this.#initElements();
-    this.#bindEvents();
-  }
-
+  /**
+   * Adds a new color to the selector and selects the default color if it matches.
+   *
+   * @param {string} id - The unique identifier for the color.
+   * @param {string} name - The name of the color.
+   * @param {string} hexCode - The hex code of the color.
+   */
   addColor(id, name, hexCode) {
     const colorCircleTemplateClone = this.colorCircleTemplate.cloneNode(true);
     const colorCircleElement = colorCircleTemplateClone.firstElementChild;
     colorCircleElement.style.setProperty('--color', hexCode);
 
-    this.carouselTrack.appendChild(colorCircleTemplateClone);
+    this.train.appendChild(colorCircleTemplateClone);
     this.allColors.push({
       id,
       name,
@@ -50,6 +71,33 @@ class ColorSelector {
     this.#setColorsClasses();
   }
 
+  /**
+   * Gets the currently selected color
+   * @returns {Object} The selected color object
+   */
+  getColor() {
+    return this.allColors[this.selectedColorIndex];
+  }
+
+  /**
+   * Initializes the color selector component.
+   * Must be awaited to ensure that color templates are loaded properly.
+   *
+   * @async
+   */
+  async init() {
+    this.colorCircleTemplate = await loadTemplateAsElement(
+      '../templates/color-circle.html',
+      'div',
+    );
+    this.#initElements();
+    this.#bindEvents();
+    this.requiredElements.checkAll();
+  }
+
+  /**
+   * Slides the carousel to the left and selects the corresponding color.
+   */
   slideLeft() {
     if (this.isSliding) return;
 
@@ -57,9 +105,16 @@ class ColorSelector {
       this.#setColorsClasses();
       this.#updateTrackPosition();
       this.isSliding = true;
+
+      if (this.onChangeCallback) {
+        this.onChangeCallback();
+      }
     }
   }
 
+  /**
+   * Slides the carousel to the right and selects the corresponding color.
+   */
   slideRight() {
     if (this.isSliding) return;
 
@@ -67,11 +122,86 @@ class ColorSelector {
       this.#setColorsClasses();
       this.#updateTrackPosition();
       this.isSliding = true;
+
+      if (this.onChangeCallback) {
+        this.onChangeCallback();
+      }
     }
   }
 
   // === Private Methods ===
 
+  /**
+   * Binds event listeners to carousel controls.
+   *
+   * - Left arrow: slides carousel to the left.
+   * - Right arrow: slides carousel to the right.
+   * - Transition end: resets sliding state after animation completes.
+   *
+   * This method is called during initialization to enable user interaction.
+   *
+   * @private
+   */
+  #bindEvents() {
+    this.leftArrow.addEventListener('click', () => this.slideLeft());
+    this.rightArrow.addEventListener('click', () => this.slideRight());
+    this.train.addEventListener('transitionend', () => {
+      this.isSliding = false;
+    });
+  }
+
+  /**
+   * Validates thats the given color index is within bounds and exists.
+   *
+   * @private
+   * @param {number} index - The index of the color to check.
+   *
+   * @throws {Error} If the index is out of bounds or the color does not exist.
+   */
+  #checkColorIndex(index) {
+    if (index < 0 || index >= this.allColors.length || !this.allColors[index]) {
+      throw new Error(`Color don't found! color index: ${index}`);
+    }
+  }
+
+  /**
+   * Returns the default index to be used when selecting a color.
+   * If there are fewer than 3 colors, it defaults to the first color (index 0).
+   * Otherwise, it returns index 1.
+   *
+   * @private
+   * @returns {number} The index of the default color.
+   */
+  #getDefaultColorIndex() {
+    if (this.allColors.length < 3) {
+      return 0;
+    }
+    return 1;
+  }
+
+  /**
+   * Returns a list of indexes representing the colors that should be hidden.
+   * It excludes the selected color and its immediate neighbors (previous and next).
+   *
+   * @private
+   * @returns {number[]} Array of color indexes to hide.
+   */
+  #getHideColorsIndexes() {
+    return this.allColors
+      .map((_, i) => i)
+      .filter(i => i !== this.selectedColorIndex
+        && i !== this.selectedColorIndex - 1
+        && i !== this.selectedColorIndex + 1);
+  }
+
+  /**
+   * Calculates the horizontal step offset used for sliding the carousel.
+   * The step is based on one-third of the carousel's usable width,
+   * excluding horizontal padding.
+   *
+   * @private
+   * @returns {number} The calculated offset in pixels.
+   */
   #getStepOffset() {
     if (!this.carousel) return 0;
 
@@ -83,81 +213,16 @@ class ColorSelector {
     return usableWidth / 3;
   }
 
-  #updateTrackPosition() {
-    const offset = this.#getStepOffset();
-    this.carouselTrack.style.transform = `translateX(${-(this.selectedColorIndex - 1) * offset}px)`;
-  }
-
-  #setColorClassForIndexes(indexes, styleClass) {
-    indexes.forEach(index => {
-      if (index >= 0 && index < this.allColors.length) {
-        const colorElement = this.allColors[index]?.element;
-
-        if (colorElement) {
-          setExclusiveStyleClass(colorElement, styleClass);
-        }
-      }
-    });
-  }
-
-  #setColorsClasses() {
-    const {
-      leftColorIndex,
-      rightColorIndex,
-    } = this.#getVisibleColorsIndexes();
-
-    this.#setColorClassForIndexes(
-      [this.selectedColorIndex],
-      'color-circle-selected',
-    );
-
-    this.#setColorClassForIndexes(
-      [leftColorIndex, rightColorIndex],
-      'color-circle-default',
-    );
-
-    this.#setColorClassForIndexes(
-      this.#getHideColorsIndexes(),
-      'color-circle-hidden',
-    );
-  }
-
-  #selectLeftColor() {
-    const newIndex = this.#getVisibleColorsIndexes().leftColorIndex;
-    if (newIndex === null) {
-      return false;
-    }
-    this.#selectColorByIndex(newIndex);
-    this.selectedColorIndex = newIndex;
-    return true;
-  }
-
-  #selectRightColor() {
-    const newIndex = this.#getVisibleColorsIndexes().rightColorIndex;
-    if (newIndex === null) {
-      return false;
-    }
-    this.#selectColorByIndex(newIndex);
-    this.selectedColorIndex = newIndex;
-    return true;
-  }
-
-  #selectColorByIndex(index) {
-    this.#checkColorIndex(index);
-    this.#deselectColor();
-
-    this.selectedColorIndex = index;
-    const { element } = this.allColors[index];
-    element.classList.add('selected-color');
-  }
-
-  #deselectColor() {
-    if (this.selectedColorIndex !== null && this.allColors[this.selectedColorIndex]) {
-      const { element } = this.allColors[this.selectedColorIndex];
-      element.classList.remove('selected-color');
-    }
-  }
-
+  /**
+   * Returns the indexes of the currently visible colors in the carousel,
+   * including the selected color and its immediate neighbors (left and right).
+   *
+   * @private
+   * @returns {Object} An object containing:
+   *   - {number|null} leftColorIndex - Index of the color to the left (or null if none).
+   *   - {number} selectedColorIndex - Index of the currently selected color.
+   *   - {number|null} rightColorIndex - Index of the color to the right (or null if none).
+   */
   #getVisibleColorsIndexes() {
     let leftColorIndex = null;
     let rightColorIndex = null;
@@ -175,89 +240,123 @@ class ColorSelector {
     };
   }
 
-  #getHideColorsIndexes() {
-    return this.allColors
-      .map((_, i) => i)
-      .filter(i => i !== this.selectedColorIndex
-        && i !== this.selectedColorIndex - 1
-        && i !== this.selectedColorIndex + 1);
-  }
-
-  #getDefaultColorIndex() {
-    if (this.allColors.length < 3) {
-      return 0;
-    }
-    return 1;
-  }
-
-  #checkColorIndex(index) {
-    if (index < 0 || index >= this.allColors.length || !this.allColors[index]) {
-      throw new Error(`Color don't found! color index:${index}`);
-    }
-  }
-
-  #checkRequiredElements() {
-    const missingElements = this.requiredElements
-      .map(({ selector, name }) => ({
-        name,
-        element: this.mainElement.querySelector(selector),
-      }))
-      .filter(item => !item.element);
-
-    if (missingElements.length > 0) {
-      throw new Error(`Required color selector elements not found: ${
-        missingElements.map(item => item.name).join(', ')
-      }`);
-    }
-  }
-
+  /**
+   * Initializes references to required DOM elements within the main container.
+   * Clears the inner HTML of the carousel train element to prepare for new content.
+   *
+   * @private
+   */
   #initElements() {
-    this.carousel = this.mainElement.querySelector('.carousel');
-    this.carouselTrack = this.mainElement.querySelector('.track');
-    this.leftArrow = this.mainElement.querySelector('.left-arrow');
-    this.rightArrow = this.mainElement.querySelector('.right-arrow');
-    this.carouselTrack.innerHTML = '';
+    this.carousel = this.mainElement.querySelector('.color-selector__carousel');
+    this.train = this.mainElement.querySelector('.color-selector__train');
+    this.leftArrow = this.mainElement.querySelector('.color-selector__left-arrow');
+    this.rightArrow = this.mainElement.querySelector('.color-selector__right-arrow');
+    this.train.innerHTML = '';
   }
 
-  #bindEvents() {
-    this.leftArrow.addEventListener('click', () => this.slideLeft());
-    this.rightArrow.addEventListener('click', () => this.slideRight());
-    this.carouselTrack.addEventListener('transitionend', () => {
-      this.isSliding = false;
+  /**
+   * Selects the color at the given index after validating it.
+   *
+   * @private
+   * @param {number} index - The index of the color to select.
+   *
+   * @throws {Error} If the index is invalid.
+   */
+  #selectColorByIndex(index) {
+    this.#checkColorIndex(index);
+    this.selectedColorIndex = index;
+  }
+
+  /**
+   * Selects the color to the left of the currently selected color, if any,
+   * updating the selected color index.
+   *
+   * @private
+   * @returns {boolean} True if the color was successfully selected, false otherwise.
+   */
+  #selectLeftColor() {
+    const newIndex = this.#getVisibleColorsIndexes().leftColorIndex;
+    if (newIndex === null) {
+      return false;
+    }
+    this.#selectColorByIndex(newIndex);
+    this.selectedColorIndex = newIndex;
+    return true;
+  }
+
+  /**
+   * Selects the color to the rigth of the currently selected color, if any,
+   * updating the selected color index.
+   *
+   * @private
+   * @returns {boolean} True if the color was successfully selected, false otherwise.
+   */
+  #selectRightColor() {
+    const newIndex = this.#getVisibleColorsIndexes().rightColorIndex;
+    if (newIndex === null) {
+      return false;
+    }
+    this.#selectColorByIndex(newIndex);
+    this.selectedColorIndex = newIndex;
+    return true;
+  }
+
+  /**
+   * Applies a specific CSS class exclusively to color elements at the given indexes.
+   * It ensures only the targeted elements have the specified style class.
+   *
+   * @private
+   * @param {number[]} indexes - Array of color indexes to apply the style to.
+   * @param {string} styleClass - The CSS class to apply exclusively.
+   */
+  #setColorClassForIndexes(indexes, styleClass) {
+    indexes.forEach(index => {
+      if (index >= 0 && index < this.allColors.length) {
+        const colorElement = this.allColors[index]?.element;
+
+        if (colorElement) {
+          setExclusiveStyleClass(colorElement, styleClass);
+        }
+      }
     });
   }
+
+  /**
+   * Updates the CSS classes for all color circles based on the current selected color.
+   * It assigns the "selected" class to the active color, "default" to its neighbors,
+   * and "hidden" to all others.
+   *
+   * @private
+   */
+  #setColorsClasses() {
+    const {
+      leftColorIndex,
+      rightColorIndex,
+    } = this.#getVisibleColorsIndexes();
+
+    this.#setColorClassForIndexes(
+      [this.selectedColorIndex],
+      'color-circle--selected',
+    );
+
+    this.#setColorClassForIndexes(
+      [leftColorIndex, rightColorIndex],
+      'color-circle--default',
+    );
+
+    this.#setColorClassForIndexes(
+      this.#getHideColorsIndexes(),
+      'color-circle--hidden',
+    );
+  }
+
+  /**
+   * Updates the position of the carousel track to slide the selected color into view.
+   *
+   * @private
+   */
+  #updateTrackPosition() {
+    const offset = this.#getStepOffset();
+    this.train.style.transform = `translateX(${-(this.selectedColorIndex - 1) * offset}px)`;
+  }
 }
-
-const clr = new ColorSelector('model-color-selector');
-await clr.init();
-clr.addColor('cor1', 'Laranja Solar', '#FF6F00');
-clr.addColor('cor2', 'Vermelho Fogo', '#D32F2F');
-clr.addColor('cor3', 'Azul Céu', '#2196F3');
-clr.addColor('cor4', 'Verde Limão', '#CDDC39');
-clr.addColor('cor5', 'Roxo Névoa', '#9C27B0');
-clr.addColor('cor6', 'Amarelo Ouro', '#FFEB3B');
-clr.addColor('cor7', 'Rosa Bebê', '#F8BBD0');
-clr.addColor('cor8', 'Cinza Urbano', '#9E9E9E');
-clr.addColor('cor9', 'Azul Petróleo', '#004D40');
-clr.addColor('cor10', 'Verde Esmeralda', '#2E7D32');
-clr.addColor('cor11', 'Marrom Terra', '#795548');
-clr.addColor('cor12', 'Branco Neve', '#FFFFFF');
-clr.addColor('cor13', 'Preto Sombra', '#000000');
-clr.addColor('cor14', 'Coral Suave', '#FF8A65');
-clr.addColor('cor15', 'Turquesa Mar', '#00BCD4');
-clr.addColor('cor16', 'Lavanda', '#E1BEE7');
-clr.addColor('cor17', 'Azul Noite', '#1A237E');
-clr.addColor('cor18', 'Verde Menta', '#A5D6A7');
-clr.addColor('cor19', 'Dourado Antigo', '#FFD700');
-clr.addColor('cor20', 'Cobre', '#B87333');
-clr.addColor('cor21', 'Bege Areia', '#F5F5DC');
-clr.addColor('cor22', 'Salmão Claro', '#FFA07A');
-clr.addColor('cor23', 'Magenta Neon', '#FF00FF');
-clr.addColor('cor24', 'Azul Bebê', '#B3E5FC');
-clr.addColor('cor25', 'Verde Floresta', '#388E3C');
-clr.addColor('cor26', 'Rosa Forte', '#E91E63');
-clr.addColor('cor27', 'Cinza Chumbo', '#455A64');
-clr.addColor('cor28', 'Laranja Pastel', '#FFCC80');
-clr.addColor('cor29', 'Violeta Profundo', '#673AB7');
-clr.addColor('cor30', 'Marfim', '#FFFFF0');
-

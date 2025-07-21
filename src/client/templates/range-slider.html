@@ -1,32 +1,36 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles/tokens.css">
-    <link rel="stylesheet" href="../styles/globals.css">
-    <link rel="stylesheet" href="../styles/quote-card.css">
-    <link rel="stylesheet" href="../styles/icon-mask.css">
-    <link rel="stylesheet" href="../styles/effects.css">
-    <link rel="stylesheet" href="../styles/range-slider.css">
-    <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/globals.css" />
+  <link rel="stylesheet" href="../styles/quote-card.css" />
+  <link rel="stylesheet" href="../styles/icon-mask.css" />
+  <link rel="stylesheet" href="../styles/effects.css" />
+  <link rel="stylesheet" href="../styles/range-slider.css" />
+  <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body class="container">
-    <div class="range-slider" id="infill" style="--default-value:25; --symbol:%; --step-value:5; --min-value:5; --max-value:100;">
-        <div class="title-box"  >
-            <p class="title" responsive-text>Preenchimento</p>
-        </div>
-        <div class="range-box">
-            <div class="track">
-                <div class="filled"></div>
-                <div class="thumb"></div>
-            </div>
-            <p class="value-label" responsive-text></p>
-        </div>
+  <div
+    class="range-slider"
+    id="infill"
+    style="--default-value:25; --symbol:%; --step-value:5; --min-value:5; --max-value:100;"
+  >
+    <div class="range-slider__header">
+      <p class="range-slider__title" responsive-text>Preenchimento</p>
     </div>
-    <script type="module" src="../scripts/rangeSliderEngine.js"></script>
-    <script type="module" src="../scripts/main.js"></script>
+    <div class="range-slider__body">
+      <div class="range-slider__track">
+        <div class="range-slider__filled"></div>
+        <div class="range-slider__thumb"></div>
+      </div>
+      <p class="range-slider__value" responsive-text></p>
+    </div>
+  </div>
+
+  <script type="module" src="../scripts/rangeSliderEngine.js"></script>
+  <script type="module" src="../scripts/main.js"></script>
 </body>
 </html>

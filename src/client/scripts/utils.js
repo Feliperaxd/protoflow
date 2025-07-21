@@ -33,6 +33,43 @@ export const getCssPropertyValue = (element, propertyName) => {
 };
 
 /**
+ * Extracts (x, y) positions from mouse or touch events.
+ *
+ * @param {MouseEvent | TouchEvent} event - The input event.
+ * @returns {{ x: number, y: number }[]} List of coordinate positions.
+ */
+export function getEventPositions(event) {
+  if (event.touches && event.touches.length > 0) {
+    return Array.from(event.touches).map(touch => ({
+      x: touch.clientX,
+      y: touch.clientY,
+    }));
+  }
+
+  if (event.changedTouches && event.changedTouches.length > 0) {
+    return Array.from(event.changedTouches).map(touch => ({
+      x: touch.clientX,
+      y: touch.clientY,
+    }));
+  }
+
+  return [{
+    x: event.clientX,
+    y: event.clientY,
+  }];
+}
+
+/**
+ * Fetches the text content from a given URL.
+ *
+ * @param {string} url - The URL to fetch the text content from.
+ * @returns {Promise<string>} A promise that resolves to the fetched text content.
+ */
+export async function getTextContent(url) {
+  return fetch(url).then(res => res.text());
+}
+
+/**
  * Prevents the default behavior and stops the propagation of a browser event.
  *
  * @param {Event} event - The event to be handled.
@@ -65,16 +102,6 @@ export const switchStyleClass = (element, classToRemove, classToAdd) => {
   element.classList.remove(classToRemove);
   element.classList.add(classToAdd);
 };
-
-/**
- * Fetches the text content from a given URL.
- *
- * @param {string} url - The URL to fetch the text content from.
- * @returns {Promise<string>} A promise that resolves to the fetched text content.
- */
-export async function getTextContent(url) {
-  return fetch(url).then(res => res.text());
-}
 
 /**
  * Loads an HTML template and returns it as a DOM element.

@@ -1,6 +1,8 @@
+import RequiredElements from './requiredElements.js';
 import {
   formatValuePrecision,
   getCssPropertyValue,
+  getEventPositions,
   preventDefaults,
 } from './utils.js';
 
@@ -13,26 +15,39 @@ export default class RangeSlider {
 
   /**
    * Creates a RangeSlider instance.
+   *
    * @param {string} mainElementID - The ID of the slider element.
-   * @throws {Error} Throws if the slider element is not found.
+   * @param {function|null} [onChangeCallback=null] - Optional callback function to be
+   *   called when the slider value changes.
+   * @throws {Error} Throws if the slider element is not found or if onChangeCallback
+   *   is not a function or null.
    */
-  constructor(mainElementID) {
+  constructor(mainElementID, onChangeCallback = null) {
     this.mainElement = document.getElementById(mainElementID);
+    this.onChangeCallback = onChangeCallback;
+
     if (!this.mainElement) {
       throw new Error(`Slider element with id "${mainElementID}" not found`);
     }
 
-    // Define os elementos obrigatórios aqui no construtor
-    this.requiredElements = [
-      { selector: '.title', name: 'title' },
-      { selector: '.track', name: 'track' },
-      { selector: '.thumb', name: 'thumb' },
-      { selector: '.filled', name: 'filled' },
-      { selector: '.value-label', name: 'value label' },
-    ];
+    if (typeof this.onChangeCallback !== 'function'
+        && this.onChangeCallback !== null) {
+      throw new Error('Expected "onChangeCallback" to be a function');
+    }
+
+    this.requiredElements = new RequiredElements(
+      [
+        { selector: '.range-slider__title', name: 'title' },
+        { selector: '.range-slider__track', name: 'track' },
+        { selector: '.range-slider__thumb', name: 'thumb' },
+        { selector: '.range-slider__filled', name: 'filled' },
+        { selector: '.range-slider__value', name: 'value' },
+      ],
+      this.mainElement,
+    );
 
     this.style = getComputedStyle(this.mainElement);
-    this.#checkRequiredElements();
+    this.requiredElements.checkAll();
     this.#initElements();
     this.#initProperties();
 
@@ -54,6 +69,10 @@ export default class RangeSlider {
       this.numberOfDecimalPlaces,
     );
     this.#updateUi();
+
+    if (this.onChangeCallback) {
+      this.onChangeCallback();
+    }
   }
 
   /**
@@ -76,29 +95,22 @@ export default class RangeSlider {
 
   // === Private Methods ===
 
-  #checkRequiredElements() {
-    const missingElements = this.requiredElements
-      .map(({ selector, name }) => ({
-        name,
-        element: this.mainElement.querySelector(selector),
-      }))
-      .filter(item => !item.element);
-
-    if (missingElements.length > 0) {
-      throw new Error(`Required slider elements not found: ${
-        missingElements.map(item => item.name).join(', ')
-      }`);
-    }
-  }
-
+  /**
+   * Initializes references to DOM elements.
+   * @private
+   */
   #initElements() {
-    this.title = this.mainElement.querySelector('.title');
-    this.track = this.mainElement.querySelector('.track');
-    this.thumb = this.mainElement.querySelector('.thumb');
-    this.filled = this.mainElement.querySelector('.filled');
-    this.valueLabel = this.mainElement.querySelector('.value-label');
+    this.title = this.mainElement.querySelector('.range-slider__title');
+    this.track = this.mainElement.querySelector('.range-slider__track');
+    this.thumb = this.mainElement.querySelector('.range-slider__thumb');
+    this.filled = this.mainElement.querySelector('.range-slider__filled');
+    this.valueLabel = this.mainElement.querySelector('.range-slider__value');
   }
 
+  /**
+   * Initializes slider properties from CSS variables.
+   * @private
+   */
   #initProperties() {
     this.symbol = this.style.getPropertyValue('--symbol').trim() || '';
     this.minValue = getCssPropertyValue(this.mainElement, '--min-value');
@@ -114,59 +126,109 @@ export default class RangeSlider {
     this.effectiveTrackWidth = this.track.offsetWidth - this.thumb.offsetWidth;
   }
 
+  /**
+   * Binds event listeners for user interaction.
+   * @private
+   */
   #bindEvents() {
-    this.thumb.addEventListener('mousedown', e => this.#handleThumbMouseDown(e));
+    this.thumb.addEventListener('mousedown', e => this.#handleDragStart(e));
+    this.thumb.addEventListener('touchstart', e => this.#handleDragStart(e));
     this.track.addEventListener('click', e => this.#handleTrackClick(e));
+
     window.addEventListener('resize', this.#onResize);
   }
 
+  /**
+   * Handles window resize event to update slider dimensions.
+   * @private
+   */
   #handleResize() {
     this.effectiveTrackWidth = this.track.offsetWidth - this.thumb.offsetWidth;
     this.#updateUi();
   }
 
-  #handleThumbMouseDown(event) {
+  /**
+   * Handles the start of dragging the thumb.
+   * @param {MouseEvent|TouchEvent} event - The drag start event.
+   * @private
+   */
+  #handleDragStart(event) {
     preventDefaults(event);
     this.isDragging = true;
     this.#applyThumbActiveStyle();
 
-    const handleDrag = e => this.#handleDrag(e);
-    const handleStopDrag = () => {
-      window.removeEventListener('mousemove', handleDrag);
-      window.removeEventListener('mouseup', handleStopDrag);
-      this.#handleStopDrag();
+    const handleDragMove = e => this.#handleDragMove(e);
+    const handleDragEnd = () => {
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('touchend', handleDragEnd);
+      window.removeEventListener('touchcancel', handleDragEnd);
+      this.#handleDragEnd();
     };
 
-    window.addEventListener('mousemove', handleDrag);
-    window.addEventListener('mouseup', handleStopDrag);
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('mouseup', handleDragEnd);
+    window.addEventListener('touchmove', handleDragMove);
+    window.addEventListener('touchend', handleDragEnd);
+    window.addEventListener('touchcancel', handleDragEnd);
   }
 
+  /**
+   * Handles clicks on the track to update the slider value.
+   * @param {MouseEvent} event - The click event.
+   * @private
+   */
   #handleTrackClick(event) {
-    this.#updateValueFromPosition(event.clientX);
+    const [{ x }] = getEventPositions(event);
+    this.#updateValueFromPosition(x);
   }
 
-  #handleDrag(event) {
+  /**
+   * Handles movement while dragging the thumb.
+   * @param {MouseEvent|TouchEvent} event - The drag move event.
+   * @private
+   */
+  #handleDragMove(event) {
     if (!this.isDragging) return;
-    this.#updateValueFromPosition(event.clientX);
+    const [{ x }] = getEventPositions(event);
+    this.#updateValueFromPosition(x);
   }
 
-  #handleStopDrag() {
+  /**
+   * Handles the end of dragging the thumb.
+   * @private
+   */
+  #handleDragEnd() {
     this.isDragging = false;
     this.#removeThumbActiveStyle();
   }
 
+  /**
+   * Applies active styles to the thumb and cursor.
+   * @private
+   */
   #applyThumbActiveStyle() {
     this.thumb.classList.toggle('active');
     document.body.style.cursor = 'grabbing';
     this.track.style.cursor = 'grabbing';
   }
 
+  /**
+   * Removes active styles from the thumb and cursor.
+   * @private
+   */
   #removeThumbActiveStyle() {
     this.thumb.classList.toggle('active');
     document.body.style.cursor = 'default';
     this.track.style.cursor = 'pointer';
   }
 
+  /**
+   * Updates the slider value based on cursor's X position.
+   * @param {number} cursorPositionX - The X position of the cursor.
+   * @private
+   */
   #updateValueFromPosition(cursorPositionX) {
     const rect = this.track.getBoundingClientRect();
     const offsetX = Math.max(
@@ -182,6 +244,10 @@ export default class RangeSlider {
     this.changeValue(rawValue);
   }
 
+  /**
+   * Updates the UI to reflect the current slider value.
+   * @private
+   */
   #updateUi() {
     const ratio = this.#getFilledRatio(this.value);
     const pixelLeft = ratio * this.effectiveTrackWidth;
@@ -191,10 +257,22 @@ export default class RangeSlider {
     this.thumb.style.left = `${pixelLeft}px`;
   }
 
+  /**
+   * Calculates the filled ratio of the track based on the slider value.
+   * @param {number} value - The current slider value.
+   * @returns {number} A number between 0 and 1 representing the fill ratio.
+   * @private
+   */
   #getFilledRatio(value) {
     return (value - this.minValue) / (this.maxValue - this.minValue);
   }
 
+  /**
+   * Clamps the value between min and max and aligns it to the step value.
+   * @param {number} value - The value to clamp.
+   * @returns {number} The clamped and stepped value.
+   * @private
+   */
   #clamp(value) {
     const numericValue = Number(value);
     if (Number.isNaN(numericValue)) {
