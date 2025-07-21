@@ -70,6 +70,26 @@ export async function getTextContent(url) {
 }
 
 /**
+ * Forces a browser reflow on the given element, useful for triggering CSS transitions/animations.
+ * This is done by accessing a layout-related property (offsetWidth), which forces the browser
+ * to recalculate layout.
+ *
+ * @param {HTMLElement} element - The DOM element to trigger reflow on.
+ * @returns {void}
+ *
+ * @example
+ * // Force reflow before restarting an animation
+ * const box = document.getElementById('myBox');
+ * box.classList.remove('animate');
+ * reflowElement(box); // Forces reflow
+ * box.classList.add('animate'); // Animation restarts
+ */
+export function reflowElement(element) {
+  // eslint-disable-next-line no-unused-expressions
+  element.offsetWidth;
+}
+
+/**
  * Prevents the default behavior and stops the propagation of a browser event.
  *
  * @param {Event} event - The event to be handled.

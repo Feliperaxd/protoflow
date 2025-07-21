@@ -1,5 +1,9 @@
 import RequiredElements from './requiredElements.js';
-import { setExclusiveStyleClass, loadTemplateAsElement } from './utils.js';
+import {
+  reflowElement,
+  setExclusiveStyleClass,
+  loadTemplateAsElement,
+} from './utils.js';
 
 /**
  * ColorSelector class to create a carousel of selectable colors.
@@ -101,14 +105,16 @@ export default class ColorSelector {
   slideLeft() {
     if (this.isSliding) return;
 
-    if (this.#selectLeftColor()) {
+    if (this.#selectRightColor()) {
       this.#setColorsClasses();
-      this.#updateTrackPosition();
+      this.#updateTrainPosition();
       this.isSliding = true;
 
       if (this.onChangeCallback) {
         this.onChangeCallback();
       }
+    } else {
+      this.#runBounceBackAnimation(1);
     }
   }
 
@@ -118,14 +124,16 @@ export default class ColorSelector {
   slideRight() {
     if (this.isSliding) return;
 
-    if (this.#selectRightColor()) {
+    if (this.#selectLeftColor()) {
       this.#setColorsClasses();
-      this.#updateTrackPosition();
+      this.#updateTrainPosition();
       this.isSliding = true;
 
       if (this.onChangeCallback) {
         this.onChangeCallback();
       }
+    } else {
+      this.#runBounceBackAnimation(-1);
     }
   }
 
@@ -146,6 +154,9 @@ export default class ColorSelector {
     this.leftArrow.addEventListener('click', () => this.slideLeft());
     this.rightArrow.addEventListener('click', () => this.slideRight());
     this.train.addEventListener('transitionend', () => {
+      this.isSliding = false;
+    });
+    this.train.addEventListener('animationend', () => {
       this.isSliding = false;
     });
   }
@@ -211,6 +222,20 @@ export default class ColorSelector {
     const usableWidth = this.carousel.clientWidth - paddingLeft - paddingRight;
 
     return usableWidth / 3;
+  }
+
+  /**
+   * Calculates the position of the train element based on the selected color index.
+   * The position is determined by multiplying the negative of (selected color index - 1)
+   * with the step offset obtained from #getStepOffset().
+   *
+   * @private
+   * @returns {number} The calculated position for the train element (in pixels or relevant units)
+   *  as a negative value to position it correctly relative to the track.
+   */
+  #getRelativeTrainPosition() {
+    const offset = this.#getStepOffset();
+    return -(this.selectedColorIndex - 1) * offset;
   }
 
   /**
@@ -351,12 +376,44 @@ export default class ColorSelector {
   }
 
   /**
-   * Updates the position of the carousel track to slide the selected color into view.
+   * Updates the position of the carousel train to slide the selected color into view.
    *
    * @private
    */
-  #updateTrackPosition() {
-    const offset = this.#getStepOffset();
-    this.train.style.transform = `translateX(${-(this.selectedColorIndex - 1) * offset}px)`;
+  #updateTrainPosition() {
+    const trainPositionX = this.#getRelativeTrainPosition();
+    this.train.style.transform = `translateX(${trainPositionX}px)`;
+  }
+
+  #runBounceBackAnimation(direction) {
+    if (direction !== -1 && direction !== 1) {
+      throw new Error(`Invalid direction: only -1 or 1 are allowed. Received: ${direction}`);
+    }
+
+    if (this.isSliding) return;
+    this.isSliding = true;
+
+    this.train.style.setProperty(
+      '--stepOffset',
+      `${this.#getStepOffset()}px`,
+    );
+    this.train.style.setProperty(
+      '--trainPosition',
+      `${this.#getRelativeTrainPosition()}px`,
+    );
+    this.train.style.setProperty(
+      '--bounceBackDirection',
+      `${direction}`,
+    );
+
+    this.train.classList.remove('color-selector__train--bounce-back-animation');
+    reflowElement(this.train);
+    this.train.classList.add('color-selector__train--bounce-back-animation');
   }
 }
+
+const clr = new ColorSelector('model-color-selector');
+await clr.init();
+clr.addColor('0', 'rosa', '#FF69B4');
+clr.addColor('1', 'vermelho', '#FF0000');
+clr.addColor('2', 'verde-limão', '#32CD32');

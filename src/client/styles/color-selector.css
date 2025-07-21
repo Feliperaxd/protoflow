@@ -58,6 +58,7 @@
   justify-content: flex-end;
 }
 
+
 .color-selector__train:has(:nth-child(3)) {
   justify-content: flex-start;
 }
@@ -94,4 +95,19 @@
 
 .color-circle--selected {
   transform: scale(var(--scale-selected));
+}
+
+.color-selector__train--bounce-back-animation {
+  animation: bounce-back 0.5s linear;
+}
+
+@keyframes bounce-back {
+  50% {
+    transform: translateX(
+      calc(var(--trainPosition) - var(--stepOffset) * var(--bounceBackDirection))
+    );
+  }
+  100% {
+    transform: translateX(var(--trainPosition));
+  }
 }
