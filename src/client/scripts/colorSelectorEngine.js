@@ -151,8 +151,8 @@ export default class ColorSelector {
    * @private
    */
   #bindEvents() {
-    this.leftArrow.addEventListener('click', () => this.slideLeft());
-    this.rightArrow.addEventListener('click', () => this.slideRight());
+    this.leftArrow.addEventListener('click', () => this.slideRight());
+    this.rightArrow.addEventListener('click', () => this.slideLeft());
     this.train.addEventListener('transitionend', () => {
       this.isSliding = false;
     });
@@ -407,8 +407,11 @@ export default class ColorSelector {
     );
 
     this.train.classList.remove('color-selector__train--bounce-back-animation');
+    this.allColors[this.selectedColorIndex].element.classList.remove('color-selector__color-circle--bounce-back-animation');
+    adicionar aqui
     reflowElement(this.train);
     this.train.classList.add('color-selector__train--bounce-back-animation');
+    this.allColors[this.selectedColorIndex].element.classList.add('color-selector__color-circle--bounce-back-animation');
   }
 }
 
