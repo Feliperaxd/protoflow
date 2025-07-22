@@ -1,4 +1,4 @@
-import { preventDefaults, setExclusiveStyleClass } from './utils.js';
+import { preventDefaults, setExclusiveStyleClass } from '../utils.js';
 
 /**
  * Class representing a drag-and-drop file upload area.

@@ -1,8 +1,10 @@
-import RequiredElements from './requiredElements.js';
+import DomRegistry from './domRegistry.js';
+
 import {
   reflowElement,
   setExclusiveStyleClass,
   loadTemplateAsElement,
+  switchStyleClass,
 } from './utils.js';
 
 /**
@@ -36,12 +38,58 @@ export default class ColorSelector {
     this.isSliding = false;
     this.selectedColorIndex = null;
 
-    this.requiredElements = new RequiredElements(
+    this.dom = new DomRegistry(
       [
-        { selector: '.color-selector__carousel', name: 'carousel' },
-        { selector: '.color-selector__train', name: 'train' },
-        { selector: '.color-selector__left-arrow', name: 'left arrow' },
-        { selector: '.color-selector__right-arrow', name: 'right arrow' },
+        {
+          selector: '.color-selector__carousel',
+          name: 'carousel',
+          check: true,
+        },
+        {
+          selector: '.color-selector__train',
+          name: 'train',
+          check: true,
+        },
+        {
+          selector: '.color-selector__left-arrow--default',
+          name: 'left-arrow-default',
+          check: true,
+        },
+        {
+          selector: '.color-selector__right-arrow--default',
+          name: 'right-arrow-default',
+          check: true,
+        },
+        {
+          selector: '.color-selector__left-arrow--hidden',
+          name: 'left-arrow-hidden',
+          check: false,
+        },
+        {
+          selector: '.color-selector__right-arrow--hidden',
+          name: 'right-arrow-hidden',
+          check: false,
+        },
+        {
+          selector: '.color-circle--default',
+          name: 'color-circle-default',
+          check: false,
+        },
+        {
+          selector: '.color-circle--hidden',
+          name: 'color-circle-hidden',
+          check: false,
+        },
+        {
+          selector: '.color-circle--selected',
+          name: 'color-circle-selected',
+          check: false,
+        },
+        {
+          selector: '.color-selector__train--shake-animation',
+          name: 'train-shake-animation',
+          check: false,
+        },
       ],
       this.mainElement,
     );
@@ -68,11 +116,7 @@ export default class ColorSelector {
       hexCode,
       element: colorCircleElement,
     });
-
-    this.#selectColorByIndex(
-      this.#getDefaultColorIndex(),
-    );
-    this.#setColorsClasses();
+    this.#updateUi();
   }
 
   /**
@@ -96,44 +140,45 @@ export default class ColorSelector {
     );
     this.#initElements();
     this.#bindEvents();
-    this.requiredElements.checkAll();
+    this.dom.checkAll();
   }
 
   /**
-   * Slides the carousel to the left and selects the corresponding color.
-   */
-  slideLeft() {
+     * Handles the sliding logic for both directions.
+     *
+     * @private
+     * @param {'left'|'right'} direction - The direction to slide ('left' or 'right')
+     * @throws {Error} If direction is not 'left' or 'right'
+     */
+  slide(direction) {
     if (this.isSliding) return;
 
-    if (this.#selectRightColor()) {
-      this.#setColorsClasses();
-      this.#updateTrainPosition();
-      this.isSliding = true;
+    let success = false;
 
-      if (this.onChangeCallback) {
-        this.onChangeCallback();
-      }
-    } else {
-      this.#runBounceBackAnimation(1);
+    switch (direction) {
+    case 'left': {
+      success = this.#selectRightColor();
+      break;
     }
-  }
+    case 'right': {
+      success = this.#selectLeftColor();
+      break;
+    }
+    default: {
+      throw new Error(`Invalid direction: "${direction}". Use 'left' or 'right'.`);
+    }
+    }
 
-  /**
-   * Slides the carousel to the right and selects the corresponding color.
-   */
-  slideRight() {
-    if (this.isSliding) return;
-
-    if (this.#selectLeftColor()) {
+    if (success) {
       this.#setColorsClasses();
       this.#updateTrainPosition();
       this.isSliding = true;
 
-      if (this.onChangeCallback) {
+      if (typeof this.onChangeCallback === 'function') {
         this.onChangeCallback();
       }
     } else {
-      this.#runBounceBackAnimation(-1);
+      this.#runTrainShakeAnimation();
     }
   }
 
@@ -151,8 +196,8 @@ export default class ColorSelector {
    * @private
    */
   #bindEvents() {
-    this.leftArrow.addEventListener('click', () => this.slideRight());
-    this.rightArrow.addEventListener('click', () => this.slideLeft());
+    this.leftArrow.addEventListener('click', () => this.slide('right'));
+    this.rightArrow.addEventListener('click', () => this.slide('left'));
     this.train.addEventListener('transitionend', () => {
       this.isSliding = false;
     });
@@ -184,10 +229,7 @@ export default class ColorSelector {
    * @returns {number} The index of the default color.
    */
   #getDefaultColorIndex() {
-    if (this.allColors.length < 3) {
-      return 0;
-    }
-    return 1;
+    return this.allColors.length > 2 ? 1 : 0;
   }
 
   /**
@@ -225,16 +267,20 @@ export default class ColorSelector {
   }
 
   /**
-   * Calculates the position of the train element based on the selected color index.
-   * The position is determined by multiplying the negative of (selected color index - 1)
-   * with the step offset obtained from #getStepOffset().
+   * Calculates the train position to show the selected color.
+   * For 2 colors: aligns left (0) or right (-offset)
+   * For 3+ colors: centers the selected color
    *
    * @private
-   * @returns {number} The calculated position for the train element (in pixels or relevant units)
-   *  as a negative value to position it correctly relative to the track.
+   * @returns {number} Position in pixels (negative value)
    */
   #getRelativeTrainPosition() {
     const offset = this.#getStepOffset();
+
+    if (this.allColors.length === 2) {
+      return -this.selectedColorIndex * offset;
+    }
+
     return -(this.selectedColorIndex - 1) * offset;
   }
 
@@ -266,17 +312,59 @@ export default class ColorSelector {
   }
 
   /**
+   * Hides both navigation arrows by switching their CSS classes.
+   * Removes the '--default' class and adds the '--hidden' class to both arrows.
+   *
+   * @private
+   */
+  #hideArrows() {
+    switchStyleClass(
+      this.leftArrow,
+      this.dom.getSelector('left-arrow-default', false),
+      this.dom.getSelector('left-arrow-hidden', false),
+    );
+    switchStyleClass(
+      this.rightArrow,
+      this.dom.getSelector('right-arrow-default', false),
+      this.dom.getSelector('right-arrow-hidden', false),
+    );
+  }
+
+  /**
    * Initializes references to required DOM elements within the main container.
    * Clears the inner HTML of the carousel train element to prepare for new content.
    *
    * @private
    */
   #initElements() {
-    this.carousel = this.mainElement.querySelector('.color-selector__carousel');
-    this.train = this.mainElement.querySelector('.color-selector__train');
-    this.leftArrow = this.mainElement.querySelector('.color-selector__left-arrow');
-    this.rightArrow = this.mainElement.querySelector('.color-selector__right-arrow');
+    this.carousel = this.dom.getElement('carousel');
+    this.train = this.dom.getElement('train');
+    this.leftArrow = this.dom.getElement('left-arrow-default');
+    this.rightArrow = this.dom.getElement('right-arrow-default');
     this.train.innerHTML = '';
+  }
+
+  /**
+   * Triggers a shake animation on the train element when navigation isn't possible.
+   *
+   * Ensures the train is in the correct position before animating.
+   * Prevents multiple animations from overlapping.
+   *
+   * @private
+   */
+  #runTrainShakeAnimation() {
+    if (this.isSliding) return;
+    this.isSliding = true;
+
+    this.#updateTrainPosition();
+
+    this.train.classList.remove(
+      this.dom.getSelector('train-shake-animation', false),
+    );
+    reflowElement(this.train);
+    this.train.classList.add(
+      this.dom.getSelector('train-shake-animation', false),
+    );
   }
 
   /**
@@ -305,7 +393,6 @@ export default class ColorSelector {
       return false;
     }
     this.#selectColorByIndex(newIndex);
-    this.selectedColorIndex = newIndex;
     return true;
   }
 
@@ -322,7 +409,6 @@ export default class ColorSelector {
       return false;
     }
     this.#selectColorByIndex(newIndex);
-    this.selectedColorIndex = newIndex;
     return true;
   }
 
@@ -361,62 +447,70 @@ export default class ColorSelector {
 
     this.#setColorClassForIndexes(
       [this.selectedColorIndex],
-      'color-circle--selected',
+      this.dom.getSelector('color-circle-selected', false),
     );
 
     this.#setColorClassForIndexes(
       [leftColorIndex, rightColorIndex],
-      'color-circle--default',
+      this.dom.getSelector('color-circle-default', false),
     );
 
     this.#setColorClassForIndexes(
       this.#getHideColorsIndexes(),
-      'color-circle--hidden',
+      this.dom.getSelector('color-circle-hidden', false),
     );
   }
 
   /**
-   * Updates the position of the carousel train to slide the selected color into view.
+   * Makes both navigation arrows visible by switching their CSS classes.
+   * Removes the '--hidden' class and adds the '--default' class to both arrows.
+   *
+   * @private
+   */
+  #showArrows() {
+    switchStyleClass(
+      this.leftArrow,
+      this.dom.getSelector('left-arrow-hidden', false),
+      this.dom.getSelector('left-arrow-default', false),
+    );
+    switchStyleClass(
+      this.rightArrow,
+      this.dom.getSelector('right-arrow-hidden', false),
+      this.dom.getSelector('right-arrow-default', false),
+    );
+  }
+
+  /**
+   * Updates the CSS custom property '--trainPosition' to move the carousel train,
+   * effectively sliding the selected color into the viewport.
    *
    * @private
    */
   #updateTrainPosition() {
-    const trainPositionX = this.#getRelativeTrainPosition();
-    this.train.style.transform = `translateX(${trainPositionX}px)`;
-  }
-
-  #runBounceBackAnimation(direction) {
-    if (direction !== -1 && direction !== 1) {
-      throw new Error(`Invalid direction: only -1 or 1 are allowed. Received: ${direction}`);
-    }
-
-    if (this.isSliding) return;
-    this.isSliding = true;
-
-    this.train.style.setProperty(
-      '--stepOffset',
-      `${this.#getStepOffset()}px`,
-    );
     this.train.style.setProperty(
       '--trainPosition',
       `${this.#getRelativeTrainPosition()}px`,
     );
-    this.train.style.setProperty(
-      '--bounceBackDirection',
-      `${direction}`,
-    );
+  }
 
-    this.train.classList.remove('color-selector__train--bounce-back-animation');
-    this.allColors[this.selectedColorIndex].element.classList.remove('color-selector__color-circle--bounce-back-animation');
-    adicionar aqui
-    reflowElement(this.train);
-    this.train.classList.add('color-selector__train--bounce-back-animation');
-    this.allColors[this.selectedColorIndex].element.classList.add('color-selector__color-circle--bounce-back-animation');
+  /**
+   * Updates the UI state of the color selector:
+   * - Selects the default color
+   * - Applies the correct CSS classes to all colors
+   * - Shows/hides navigation arrows based on color count
+   *
+   * @private
+   */
+  #updateUi() {
+    this.#selectColorByIndex(
+      this.#getDefaultColorIndex(),
+    );
+    this.#setColorsClasses();
+
+    if (this.allColors.length < 2) {
+      this.#hideArrows();
+    } else {
+      this.#showArrows();
+    }
   }
 }
-
-const clr = new ColorSelector('model-color-selector');
-await clr.init();
-clr.addColor('0', 'rosa', '#FF69B4');
-clr.addColor('1', 'vermelho', '#FF0000');
-clr.addColor('2', 'verde-limão', '#32CD32');

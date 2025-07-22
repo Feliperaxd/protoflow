@@ -1,7 +1,7 @@
-import RequiredElements from './requiredElements.js';
+import DomRegistry from './domRegistry.js';
 import {
   formatValuePrecision,
-  getCssPropertyValue,
+  getComputedCssNumber,
   getEventPositions,
   preventDefaults,
 } from './utils.js';
@@ -35,19 +35,39 @@ export default class RangeSlider {
       throw new Error('Expected "onChangeCallback" to be a function');
     }
 
-    this.requiredElements = new RequiredElements(
+    this.dom = new DomRegistry(
       [
-        { selector: '.range-slider__title', name: 'title' },
-        { selector: '.range-slider__track', name: 'track' },
-        { selector: '.range-slider__thumb', name: 'thumb' },
-        { selector: '.range-slider__filled', name: 'filled' },
-        { selector: '.range-slider__value', name: 'value' },
+        {
+          selector: '.range-slider__title',
+          name: 'title',
+          check: true,
+        },
+        {
+          selector: '.range-slider__track',
+          name: 'track',
+          check: true,
+        },
+        {
+          selector: '.range-slider__thumb',
+          name: 'thumb',
+          check: true,
+        },
+        {
+          selector: '.range-slider__filled',
+          name: 'filled',
+          check: true,
+        },
+        {
+          selector: '.range-slider__value',
+          name: 'value',
+          check: true,
+        },
       ],
       this.mainElement,
     );
 
     this.style = getComputedStyle(this.mainElement);
-    this.requiredElements.checkAll();
+    this.dom.checkAll();
     this.#initElements();
     this.#initProperties();
 
@@ -100,11 +120,11 @@ export default class RangeSlider {
    * @private
    */
   #initElements() {
-    this.title = this.mainElement.querySelector('.range-slider__title');
-    this.track = this.mainElement.querySelector('.range-slider__track');
-    this.thumb = this.mainElement.querySelector('.range-slider__thumb');
-    this.filled = this.mainElement.querySelector('.range-slider__filled');
-    this.valueLabel = this.mainElement.querySelector('.range-slider__value');
+    this.title = this.dom.getElement('title');
+    this.track = this.dom.getElement('track');
+    this.thumb = this.dom.getElement('thumb');
+    this.filled = this.dom.getElement('filled');
+    this.valueLabel = this.dom.getElement('value');
   }
 
   /**
@@ -113,10 +133,10 @@ export default class RangeSlider {
    */
   #initProperties() {
     this.symbol = this.style.getPropertyValue('--symbol').trim() || '';
-    this.minValue = getCssPropertyValue(this.mainElement, '--min-value');
-    this.maxValue = getCssPropertyValue(this.mainElement, '--max-value');
-    this.stepValue = getCssPropertyValue(this.mainElement, '--step-value');
-    this.defaultValue = getCssPropertyValue(this.mainElement, '--default-value');
+    this.minValue = getComputedCssNumber(this.mainElement, '--min-value');
+    this.maxValue = getComputedCssNumber(this.mainElement, '--max-value');
+    this.stepValue = getComputedCssNumber(this.mainElement, '--step-value');
+    this.defaultValue = getComputedCssNumber(this.mainElement, '--default-value');
     this.numberOfDecimalPlaces = Number(
       this.style.getPropertyValue('--number-of-decimal-places'),
     ) || 2;
@@ -161,6 +181,7 @@ export default class RangeSlider {
     const handleDragEnd = () => {
       window.removeEventListener('mousemove', handleDragMove);
       window.removeEventListener('mouseup', handleDragEnd);
+
       window.removeEventListener('touchmove', handleDragMove);
       window.removeEventListener('touchend', handleDragEnd);
       window.removeEventListener('touchcancel', handleDragEnd);
@@ -169,6 +190,7 @@ export default class RangeSlider {
 
     window.addEventListener('mousemove', handleDragMove);
     window.addEventListener('mouseup', handleDragEnd);
+
     window.addEventListener('touchmove', handleDragMove);
     window.addEventListener('touchend', handleDragEnd);
     window.addEventListener('touchcancel', handleDragEnd);

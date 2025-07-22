@@ -11,26 +11,40 @@
   position: relative;
 }
 
-.color-selector__left-arrow,
-.color-selector__right-arrow {
+.color-selector__left-arrow--hidden,
+.color-selector__right-arrow--hidden,
+.color-selector__left-arrow--default,
+.color-selector__right-arrow--default {
   width: 6%;
   aspect-ratio: 0.59 / 1;
+
   z-index: 1;
   transition: var(--transition-fast);
   background-color: var(--color-icon-button-secondary-default);
 }
-.color-selector__left-arrow {
+
+.color-selector__left-arrow--default,
+.color-selector__right-arrow--default {
+  opacity: 1;
+}
+
+.color-selector__left-arrow--hidden,
+.color-selector__right-arrow--hidden {
+  opacity: 0;
+}
+
+.color-selector__left-arrow--default {
   transform: rotateY(180deg);
 }
 
-.color-selector__left-arrow:hover,
-.color-selector__right-arrow:hover {
+.color-selector__left-arrow--default:hover,
+.color-selector__right-arrow--default:hover {
   cursor: pointer;
   scale: var(--scale-icon-button-hover);
 }
 
-.color-selector__left-arrow:active,
-.color-selector__right-arrow:active {
+.color-selector__left-arrow--default:active,
+.color-selector__right-arrow--default:active {
   scale: var(--scale-icon-button-pressed);
 }
 
@@ -48,6 +62,7 @@
   display: flex;
   align-items: center;
   transition: var(--transition-default);
+  transform: translateX(var(--trainPosition));
 }
 
 .color-selector__train:has(:only-child) {
@@ -97,45 +112,30 @@
   transform: scale(var(--scale-selected));
 }
 
-.color-selector__train--bounce-back-animation {
-  animation: color-selector__train--bounce-back 0.5s linear;
+.color-selector__train--shake-animation {
+  animation: color-selector__train--shake 0.4s ease-in-out;
 }
 
-.color-selector__color-circle--selected--bounce-back-animation {
-  animation: color-selector__color-circle--selected--bounce-back 0.5s linear;
-}
-
-.color-selector__color-circle--default--bounce-back-animation {
-  animation: color-selector__color-circle--default--bounce-back 0.5s linear;
-}
-
-@keyframes color-selector__train--bounce-back {
+@keyframes color-selector__train--shake {
+  0% {
+    transform: translateX(var(--trainPosition));
+  }
+  25% {
+    transform: translateX(
+      calc(var(--trainPosition) + 4px)
+    );
+  }
   50% {
     transform: translateX(
-      calc(var(--trainPosition) - var(--stepOffset) * var(--bounceBackDirection))
+      calc(var(--trainPosition) - 4px)
+    );
+  }
+  75% {
+    transform: translateX(
+      calc(var(--trainPosition) + 2px)
     );
   }
   100% {
     transform: translateX(var(--trainPosition));
-  }
-}
-
-@keyframes color-selector__color-circle--selected--bounce-back {
-  50% {
-    transform: scale(var(--scale-default));
-  }
-  100% {
-    transform: scale(var(--scale-selected));
-  }
-}
-
-@keyframes color-selector__color-circle--default--bounce-back {
-  50% {
-    opacity: 0;
-    transform: scale(var(--scale-hidden));
-  }
-  100% {
-    opacity: 1;
-    transform: scale(var(--scale-default));
   }
 }

@@ -16,15 +16,15 @@ export const formatValuePrecision = (value, numberOfDecimalPlaces = 2) => {
 };
 
 /**
- * Retrieves the numeric value of a custom CSS property from a given element.
- * Throws an error if the value is not a valid number.
+ * Gets the numeric value of a computed custom CSS variable from a given element.
+ * Throws an error if the value cannot be parsed as a number.
  *
  * @param {HTMLElement} element - The DOM element to read the property from.
- * @param {string} propertyName - The name of the CSS property (e.g., '--min-value').
- * @returns {number} - The numeric value of the CSS property.
+ * @param {string} propertyName - The name of the CSS variable (e.g., '--min-value').
+ * @returns {number} - The numeric value of the computed CSS variable.
  * @throws {Error} - If the value is not a valid number.
  */
-export const getCssPropertyValue = (element, propertyName) => {
+export const getComputedCssNumber = (element, propertyName) => {
   const value = parseFloat(getComputedStyle(element).getPropertyValue(propertyName));
   if (Number.isNaN(value)) {
     throw new Error(`Invalid CSS value for ${propertyName}`);
