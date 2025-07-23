@@ -1,11 +1,10 @@
-import DomRegistry from './domRegistry.js';
-
+import DomRegistry from '../../scripts/domRegistry.js';
 import {
   reflowElement,
   setExclusiveStyleClass,
   loadTemplateAsElement,
   switchStyleClass,
-} from './utils.js';
+} from '../../scripts/utils.js';
 
 /**
  * ColorSelector class to create a carousel of selectable colors.
@@ -135,7 +134,7 @@ export default class ColorSelector {
    */
   async init() {
     this.colorCircleTemplate = await loadTemplateAsElement(
-      '../templates/color-circle.html',
+      './ColorCircle.html',
       'div',
     );
     this.#initElements();
@@ -144,12 +143,12 @@ export default class ColorSelector {
   }
 
   /**
-     * Handles the sliding logic for both directions.
-     *
-     * @private
-     * @param {'left'|'right'} direction - The direction to slide ('left' or 'right')
-     * @throws {Error} If direction is not 'left' or 'right'
-     */
+   * Handles the sliding logic for both directions.
+   *
+   * @private
+   * @param {'left'|'right'} direction - The direction to slide ('left' or 'right')
+   * @throws {Error} If direction is not 'left' or 'right'
+   */
   slide(direction) {
     if (this.isSliding) return;
 
@@ -514,3 +513,11 @@ export default class ColorSelector {
     }
   }
 }
+
+const clr = new ColorSelector('model-color-selector');
+await clr.init();
+clr.addColor('a', 'a', 'red');
+clr.addColor('a', 'a', 'green');
+clr.addColor('a', 'a', 'blue');
+clr.addColor('a', 'a', 'yellow');
+

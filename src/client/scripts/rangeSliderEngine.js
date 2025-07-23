@@ -84,8 +84,7 @@ export default class RangeSlider {
    * @param {number} value - The new value to set.
    */
   changeValue(value) {
-    this.value = formatValuePrecision(
-      this.#clamp(value),
+    this.value = this.#clamp(value).toFixed(
       this.numberOfDecimalPlaces,
     );
     this.#updateUi();
@@ -100,8 +99,7 @@ export default class RangeSlider {
    * @returns {string} The formatted value.
    */
   getValue() {
-    return formatValuePrecision(
-      this.#clamp(this.value),
+    return this.#clamp(this.value).toFixed(
       this.numberOfDecimalPlaces,
     );
   }

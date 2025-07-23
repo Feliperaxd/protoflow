@@ -1,21 +1,4 @@
 /**
- * Formats a numeric value to a specified precision (number of decimal places).
- * @param {number} value - The numeric value to be formatted.
- * @param {number} [numberOfDecimalPlaces=2] - Number of decimal places (default: 2).
- * @returns {string} Formatted value as string with specified precision.
- * @throws {TypeError} If input is not valid number.
- */
-export const formatValuePrecision = (value, numberOfDecimalPlaces = 2) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    throw new TypeError('Value must be valid number');
-  }
-  if (typeof numberOfDecimalPlaces !== 'number' || numberOfDecimalPlaces < 0) {
-    throw new TypeError('Decimal places must be non-negative number');
-  }
-  return value.toFixed(numberOfDecimalPlaces);
-};
-
-/**
  * Gets the numeric value of a computed custom CSS variable from a given element.
  * Throws an error if the value cannot be parsed as a number.
  *
