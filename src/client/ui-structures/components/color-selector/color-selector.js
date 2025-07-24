@@ -1,10 +1,10 @@
-import DomRegistry from '../../scripts/domRegistry.js';
 import {
+  DomRegistry,
   reflowElement,
   setExclusiveStyleClass,
   loadTemplateAsElement,
   switchStyleClass,
-} from '../../scripts/utils.js';
+} from '../../../core';
 
 /**
  * ColorSelector class to create a carousel of selectable colors.
