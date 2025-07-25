@@ -1,4 +1,4 @@
-@import url(tokens.css);
+@import url(../../../styles/tokens.css);
 
 :root {
   --track-width: 80%;

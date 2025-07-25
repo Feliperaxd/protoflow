@@ -1,10 +1,10 @@
 import {
   DomRegistry,
   reflowElement,
-  setExclusiveStyleClass,
-  loadTemplateAsElement,
   switchStyleClass,
-} from '../../../core';
+  loadTemplateAsElement,
+  setExclusiveStyleClass,
+} from '../../../core/index.js';
 
 /**
  * ColorSelector class to create a carousel of selectable colors.
@@ -133,10 +133,12 @@ export default class ColorSelector {
    * @async
    */
   async init() {
+    const colorCirlceUrl = new URL('./color-circle.html', import.meta.url).href;
     this.colorCircleTemplate = await loadTemplateAsElement(
-      './ColorCircle.html',
+      colorCirlceUrl,
       'div',
     );
+
     this.#initElements();
     this.#bindEvents();
     this.dom.checkAll();
@@ -513,11 +515,3 @@ export default class ColorSelector {
     }
   }
 }
-
-const clr = new ColorSelector('model-color-selector');
-await clr.init();
-clr.addColor('a', 'a', 'red');
-clr.addColor('a', 'a', 'green');
-clr.addColor('a', 'a', 'blue');
-clr.addColor('a', 'a', 'yellow');
-

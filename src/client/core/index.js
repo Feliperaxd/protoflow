@@ -1,2 +1,2 @@
-export * from './utils';
-export * from './ui-resources';
+export * from './utils/index.js';
+export * from './ui-resources/index.js';

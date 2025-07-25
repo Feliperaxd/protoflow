@@ -1,4 +1,4 @@
-@import url(tokens.css);
+@import url(../../../styles/tokens.css);
 
 .dropdown-selector {
   width: 200px;
@@ -29,19 +29,26 @@
   width: 100%;
   height: 60%;
 
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
   background-color: rgb(53, 53, 53);
 }
 
-.dropdown-selector__value-side::before {
+/*.dropdown-selector__value-side::before {
   width: 2%;
   height: 100%;
   content: "";
   display: block;
   background: var(--color-background-primary-emphasis);
+}*/
+
+.dropdown-selector__arrow {
+  height: 70%;
+  aspect-ratio: 0.59 / 1;
+
+  transform: rotateZ(90deg);
+  background-color: green;
 }
 
-.dropdown-selector__bottom-arrow {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  background-color: red;
-}

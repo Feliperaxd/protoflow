@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../color-selector.css">
+  <link rel="stylesheet" href="../../../../styles/tokens.css">
+  <link rel="stylesheet" href="../../../../styles/globals.css">
+  <link rel="stylesheet" href="../../../../styles/icon-mask.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #FAFAFA;
+    }
+  </style>
+</head>
+<body>
+  <div class="color-selector" id="color-selector-example">
+    <div class="icon-mask color-selector__left-arrow--default"
+         style="--icon-mask-url:url(../assets/icons/arrow-icon-mask.svg)">
+    </div>
+    <div class="color-selector__carousel">
+      <div class="color-selector__train"></div>
+    </div>
+    <div class="icon-mask color-selector__right-arrow--default"
+         style="--icon-mask-url:url(../assets/icons/arrow-icon-mask.svg)">
+    </div>
+  </div>
+  <script type="module" src="./color-selector.test.js"></script>
+</body>
+</html>

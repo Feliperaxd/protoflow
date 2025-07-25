@@ -1,10 +1,9 @@
-import DomRegistry from './domRegistry.js';
 import {
-  formatValuePrecision,
-  getComputedCssNumber,
-  getEventPositions,
+  DomRegistry,
   preventDefaults,
-} from './utils.js';
+  getEventPositions,
+  getComputedCssNumber,
+} from '../../../core/index.js';
 
 /**
  * RangeSlider class to create a customizable slider input component.

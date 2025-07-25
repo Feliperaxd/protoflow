@@ -1,2 +1,2 @@
-export * from './dom';
-export * from './network';
+export * from './dom/index.js';
+export * from './network/index.js';

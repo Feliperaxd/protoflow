@@ -3,18 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="../../../styles/tokens.css" />
-  <link rel="stylesheet" href="../../../styles/globals.css" />
-  <link rel="stylesheet" href="../../../styles/icon-mask.css" />
-  <link rel="stylesheet" href="./range-slider.css" />
+  <link rel="stylesheet" href="../../../../styles/tokens.css" />
+  <link rel="stylesheet" href="../../../../styles/globals.css" />
+  <link rel="stylesheet" href="../../../../styles/icon-mask.css" />
+  <link rel="stylesheet" href="../range-slider.css" />
 
   <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #1C1C1C;
+    }
+  </style>
 </head>
-<body class="container">
+<body>
   <div
     class="range-slider"
-    id="infill"
+    id="range-slider-example"
     style="--default-value:25; --symbol:%; --step-value:5; --min-value:5; --max-value:100;"
   >
     <div class="range-slider__header">
@@ -29,6 +46,6 @@
     </div>
   </div>
 
-  <script type="module" src="./range-slider.js"></script>
+  <script type="module" src="./range-slider.test.js"></script>
 </body>
 </html>
