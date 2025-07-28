@@ -25,7 +25,7 @@ export default class ColorSelector {
     this.onChangeCallback = onChangeCallback;
 
     if (!this.mainElement) {
-      throw new Error(`Slider element with id "${mainElementID}" not found`);
+      throw new Error(`Color selector element with id "${mainElementID}" not found`);
     }
 
     if (typeof this.onChangeCallback !== 'function'

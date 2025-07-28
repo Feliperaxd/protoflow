@@ -19,7 +19,7 @@
   aspect-ratio: 1 / 1;
 
   z-index: 1;
-  transition: var(--transition-fast);
+  transition: var(--transition-default);
   background-color: var(--color-icon-button-secondary-default);
 }
 
