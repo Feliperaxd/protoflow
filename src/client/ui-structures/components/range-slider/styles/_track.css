@@ -1,0 +1,22 @@
+@import url(../../../../styles/tokens.css);
+
+.range-slider__track {
+  width: 79%;
+  height: var(--track-height);
+  margin-top: 0.7%;
+  border-radius: 1em;
+
+  display: flex;
+  align-items: center;
+
+  cursor: pointer;
+  background-color: var(--color-disabled);
+}
+
+.range-slider__filled-track {
+  height: 100%;
+  border-radius: 1em 0 0 1em;
+
+  transition: var(--transition-fast);
+  background: var(--color-background-primary-emphasis);
+}

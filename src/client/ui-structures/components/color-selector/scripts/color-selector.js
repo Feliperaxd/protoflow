@@ -4,7 +4,7 @@ import {
   switchStyleClass,
   loadTemplateAsElement,
   setExclusiveStyleClass,
-} from '../../../core/index.js';
+} from '../../../../core/index.js';
 
 /**
  * ColorSelector class to create a carousel of selectable colors.
@@ -37,61 +37,7 @@ export default class ColorSelector {
     this.isSliding = false;
     this.selectedColorIndex = null;
 
-    this.dom = new DomRegistry(
-      [
-        {
-          selector: '.color-selector__carousel',
-          name: 'carousel',
-          check: true,
-        },
-        {
-          selector: '.color-selector__train',
-          name: 'train',
-          check: true,
-        },
-        {
-          selector: '.color-selector__left-arrow--default',
-          name: 'left-arrow-default',
-          check: true,
-        },
-        {
-          selector: '.color-selector__right-arrow--default',
-          name: 'right-arrow-default',
-          check: true,
-        },
-        {
-          selector: '.color-selector__left-arrow--hidden',
-          name: 'left-arrow-hidden',
-          check: false,
-        },
-        {
-          selector: '.color-selector__right-arrow--hidden',
-          name: 'right-arrow-hidden',
-          check: false,
-        },
-        {
-          selector: '.color-circle--default',
-          name: 'color-circle-default',
-          check: false,
-        },
-        {
-          selector: '.color-circle--hidden',
-          name: 'color-circle-hidden',
-          check: false,
-        },
-        {
-          selector: '.color-circle--selected',
-          name: 'color-circle-selected',
-          check: false,
-        },
-        {
-          selector: '.color-selector__train--shake-animation',
-          name: 'train-shake-animation',
-          check: false,
-        },
-      ],
-      this.mainElement,
-    );
+    this.dom = this.#getDomRegistry();
   }
 
   // === Public Methods ===
@@ -133,7 +79,7 @@ export default class ColorSelector {
    * @async
    */
   async init() {
-    const colorCirlceUrl = new URL('./color-circle.html', import.meta.url).href;
+    const colorCirlceUrl = new URL('../templates/color-circle.html', import.meta.url).href;
     this.colorCircleTemplate = await loadTemplateAsElement(
       colorCirlceUrl,
       'div',
@@ -338,10 +284,10 @@ export default class ColorSelector {
    * @private
    */
   #initElements() {
-    this.carousel = this.dom.getElement('carousel');
-    this.train = this.dom.getElement('train');
-    this.leftArrow = this.dom.getElement('left-arrow-default');
-    this.rightArrow = this.dom.getElement('right-arrow-default');
+    [this.carousel] = this.dom.getElements('carousel');
+    [this.train] = this.dom.getElements('train');
+    [this.leftArrow] = this.dom.getElements('left-arrow-default');
+    [this.rightArrow] = this.dom.getElements('right-arrow-default');
     this.train.innerHTML = '';
   }
 
@@ -513,5 +459,82 @@ export default class ColorSelector {
     } else {
       this.#showArrows();
     }
+  }
+
+  /**
+   * Creates and returns a new instance of DomRegistry containing the DOM structure
+   * configuration for the Color Selector component.
+   *
+   * The registry includes elements like arrows, carousel, train, and color circles,
+   * each with its associated CSS selector, name, and validation check flag.
+   *
+   * @private
+   * @returns {DomRegistry} A configured DomRegistry instance tied to this.mainElement.
+   */
+  #getDomRegistry() {
+    return new DomRegistry(
+      [
+        /* -- Left Arrow -- */
+        {
+          selector: '.color-selector__left-arrow--default',
+          name: 'left-arrow-default',
+          check: false,
+        },
+        {
+          selector: '.color-selector__left-arrow--hidden',
+          name: 'left-arrow-hidden',
+          check: false,
+        },
+
+        /* -- Right Arrow -- */
+        {
+          selector: '.color-selector__right-arrow--default',
+          name: 'right-arrow-default',
+          check: false,
+        },
+        {
+          selector: '.color-selector__right-arrow--hidden',
+          name: 'right-arrow-hidden',
+          check: false,
+        },
+
+        /* -- Color Carousel -- */
+        {
+          selector: '.color-selector__carousel',
+          name: 'carousel',
+          check: false,
+        },
+
+        /* -- Carousel Train -- */
+        {
+          selector: '.color-selector__train',
+          name: 'train',
+          check: false,
+        },
+        {
+          selector: '.color-selector__train--shake-animation',
+          name: 'train-shake-animation',
+          check: false,
+        },
+
+        /* -- Carousel Train -- */
+        {
+          selector: '.color-selector__color-circle--hidden',
+          name: 'color-circle-hidden',
+          check: false,
+        },
+        {
+          selector: '.color-selector__color-circle--default',
+          name: 'color-circle-default',
+          check: false,
+        },
+        {
+          selector: '.color-selector__color-circle--selected',
+          name: 'color-circle-selected',
+          check: false,
+        },
+      ],
+      this.mainElement,
+    );
   }
 }

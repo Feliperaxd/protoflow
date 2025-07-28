@@ -1,0 +1,16 @@
+@import url(../../../../styles/tokens.css);
+
+.range-slider__title,
+.range-slider__value {
+  color: var(--color-text-primary-default);
+  font-family: var(--font-family-base);
+  letter-spacing: var(--letter-spacing-default);
+}
+
+.range-slider__title[responsive-text] {
+  --responsive-text-ratio: 20;
+}
+
+.range-slider__value[responsive-text] {
+  --responsive-text-ratio: 26;
+}

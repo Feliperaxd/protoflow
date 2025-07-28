@@ -3,32 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Base styles -->
   <link rel="stylesheet" href="../../../styles/tokens.css">
   <link rel="stylesheet" href="../../../styles/globals.css">
+  <link rel="stylesheet" href="../../../styles/effects.css">
   <link rel="stylesheet" href="../../../styles/icon-mask.css">
 
-  <link rel="stylesheet" href="../../../assets/icons/arrow-icon-mask.svg">
+  <!-- Component style -->
   <link rel="stylesheet" href="./dropdown-selector.css">
 
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
 </head>
+
 <body class="container">
+
+  <!-- Dropdown Selector -->
   <div class="dropdown-selector" id="selector-example">
+
+    <!-- Title -->
     <div class="dropdown-selector__title-box">
       <p class="dropdown-selector__title--default" responsive-text>Material</p>
     </div>
+
+    <!-- Selected value and arrow -->
     <div class="dropdown-selector__value-side">
       <div class="dropdown-selector__accent-bar--default"></div>
       <p class="dropdown-selector__value--default" responsive-text>PETG</p>
       <div class="icon-mask dropdown-selector__arrow--default"
            style="--icon-mask-url:url(../assets/icons/arrow-icon-mask.svg)">
       </div>
-      <div class="dropdown-selector__menu--default">
 
-      </div>
+      <!-- Options menu -->
+      <ul class="glassmorphism-clear dropdown-selector__menu--default"> <!-- Menu -->
+        <li class="dropdown-selector__item--default">
+          <p class="dropdown-selector__item-value--default" responsive-text>PLA</p>
+        </li>
+        <li class="dropdown-selector__item--default">
+          <p class="dropdown-selector__item-value--default" responsive-text>ABS</p>
+        </li>
+        <li class="dropdown-selector__item--default">
+          <p class="dropdown-selector__item-value--default" responsive-text>TPU</p>
+        </li>
+        <li class="dropdown-selector__item--default">
+          <p class="dropdown-selector__item-value--default" responsive-text>PETG</p>
+        </li>
+        <li class="dropdown-selector__item--default">
+          <p class="dropdown-selector__item-value--default" responsive-text>Nylon</p>
+        </li>
+      </ul>
+
     </div>
+
   </div>
+
+  <!-- Component script -->
   <script type="module" src="./dropdown-selector.js"></script>
 </body>
 </html>

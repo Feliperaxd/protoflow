@@ -38,16 +38,22 @@ export default class DomRegistry {
    */
 
   /**
-   * Retrieves a registered DOM element
+   * Retrieves one or multiple DOM elements by identifier.
    *
    * @param {string} identifier - Name or selector of the element
-   * @returns {HTMLElement|null} The matched element or null
+   * @returns {HTMLElement|HTMLElement[]|null} The matched element(s) or null
    */
-  getElement(identifier) {
+  getElements(identifier) {
     const config = this.elements.find(
       item => item.name === identifier || item.selector === identifier,
     );
-    return config ? this.root.querySelector(config.selector) : null;
+
+    if (!config) return null;
+
+    const matched = this.root.querySelectorAll(config.selector);
+
+    if (matched.length === 0) return null;
+    return Array.from(matched);
   }
 
   /**

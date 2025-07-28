@@ -1,0 +1,24 @@
+@import url(../../../../styles/tokens.css);
+
+.range-slider__thumb {
+  height: var(--thumb-diameter);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+
+  transition: var(--transition-fast);
+  touch-action: none;
+  background-color: var(--color-background-secondary-default);
+}
+
+.range-slider__thumb:hover,
+.range-slider__thumb--active {
+  scale: var(--scale-icon-button-hover);
+}
+
+.range-slider__thumb:hover {
+  cursor: grab;
+}
+
+.range-slider__thumb--active {
+  cursor: grabbing;
+}

@@ -1,0 +1,15 @@
+@import url(./_train.css);
+@import url(./_arrows.css);
+@import url(./_carousel.css);
+@import url(./_color-circle.css);
+
+.color-selector {
+  width: 250px;
+  aspect-ratio: 2.5 / 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  position: relative;
+}

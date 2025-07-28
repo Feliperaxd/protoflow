@@ -1,0 +1,35 @@
+@import url(../../../../styles/tokens.css);
+
+.color-selector__circle-wrapper {
+  height: 100%;
+  width: 33.33%;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-selector__color-circle--hidden,
+.color-selector__color-circle--default,
+.color-selector__color-circle--selected {
+  width: 50%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: var(--color);
+  transition: var(--transition-default);
+  filter: drop-shadow(var(--shadow-strong));
+}
+
+.color-selector__color-circle--hidden {
+  opacity: 0;
+  transform: scale(var(--scale-hidden));
+}
+
+.color-selector__color-circle--default {
+  transform: scale(var(--scale-default));
+}
+
+.color-selector__color-circle--selected {
+  transform: scale(var(--scale-selected));
+}

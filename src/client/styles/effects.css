@@ -1,7 +1,15 @@
 @import url(tokens.css);
 
+.glassmorphism-clear,
+.glassmorphism-smoke {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glassmorphism-clear {
+  background: var(--gradient-background-glassmorphism-clear);;
+}
+
 .glassmorphism-smoke {
     background: var(--gradient-background-glassmorphism-smoke);;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 }

@@ -3,23 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./color-selector.css">
+
+  <!-- Base styles -->
   <link rel="stylesheet" href="../../../styles/tokens.css">
   <link rel="stylesheet" href="../../../styles/globals.css">
   <link rel="stylesheet" href="../../../styles/icon-mask.css">
+
+  <!-- Component style -->
+  <link rel="stylesheet" href="../styles/color-selector.css">
 </head>
 <body class="container">
+
+  <!-- Color selector -->
   <div class="color-selector" id="color-selector-example">
+
+    <!-- Left arrow -->
     <div class="icon-mask color-selector__left-arrow--default"
           style="--icon-mask-url:url(../assets/icons/arrow-icon-mask.svg)">
     </div>
+
+    <!-- Color carousel -->
     <div class="color-selector__carousel">
       <div class="color-selector__train"></div>
     </div>
+
+    <!-- Right arrow -->
     <div class="icon-mask color-selector__right-arrow--default"
           style="--icon-mask-url:url(../assets/icons/arrow-icon-mask.svg)">
     </div>
+
   </div>
-  <script type="module" src="./color-selector.js"></script>
+
+  <!-- Component script -->
+  <script type="module" src="../scripts/color-selector.js"></script>
 </body>
 </html>

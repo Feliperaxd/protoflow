@@ -1,4 +1,4 @@
-import ColorSelector from '../color-selector.js';
+import ColorSelector from '../scripts/color-selector.js';
 
 const callBack = () => {
   console.log('The color changed');

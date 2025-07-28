@@ -1,9 +1,10 @@
 import {
   DomRegistry,
+  ResponsiveText,
   preventDefaults,
   getEventPositions,
   getComputedCssNumber,
-} from '../../../core/index.js';
+} from '../../../../core/index.js';
 
 /**
  * RangeSlider class to create a customizable slider input component.
@@ -34,41 +35,18 @@ export default class RangeSlider {
       throw new Error('Expected "onChangeCallback" to be a function');
     }
 
-    this.dom = new DomRegistry(
-      [
-        {
-          selector: '.range-slider__title',
-          name: 'title',
-          check: true,
-        },
-        {
-          selector: '.range-slider__track',
-          name: 'track',
-          check: true,
-        },
-        {
-          selector: '.range-slider__thumb',
-          name: 'thumb',
-          check: true,
-        },
-        {
-          selector: '.range-slider__filled',
-          name: 'filled',
-          check: true,
-        },
-        {
-          selector: '.range-slider__value',
-          name: 'value',
-          check: true,
-        },
-      ],
-      this.mainElement,
+    this.responsiveText = new ResponsiveText(
+      'responsive-text',
+      '--responsive-text-ratio',
     );
 
+    this.dom = this.#getDomRegistry();
     this.style = getComputedStyle(this.mainElement);
     this.dom.checkAll();
+
     this.#initElements();
     this.#initProperties();
+    this.responsiveText.init();
 
     this.#onResize = this.#handleResize.bind(this);
     this.#bindEvents();
@@ -117,11 +95,11 @@ export default class RangeSlider {
    * @private
    */
   #initElements() {
-    this.title = this.dom.getElement('title');
-    this.track = this.dom.getElement('track');
-    this.thumb = this.dom.getElement('thumb');
-    this.filled = this.dom.getElement('filled');
-    this.valueLabel = this.dom.getElement('value');
+    [this.title] = this.dom.getElements('title');
+    [this.track] = this.dom.getElements('track');
+    [this.thumb] = this.dom.getElements('thumb');
+    [this.filledTrack] = this.dom.getElements('filled-track');
+    [this.valueLabel] = this.dom.getElements('value');
   }
 
   /**
@@ -271,7 +249,7 @@ export default class RangeSlider {
     const ratio = this.#getFilledRatio(this.value);
     const pixelLeft = ratio * this.effectiveTrackWidth;
 
-    this.filled.style.width = `${ratio * 100}%`;
+    this.filledTrack.style.width = `${ratio * 100}%`;
     this.valueLabel.textContent = `${this.value}${this.symbol}`;
     this.thumb.style.left = `${pixelLeft}px`;
   }
@@ -301,5 +279,55 @@ export default class RangeSlider {
     const clamped = Math.min(Math.max(numericValue, this.minValue), this.maxValue);
     const steps = Math.round((clamped - this.minValue) / this.stepValue);
     return this.minValue + steps * this.stepValue;
+  }
+
+  /**
+   * Creates and returns a new instance of DomRegistry containing the DOM structure
+   * configuration for the Color Selector component.
+   *
+   * The registry includes elements like arrows, carousel, train, and color circles,
+   * each with its associated CSS selector, name, and validation check flag.
+   *
+   * @private
+   * @returns {DomRegistry} A configured DomRegistry instance tied to this.mainElement.
+   */
+  #getDomRegistry() {
+    return new DomRegistry(
+      [
+        /* -- Title -- */
+        {
+          selector: '.range-slider__title',
+          name: 'title',
+          check: false,
+        },
+
+        /* -- Track -- */
+        {
+          selector: '.range-slider__track',
+          name: 'track',
+          check: false,
+        },
+        {
+          selector: '.range-slider__filled-track',
+          name: 'filled-track',
+          check: false,
+        },
+
+        /* -- Thumb -- */
+        {
+          selector: '.range-slider__thumb',
+          name: 'thumb',
+          check: false,
+        },
+
+        /* -- Value -- */
+        {
+          selector: '.range-slider__value',
+          name: 'value',
+          check: false,
+        },
+      ],
+      this.mainElement,
+    );
   }
 }
