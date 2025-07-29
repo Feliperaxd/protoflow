@@ -1,0 +1,36 @@
+@import url(../../../../styles/tokens.css);
+
+.dropdown-selector__label-box {
+  width: 100%;
+  height: 35%;
+}
+
+.dropdown-selector__label-box {
+  display: flex;
+  align-items: center;
+
+  position: relative;
+}
+
+.dropdown-selector__label--open,
+.dropdown-selector__label--default {
+  left: 0;
+  bottom: 0;
+  position: absolute;
+
+  user-select: none;
+  font-weight: bold;
+  font-family: var(--font-family-base);
+  letter-spacing: var(--letter-spacing-default);
+  --responsive-text-ratio: 1.1;
+
+  transition: var(--transition-default);
+}
+
+.dropdown-selector__label--open {
+  color: var(--color-white);
+}
+
+.dropdown-selector__label--default {
+  color: var(--color-disabled);
+}

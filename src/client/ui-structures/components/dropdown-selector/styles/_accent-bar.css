@@ -1,0 +1,17 @@
+@import url(../../../../styles/tokens.css);
+
+.dropdown-selector__accent-bar--open,
+.dropdown-selector__accent-bar--default {
+  height: 100%;
+  aspect-ratio: 5 / 80;
+  transition: var(--transition-default);
+  background: var(--color-background-primary-emphasis);
+}
+
+.dropdown-selector__accent-bar--open {
+  opacity: 0;
+}
+
+.dropdown-selector__accent-bar--default {
+  opacity: 1;
+}

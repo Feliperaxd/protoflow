@@ -23,7 +23,7 @@
 }
 
 .dropdown-selector__title-box,
-.dropdown-selector__value-side {
+.dropdown-selector__body-box {
   display: flex;
   align-items: center;
   position: relative;

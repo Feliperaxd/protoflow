@@ -1,0 +1,28 @@
+@import url(../../../../styles/tokens.css);
+
+.dropdown-selector__value--open,
+.dropdown-selector__value--default {
+  margin: 0 calc(0.50 * var(--main-height)) 0 calc(0.13 * var(--main-height));
+  padding-bottom: calc(0.06 * var(--main-height));
+
+  color: var(--color-white);
+  user-select: none;
+  font-weight: bold;
+  font-family: var(--font-family-base);
+  letter-spacing: var(--letter-spacing-default);
+  --responsive-text-ratio: 1.1;
+
+  transition: var(--transition-default);
+}
+
+.dropdown-selector__value--open {
+  opacity: 0;
+}
+
+.dropdown-selector__value--default {
+  opacity: 1;
+}
+
+.dropdown-selector__value--default:hover {
+  cursor: pointer;
+}

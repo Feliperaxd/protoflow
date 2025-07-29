@@ -96,7 +96,7 @@ export default class RangeSlider {
    * @private
    */
   #initElements() {
-    [this.title] = this.dom.getElements('title');
+    [this.label] = this.dom.getElements('label');
     [this.track] = this.dom.getElements('track');
     [this.thumb] = this.dom.getElements('thumb');
     [this.filledTrack] = this.dom.getElements('filled-track');
@@ -299,10 +299,10 @@ export default class RangeSlider {
   #getDomRegistry() {
     return new DomRegistry(
       [
-        /* -- Title -- */
+        /* -- Label -- */
         {
-          selector: '.range-slider__title',
-          name: 'title',
+          selector: '.range-slider__label',
+          name: 'label',
           check: false,
         },
 

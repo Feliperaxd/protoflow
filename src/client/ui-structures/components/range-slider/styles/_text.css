@@ -1,13 +1,13 @@
 @import url(../../../../styles/tokens.css);
 
-.range-slider__title,
+.range-slider__label,
 .range-slider__value {
   color: var(--color-text-primary-default);
   font-family: var(--font-family-base);
   letter-spacing: var(--letter-spacing-default);
 }
 
-.range-slider__title[responsive-text] {
+.range-slider__label[responsive-text] {
   --responsive-text-ratio: 20;
 }
 

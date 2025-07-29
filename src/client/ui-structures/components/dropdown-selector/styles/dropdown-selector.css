@@ -1,0 +1,18 @@
+@import url(_body.css);
+@import url(_menu.css);
+@import url(_arrow.css);
+@import url(_label.css);
+@import url(_value.css);
+@import url(_menu-item.css);
+@import url(_accent-bar.css);
+@import url(../../../../styles/tokens.css);
+
+:root {
+  --main-height: 100px;
+  --menu-open-duration: .5s
+}
+
+.dropdown-selector {
+  width: fit-content;
+  height: var(--main-height);
+}
