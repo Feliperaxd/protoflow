@@ -13,4 +13,5 @@
 
 .range-slider__value[responsive-text] {
   --responsive-text-ratio: 26;
+  margin-left: calc(var(--main-height) * 0.25);
 }

@@ -1,14 +1,13 @@
+@import url(./_box.css);
 @import url(./_text.css);
 @import url(./_body.css);
 @import url(./_thumb.css);
 @import url(./_track.css);
-@import url(./_title-box.css);
 @import url(../../../../styles/tokens.css);
 
 :root {
-  --track-width: 80%;
-  --track-height: 10%;
-  --thumb-diameter: 500%;
+  --main-height: 21.83px;
+  --max-value-lenght: 0;
   --thumb-action-scale: var(--scale-hover);
 
   --symbol: '';
@@ -20,6 +19,7 @@
 }
 
 .range-slider {
-  width: 200px;
-  aspect-ratio: 229 / 25;
+  width: fit-content;
+  height: var(--main-height);
+  min-width: calc(var(--main-height) * 7.5 + calc(var(--max-value-length) * 1ch));
 }

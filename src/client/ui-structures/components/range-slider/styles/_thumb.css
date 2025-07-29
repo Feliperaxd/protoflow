@@ -1,7 +1,7 @@
 @import url(../../../../styles/tokens.css);
 
 .range-slider__thumb {
-  height: var(--thumb-diameter);
+  height: calc(var(--main-height) * 0.25);
   aspect-ratio: 1 / 1;
   border-radius: 50%;
 

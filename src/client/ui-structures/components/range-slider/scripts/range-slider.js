@@ -116,6 +116,10 @@ export default class RangeSlider {
     this.numberOfDecimalPlaces = Number(
       this.style.getPropertyValue('--number-of-decimal-places'),
     ) || 0;
+    this.mainElement.style.setProperty(
+      '--max-value-length',
+      String(this.maxValue).length + this.numberOfDecimalPlaces + this.symbol.length,
+    );
 
     this.value = 0;
     this.isDragging = false;

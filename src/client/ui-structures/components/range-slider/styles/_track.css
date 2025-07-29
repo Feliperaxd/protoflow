@@ -1,8 +1,8 @@
 @import url(../../../../styles/tokens.css);
 
 .range-slider__track {
-  width: 79%;
-  height: var(--track-height);
+  width: calc(var(--main-height) * 7.5);
+  height: calc(var(--main-height) * 0.05);
   margin-top: 0.7%;
   border-radius: 1em;
 
