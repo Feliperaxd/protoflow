@@ -79,7 +79,7 @@ export default class ColorSelector {
    * @async
    */
   async init() {
-    const colorCirlceUrl = new URL('../templates/color-circle.html', import.meta.url).href;
+    const colorCirlceUrl = new URL('../templates/_color-circle.html', import.meta.url).href;
     this.colorCircleTemplate = await loadTemplateAsElement(
       colorCirlceUrl,
       'div',
@@ -474,7 +474,7 @@ export default class ColorSelector {
   #getDomRegistry() {
     return new DomRegistry(
       [
-        /* -- Left Arrow -- */
+        /* -- Left arrow -- */
         {
           selector: '.color-selector__left-arrow--default',
           name: 'left-arrow-default',
@@ -486,7 +486,7 @@ export default class ColorSelector {
           check: false,
         },
 
-        /* -- Right Arrow -- */
+        /* -- Right arrow -- */
         {
           selector: '.color-selector__right-arrow--default',
           name: 'right-arrow-default',
@@ -498,14 +498,14 @@ export default class ColorSelector {
           check: false,
         },
 
-        /* -- Color Carousel -- */
+        /* -- Color carousel -- */
         {
           selector: '.color-selector__carousel',
           name: 'carousel',
           check: false,
         },
 
-        /* -- Carousel Train -- */
+        /* -- Carousel train -- */
         {
           selector: '.color-selector__train',
           name: 'train',
@@ -517,7 +517,7 @@ export default class ColorSelector {
           check: false,
         },
 
-        /* -- Carousel Train -- */
+        /* -- Color circle -- */
         {
           selector: '.color-selector__color-circle--hidden',
           name: 'color-circle-hidden',

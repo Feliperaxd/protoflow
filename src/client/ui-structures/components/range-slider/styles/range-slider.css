@@ -16,7 +16,7 @@
   --max-value: 100;
   --step-value: 0;
   --default-value: 0;
-  --number-of-decimal-places: 2;
+  --number-of-decimal-places: 0;
 }
 
 .range-slider {

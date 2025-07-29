@@ -61,6 +61,7 @@ export default class RangeSlider {
    * @param {number} value - The new value to set.
    */
   changeValue(value) {
+    console.log(this.numberOfDecimalPlaces);
     this.value = this.#clamp(value).toFixed(
       this.numberOfDecimalPlaces,
     );
@@ -114,7 +115,7 @@ export default class RangeSlider {
     this.defaultValue = getComputedCssNumber(this.mainElement, '--default-value');
     this.numberOfDecimalPlaces = Number(
       this.style.getPropertyValue('--number-of-decimal-places'),
-    ) || 2;
+    ) || 0;
 
     this.value = 0;
     this.isDragging = false;

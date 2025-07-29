@@ -3,14 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Base styles -->
   <link rel="stylesheet" href="../../../../styles/tokens.css" />
   <link rel="stylesheet" href="../../../../styles/globals.css" />
   <link rel="stylesheet" href="../../../../styles/icon-mask.css" />
+
+  <!-- Component style -->
   <link rel="stylesheet" href="../styles/range-slider.css" />
 
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
+  <!-- Example style -->
   <style>
     * {
       margin: 0;
@@ -29,14 +35,20 @@
   </style>
 </head>
 <body>
+
+  <!-- Range slider -->
   <div
     class="range-slider"
     id="range-slider-example"
     style="--default-value:25; --symbol:%; --step-value:5; --min-value:5; --max-value:100;"
   >
+
+    <!-- Title box -->
     <div class="range-slider__title-box">
       <p class="range-slider__title" responsive-text>Preenchimento</p>
     </div>
+
+    <!-- Body -->
     <div class="range-slider__body">
       <div class="range-slider__track">
         <div class="range-slider__filled-track"></div>
@@ -44,8 +56,10 @@
       </div>
       <p class="range-slider__value" responsive-text></p>
     </div>
+
   </div>
 
+  <!-- Component script -->
   <script type="module" src="./range-slider.test.js"></script>
 </body>
 </html>
