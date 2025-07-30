@@ -4,14 +4,15 @@
 .dropdown-selector__accent-bar--default {
   height: 100%;
   aspect-ratio: 5 / 80;
-  transition: var(--transition-default);
   background: var(--color-background-primary-emphasis);
 }
 
 .dropdown-selector__accent-bar--open {
   opacity: 0;
+  transition: calc(var(--menu-open-duration) * 0.3) ease-in;
 }
 
 .dropdown-selector__accent-bar--default {
   opacity: 1;
+  transition: calc(var(--menu-open-duration) * 1.3) ease-in;
 }

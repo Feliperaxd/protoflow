@@ -11,16 +11,16 @@
   font-family: var(--font-family-base);
   letter-spacing: var(--letter-spacing-default);
   --responsive-text-ratio: 1.1;
-
-  transition: var(--transition-default);
 }
 
 .dropdown-selector__value--open {
   opacity: 0;
+  transition: calc(var(--menu-open-duration) * 0.3) ease-in;
 }
 
 .dropdown-selector__value--default {
   opacity: 1;
+  transition: calc(var(--menu-open-duration) * 1.1) ease-in;
 }
 
 .dropdown-selector__value--default:hover {

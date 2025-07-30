@@ -28,7 +28,7 @@
   animation:
     dropdown-selector__arrow-to-bottom-animation
     var(--menu-open-duration)
-    ease-in-out
+    ease-out
     forwards;
 }
 
@@ -36,20 +36,23 @@
   animation:
     dropdown-selector__arrow-to-top-animation
     var(--menu-open-duration)
-    ease-in-out
+    ease-out
     forwards;
 }
 
 @keyframes dropdown-selector__arrow-to-bottom-animation {
   0% {
     top: var(--arrow-top-default);
+    opacity: 1;
   }
   70% {
     top: var(--arrow-top-open);
+    opacity: 0;
     transform: rotateX(0) rotateZ(90deg);
   }
   100% {
     top: var(--arrow-top-open);
+    opacity: 0;
     transform: rotateX(180deg) rotateZ(90deg);
   }
 }
@@ -57,14 +60,17 @@
 @keyframes dropdown-selector__arrow-to-top-animation {
   0% {
     top: var(--arrow-top-open);
+    opacity: 0;
     transform: rotateX(180deg) rotateZ(90deg);
   }
   70% {
     top: var(--arrow-top-default);
+    opacity: 1;
     transform: rotateX(180deg) rotateZ(90deg)
   }
   100% {
     top: var(--arrow-top-default);
+    opacity: 1;
     transform: rotateX(0) rotateZ(90deg);
   }
 }
