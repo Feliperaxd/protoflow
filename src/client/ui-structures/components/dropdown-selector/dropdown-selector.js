@@ -46,8 +46,8 @@ export default class DropdownSelector {
     [this.accentBar] = this.dom.getElements('accent-bar');
     [this.value] = this.dom.getElements('value');
     [this.arrow] = this.dom.getElements('arrow');
-    /*
     [this.menu] = this.dom.getElements('menu');
+    /*
     this.menuItems = this.dom.getElements('menu-item');
     this.menuItemsValue = this.dom.getElements('menu-item-value');
     */
@@ -115,6 +115,11 @@ export default class DropdownSelector {
       this.dom.getSelector('value', false),
       this.dom.getSelector('value-open', false),
     );
+    switchStyleClass(
+      this.menu,
+      this.dom.getSelector('menu', false),
+      this.dom.getSelector('menu-open', false),
+    );
 
     this.responsiveText.updateElements();
     this.menuIsOpen = true;
@@ -144,6 +149,11 @@ export default class DropdownSelector {
       this.value,
       this.dom.getSelector('value-open', false),
       this.dom.getSelector('value', false),
+    );
+    switchStyleClass(
+      this.menu,
+      this.dom.getSelector('menu-open', false),
+      this.dom.getSelector('menu', false),
     );
 
     this.responsiveText.updateElements();
@@ -198,6 +208,18 @@ export default class DropdownSelector {
         {
           selector: '.dropdown-selector__accent-bar--default',
           name: 'accent-bar',
+          check: false,
+        },
+
+        /* -- Menu -- */
+        {
+          selector: '.dropdown-selector__menu--open',
+          name: 'menu-open',
+          check: false,
+        },
+        {
+          selector: '.dropdown-selector__menu--default',
+          name: 'menu',
           check: false,
         },
       ],
