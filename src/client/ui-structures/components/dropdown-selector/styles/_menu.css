@@ -1,4 +1,4 @@
-.dropdown-selector__menu--open,
+/*.dropdown-selector__menu--open,
 .dropdown-selector__menu--default {
   width: 100%;
   margin-top: 3%;
@@ -8,7 +8,7 @@
   position: absolute;
 
   transition: var(--menu-open-duration);
-  border-radius: 0 10% 0 10%; /*Create token to this*/
+  border-radius: 0 10% 0 10%;
 }
 
 .dropdown-selector__menu--open {
@@ -18,4 +18,5 @@
 .dropdown-selector__menu--default {
   height: 0;
 }
+*/
 

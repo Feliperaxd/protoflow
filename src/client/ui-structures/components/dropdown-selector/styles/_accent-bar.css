@@ -1,4 +1,5 @@
 @import url(../../../../styles/tokens.css);
+@import url(../../../../styles/globals/_fade-animations.css);
 
 .dropdown-selector__accent-bar--open,
 .dropdown-selector__accent-bar--default {
@@ -8,11 +9,17 @@
 }
 
 .dropdown-selector__accent-bar--open {
-  opacity: 0;
-  transition: calc(var(--menu-open-duration) * 0.3) ease-in;
+  animation:
+    fade-out-slide-down--default
+    calc(var(--menu-open-duration) * 0.2)
+    ease-out
+    forwards;
 }
 
 .dropdown-selector__accent-bar--default {
-  opacity: 1;
-  transition: calc(var(--menu-open-duration) * 1.3) ease-in;
+  animation:
+    fade-in-slide-up--default
+    calc(var(--menu-open-duration) * 0.2)
+    ease-out
+    forwards;
 }

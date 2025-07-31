@@ -10,6 +10,7 @@
 .dropdown-selector__label--open,
 .dropdown-selector__label--default {
   position: absolute;
+
   user-select: none;
   font-weight: bold;
   font-family: var(--font-family-base);

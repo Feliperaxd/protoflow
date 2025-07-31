@@ -1,4 +1,5 @@
 @import url(../../../../styles/tokens.css);
+@import url(../../../../styles/globals/_fade-animations.css);
 
 .dropdown-selector__value--open,
 .dropdown-selector__value--default {
@@ -14,15 +15,19 @@
 }
 
 .dropdown-selector__value--open {
-  opacity: 0;
-  transition: calc(var(--menu-open-duration) * 0.3) ease-in;  /*Create animation here*/
+  animation:
+    fade-out-slide-down--default
+    calc(var(--menu-open-duration) * 0.2)
+    ease-out
+    forwards;
 }
 
 .dropdown-selector__value--default {
   opacity: 1;
   transition: calc(var(--menu-open-duration) * 1.1) ease-in;
-}
+}colocar animação aqui
 
 .dropdown-selector__value--default:hover {
   cursor: pointer;
 }
+
