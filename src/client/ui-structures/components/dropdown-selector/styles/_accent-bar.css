@@ -1,5 +1,5 @@
 @import url(../../../../styles/tokens.css);
-@import url(../../../../styles/globals/_fade-animations.css);
+@import url(../../../../styles/shared-partials/_fade-animations.css);
 
 .dropdown-selector__accent-bar--open,
 .dropdown-selector__accent-bar--default {
@@ -12,7 +12,7 @@
   animation:
     fade-out-slide-down--default
     calc(var(--menu-open-duration) * 0.2)
-    ease-out
+    ease-in
     forwards;
 }
 
