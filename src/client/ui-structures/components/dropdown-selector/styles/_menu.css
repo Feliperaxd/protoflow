@@ -1,4 +1,4 @@
-/*.dropdown-selector__menu--open,
+.dropdown-selector__menu--open,
 .dropdown-selector__menu--default {
   width: 100%;
   margin-top: 3%;
@@ -18,5 +18,3 @@
 .dropdown-selector__menu--default {
   height: 0;
 }
-*/
-

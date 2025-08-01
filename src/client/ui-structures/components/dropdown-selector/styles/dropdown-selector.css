@@ -9,7 +9,7 @@
 
 :root {
   --main-height: 100px;
-  --menu-open-duration: .5s
+  --menu-open-duration: .4s
 }
 
 .dropdown-selector {

@@ -3,6 +3,7 @@ import {
   DomRegistry,
   setExclusiveStyleClass,
   switchStyleClass,
+  reflowElement,
 } from '../../../core/index.js';
 
 export default class DropdownSelector {
@@ -41,8 +42,9 @@ export default class DropdownSelector {
     this.relativeArrowPosition = this.#getRelativeArrowPosition();
   }
 
+  /* REFACTORY */
   #initElements() {
-    [this.label] = this.dom.getElements('label');
+    this.label = this.mainElement.querySelector('.dropdown-selector__label--default');
     [this.accentBar] = this.dom.getElements('accent-bar');
     [this.value] = this.dom.getElements('value');
     [this.arrow] = this.dom.getElements('arrow');
@@ -95,11 +97,10 @@ export default class DropdownSelector {
     this.runningAnimation = true;
     this.#setArrowProperties();
 
-    switchStyleClass(
-      this.label,
-      this.dom.getSelector('label', false),
-      this.dom.getSelector('label-open', false),
-    );
+    this.label.classList.remove('dropdown-selector__label--default');
+    reflowElement(this.label);
+    this.label.classList.add('dropdown-selector__label--open');
+
     switchStyleClass(
       this.arrow,
       this.dom.getSelector('arrow', false),
@@ -130,11 +131,10 @@ export default class DropdownSelector {
 
     this.#setArrowProperties();
 
-    switchStyleClass(
-      this.label,
-      this.dom.getSelector('label-open', false),
-      this.dom.getSelector('label', false),
-    );
+    this.label.classList.remove('dropdown-selector__label--open');
+    reflowElement(this.label);
+    this.label.classList.add('dropdown-selector__label--default');
+
     switchStyleClass(
       this.arrow,
       this.dom.getSelector('arrow-open', false),

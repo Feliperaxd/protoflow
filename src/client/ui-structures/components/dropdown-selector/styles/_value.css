@@ -3,7 +3,8 @@
 
 .dropdown-selector__value--open,
 .dropdown-selector__value--default {
-  margin: 0 calc(0.50 * var(--main-height)) 0 calc(0.13 * var(--main-height));
+  margin-left: calc(0.13 * var(--main-height));
+  margin-right: calc(0.50 * var(--main-height));
   padding-bottom: calc(0.06 * var(--main-height));
 
   color: var(--color-white);
@@ -25,7 +26,7 @@
 .dropdown-selector__value--default {
   animation:
     fade-in-slide-up--default
-    calc(var(--menu-open-duration) * 0.2)
+    calc(var(--menu-open-duration) * 1.2)
     ease-out
     forwards;
 }
