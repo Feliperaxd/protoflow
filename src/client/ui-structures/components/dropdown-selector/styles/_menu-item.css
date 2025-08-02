@@ -1,0 +1,22 @@
+.dropdown-selector__item--open,
+.dropdown-selector__item--default {
+  width: 100%;
+  background-color: rgba(131, 76, 76, 0.295);
+}
+
+.dropdown-selector__item--open {
+  height: var(--menu-item-height);
+} /*Don't working*/
+
+.dropdown-selector__item--default {
+  height: 1;
+  height: var(--menu-item-height);
+}
+
+.dropdown-selector__item-value--open {
+  opacity: 0;
+}
+
+.dropdown-selector__item-value--default {
+  opacity: 0;
+}

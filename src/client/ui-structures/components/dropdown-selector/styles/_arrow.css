@@ -28,14 +28,14 @@
   animation:
     dropdown-selector__arrow-to-bottom-animation
     var(--menu-open-duration)
-    ease-out
+    ease-in
     forwards;
 }
 
 .dropdown-selector__arrow--default {
   animation:
     dropdown-selector__arrow-to-top-animation
-    var(--menu-open-duration)
+    calc(var(--menu-open-duration) * 1.43)
     ease-out
     forwards;
 }

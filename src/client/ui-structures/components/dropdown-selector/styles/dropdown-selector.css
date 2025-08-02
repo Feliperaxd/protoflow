@@ -9,7 +9,11 @@
 
 :root {
   --main-height: 100px;
-  --menu-open-duration: .4s
+
+  --menu-item-height: calc(var(--main-height) * 0.4);
+  --menu-open-duration: .3s;
+  --menu-number-of-items: 100;
+  --menu-max-visible-items: 5;
 }
 
 .dropdown-selector {

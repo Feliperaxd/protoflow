@@ -6,21 +6,14 @@
   width: calc(var(--main-height) * 0.04);
   height: 100%;
 
+  transition: calc(var(--menu-open-duration) * 2);
   background: var(--color-background-primary-emphasis);
 }
 
 .dropdown-selector__accent-bar--open {
-  animation:
-    fade-out-slide-down--default
-    calc(var(--menu-open-duration) * 0.2)
-    ease-in
-    forwards;
+  opacity: 0;
 }
 
 .dropdown-selector__accent-bar--default {
-  animation:
-    fade-in-slide-up--default
-    calc(var(--menu-open-duration) * 1.2)
-    ease-out
-    forwards;
+  opacity: 1;
 }

@@ -1,20 +1,23 @@
 .dropdown-selector__menu--open,
 .dropdown-selector__menu--default {
   width: 100%;
-  margin-top: 3%;
+  max-height: calc(var(--menu-item-height) * var(--max-visible-items));
+
+  display: flex;
 
   top: 0;
   left: 0;
   position: absolute;
 
-  transition: var(--menu-open-duration);
   border-radius: 0 10% 0 10%;
 }
 
 .dropdown-selector__menu--open {
-  height: 200px;
+  height: auto;
+  transition: var(--menu-open-duration) ease-in;
 }
 
 .dropdown-selector__menu--default {
   height: 0;
+  transition: var(--menu-open-duration) ease-out;
 }
