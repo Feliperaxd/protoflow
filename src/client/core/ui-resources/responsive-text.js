@@ -74,12 +74,25 @@ export default class ResponsiveText {
   }
 
   /**
-   * Finds and resizes all responsive elements.
-   * @returns {void}
+   * Resizes a single element with optional base and ratio parameters.
+   * @param {HTMLElement} element - Element to resize
+   * @param {number} [base] - Optional base dimension to use
+   * @param {number} [sizeRatio] - Optional size ratio to use
+   * @returns {boolean} True if resizing was successful
    */
-  updateElements() {
+  updateElement(element, base, sizeRatio) {
+    return this.#resizeOne(element, base, sizeRatio);
+  }
+
+  /**
+   * Finds and resizes all responsive elements with optional base and ratio parameters.
+   * @param {number} [base] - Optional base dimension to apply to all elements
+   * @param {number} [sizeRatio] - Optional size ratio to apply to all elements
+   * @returns {number} Count of successfully resized elements
+   */
+  updateElements(base, sizeRatio) {
     this.elements = this.#getResponsiveElements();
-    this.#resizeAll();
+    return this.#resizeAll(base, sizeRatio);
   }
 
   // === Private Methods ===
@@ -108,12 +121,22 @@ export default class ResponsiveText {
   }
 
   /**
-   * Resizes all responsive elements.
+   * Resizes all responsive elements with optional base and ratio parameters.
    * @private
    * @method #resizeAll
+   * @param {number} [base] - Optional base dimension to apply to all elements
+   * @param {number} [sizeRatio] - Optional size ratio to apply to all elements
+   * @returns {number} Count of successfully resized elements
    */
-  #resizeAll() {
-    this.elements.forEach(el => this.#resizeOne(el));
+  #resizeAll(base, sizeRatio) {
+    let successCount = 0;
+
+    this.elements.forEach(el => {
+      const result = this.#resizeOne(el, base, sizeRatio);
+      if (result) successCount += 1;
+    });
+
+    return successCount;
   }
 
   /**
@@ -146,17 +169,23 @@ export default class ResponsiveText {
    * @private
    * @method #resizeOne
    * @param {HTMLElement} element - Element to resize
+   * @param {number} [base] - Optional: base dimension to use (skips auto-detection)
+   * @param {number} [sizeRatio] - Optional: size ratio to use (skips auto-detection)
+   * @returns {boolean} True if resizing was successful, false otherwise
    */
-  #resizeOne(element) {
-    const ratio = this.#getSizeRatio(element);
-    const base = this.#getBaseDimension(element);
+  #resizeOne(element, base, sizeRatio) {
+    const ratio = typeof sizeRatio === 'number' ? sizeRatio : this.#getSizeRatio(element);
+    const dimension = typeof base === 'number' ? base : this.#getBaseDimension(element);
 
-    if (!Number.isNaN(ratio) && ratio > 0) {
-      const fontSize = base / ratio;
-
-      // eslint-disable-next-line no-param-reassign
-      element.style.fontSize = `${fontSize}${this.unit}`;
+    if (Number.isNaN(ratio) || Number.isNaN(dimension) || ratio <= 0 || dimension <= 0) {
+      return false;
     }
+
+    const fontSize = dimension / ratio;
+
+    // eslint-disable-next-line no-param-reassign
+    element.style.fontSize = `${fontSize}${this.unit}`;
+    return true;
   }
 
   /**

@@ -6,14 +6,15 @@
   width: calc(var(--main-height) * 0.04);
   height: 100%;
 
-  transition: calc(var(--menu-open-duration) * 2);
   background: var(--color-background-primary-emphasis);
 }
 
 .dropdown-selector__accent-bar--open {
   opacity: 0;
+  transition: calc(var(--menu-open-duration) * 0.5);
 }
 
 .dropdown-selector__accent-bar--default {
   opacity: 1;
+  transition: calc(var(--menu-open-duration) * 1.5);
 }

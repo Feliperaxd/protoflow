@@ -4,6 +4,7 @@ import {
   setExclusiveStyleClass,
   switchStyleClass,
   reflowElement,
+  getCssPropertyNumber,
 } from '../../../core/index.js';
 
 export default class DropdownSelector {
@@ -49,6 +50,10 @@ export default class DropdownSelector {
     [this.value] = this.dom.getElements('value');
     [this.arrow] = this.dom.getElements('arrow');
     [this.menu] = this.dom.getElements('menu');
+    this.menuItems = this.mainElement.querySelectorAll('.dropdown-selector__item--default');
+    this.menuItemsValue = this.mainElement.querySelectorAll(
+      '.dropdown-selector__item-value--default',
+    );
     /*
     this.menuItems = this.dom.getElements('menu-item');
     this.menuItemsValue = this.dom.getElements('menu-item-value');
@@ -121,6 +126,7 @@ export default class DropdownSelector {
       this.dom.getSelector('menu', false),
       this.dom.getSelector('menu-open', false),
     );
+    this.#showMenuItems();
 
     this.responsiveText.updateElements();
     this.menuIsOpen = true;
@@ -155,9 +161,65 @@ export default class DropdownSelector {
       this.dom.getSelector('menu-open', false),
       this.dom.getSelector('menu', false),
     );
+    this.#hideMenuItems();
 
     this.responsiveText.updateElements();
     this.menuIsOpen = false;
+  }
+
+  #hideMenuItems() {
+    let time = 0;
+    this.menuItems.forEach(item => {
+      setTimeout(
+        () => {
+          item.classList.remove('dropdown-selector__item--open');
+          item.classList.add('dropdown-selector__item--default');
+        },
+        time,
+      );
+      time += 100;
+    });
+
+    time = 0;
+    this.menuItemsValue.forEach(item => {
+      setTimeout(
+        () => {
+          item.classList.remove('dropdown-selector__item-value--open');
+          item.classList.add('dropdown-selector__item-value--default');
+        },
+        time,
+      );
+      time += 100;
+    });
+  }
+
+  #showMenuItems() {
+    const itemHeight = getCssPropertyNumber('--menu-item-height');
+
+    let time = 0;
+    this.menuItems.forEach(item => {
+      setTimeout(
+        () => {
+          item.classList.remove('dropdown-selector__item--default');
+          item.classList.add('dropdown-selector__item--open');
+        },
+        time,
+      );
+      time += 100;
+    });
+
+    time = 0;
+    this.menuItemsValue.forEach(item => {
+      setTimeout(
+        () => {
+          item.classList.remove('dropdown-selector__item-value--default');
+          item.classList.add('dropdown-selector__item-value--open');
+          this.responsiveText.updateElement(item, itemHeight);
+        },
+        time,
+      );
+      time += 100;
+    });
   }
 
   #getDomRegistry() {

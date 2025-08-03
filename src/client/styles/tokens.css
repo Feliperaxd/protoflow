@@ -61,6 +61,7 @@
 
     --font-family-base: 'K2D', 'Poppins', sans-serif;
     --letter-spacing-default: 0.15em;
+    --letter-spacing-wide: 0.3em;
 
     /* ===== Sizes ===== */
     --loading-bar-length: 200px;

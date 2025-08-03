@@ -10,15 +10,24 @@
 :root {
   --main-height: 100px;
 
-  --menu-item-height: calc(var(--main-height) * 0.4);
+  --menu-item-height: calc(var(--main-height) * 0.8);
   --menu-open-duration: .3s;
   --menu-number-of-items: 100;
-  --menu-max-visible-items: 5;
+  --menu-max-visible-items: 3;
 }
 
 .dropdown-selector {
   width: fit-content;
   height: var(--main-height);
+}
+
+.testblock {
+  width: 100px;
+  height: 100px;
+  background-color: aqua;
+  position: absolute;
+  left: 600px;
+  top: 400px;
 }
 
 /*Create animation in value*/
