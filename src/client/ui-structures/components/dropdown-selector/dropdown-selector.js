@@ -121,11 +121,6 @@ export default class DropdownSelector {
       this.dom.getSelector('value', false),
       this.dom.getSelector('value-open', false),
     );
-    switchStyleClass(
-      this.menu,
-      this.dom.getSelector('menu', false),
-      this.dom.getSelector('menu-open', false),
-    );
     this.#showMenuItems();
 
     this.responsiveText.updateElements();
@@ -156,11 +151,6 @@ export default class DropdownSelector {
       this.dom.getSelector('value-open', false),
       this.dom.getSelector('value', false),
     );
-    switchStyleClass(
-      this.menu,
-      this.dom.getSelector('menu-open', false),
-      this.dom.getSelector('menu', false),
-    );
     this.#hideMenuItems();
 
     this.responsiveText.updateElements();
@@ -169,7 +159,9 @@ export default class DropdownSelector {
 
   #hideMenuItems() {
     let time = 0;
-    this.menuItems.forEach(item => {
+
+    const items = [...this.menuItems].reverse();
+    items.forEach(item => {
       setTimeout(
         () => {
           item.classList.remove('dropdown-selector__item--open');
@@ -181,7 +173,8 @@ export default class DropdownSelector {
     });
 
     time = 0;
-    this.menuItemsValue.forEach(item => {
+    const itemsValue = [...this.menuItemsValue].reverse();
+    itemsValue.forEach(item => {
       setTimeout(
         () => {
           item.classList.remove('dropdown-selector__item-value--open');
@@ -189,7 +182,7 @@ export default class DropdownSelector {
         },
         time,
       );
-      time += 100;
+      time += 150;
     });
   }
 
