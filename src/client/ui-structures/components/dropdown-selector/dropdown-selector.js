@@ -166,6 +166,7 @@ export default class DropdownSelector {
         () => {
           item.classList.remove('dropdown-selector__item--open');
           item.classList.add('dropdown-selector__item--default');
+          this.responsiveText.updateElements();
         },
         time,
       );
@@ -182,7 +183,7 @@ export default class DropdownSelector {
         },
         time,
       );
-      time += 150;
+      time += 70;
     });
   }
 
@@ -198,7 +199,7 @@ export default class DropdownSelector {
         },
         time,
       );
-      time += 100;
+      time += 50;
     });
 
     time = 0;
@@ -211,7 +212,7 @@ export default class DropdownSelector {
         },
         time,
       );
-      time += 100;
+      time += 120;
     });
   }
 

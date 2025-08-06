@@ -7,7 +7,7 @@
 
   list-style: none;
   flex-shrink: 0;
-  transition: var(--transition-default);
+  transition: 0.1s ease-in;
 }
 
 .dropdown-selector__item--open::before {
@@ -52,14 +52,16 @@
   font-weight: bold;
   font-family: var(--font-family-base);
   letter-spacing: var(--letter-spacing-wide);
-  --responsive-text-ratio: 3.5;
+  --responsive-text-ratio: 4;
 }
 
 .dropdown-selector__item-value--open {
+  transition: 0.1s ease-in;
   opacity: 1;
 }
 
 .dropdown-selector__item-value--default {
   opacity: 0;
+  transition: 0.05s ease-in;
 }
 
