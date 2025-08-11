@@ -1,66 +1,45 @@
-class BEM {
-  #registry;
+/* eslint-disable max-classes-per-file */
 
-  constructor() {
-    this.#registry = {};
+class Block {
+  constructor(name, alias) {
+    this.name = name;
+    this.alias = alias;
+    this.elements = {};
   }
 
-  addBlock(alias, block, overwrite = false) {
-    if (!(alias in this.#registry) || overwrite) {
-      this.#registry[alias] = {
-        name: block,
-        elements: [],
-      };
-    }
-  }
-
-  addElement(alias, name, block, overwrite = false) {
-    this.registry[this.block] = {};
-
-    this[name] = new Proxy(() => baseString, {
-      get(target, prop) {
-        if (prop === Symbol.toPrimitive || prop === 'toString' || prop === 'valueOf') {
-          return () => baseString;
-        }
-        return `${baseString}--${prop}`;
-      },
-      apply() {
-        return baseString;
-      }
-    });
-
+  add(elementName, elementAlias) {
+    this.elements[elementAlias] = elementName;
     return this;
   }
 }
 
-/*
-  blockTag {
-    name: block-name,
-    elements: [
-      elementTagA {
-        name: element-a,
-        modifiers: [
-          is-active,
-          is-inative
-        ]
+class BEM {
+  constructor() {
+    this.registry = {};
+
+    const handler = {
+      get: (_this, block) => {
+        if (block in _this) return _this[block];
+        if (block in _this.registry) {
+          return _this.registry[block];
+        }
+        return undefined;
       },
-      elementTagB {
-        name: element-b,
-      modifiers: [
-          is-active,
-          is-inative
-        ]
-      }
-    ]
+    };
+
+    // eslint-disable-next-line no-constructor-return
+    return new Proxy(this, handler);
   }
-*/
 
+  add(name, alias) {
+    const block = new Block(name, alias);
+    this.registry[alias] = block;
+    return block;
+  }
+}
 
-const a = new BEM('block');
-a.addElement('el', 'element');
-
-console.log(a.el);             // "block__element"
-console.log(a.el());           // "block__element"
-console.log(a.el.modifier);    // "block__element--modifier"
-console.log(String(a.el));     // "block__element"
-console.log(a.el + '');        // "block__element"
+const a = new BEM();
+a.add('blockName', 'blockTesteAlias');
+console.log(a.blockTesteAlias);
+a.blockTesteAlias.add('elementName', 'elementAlias');
+console.log(a.blockTesteAlias.elements);
