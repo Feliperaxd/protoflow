@@ -1,89 +1,30 @@
 /* eslint-disable max-classes-per-file */
-class Modifier {
-  constructor(name, alias, parentPath) {
-    this.name = name;
-    this.alias = alias;
-    this.path = `${parentPath}--${name}`;
-    this.selector = `.${this.path}`;
-  }
-}
 
-class Element {
-  constructor(name, alias, parentPath) {
-    this.name = name;
-    this.alias = alias;
-    this.path = `${parentPath}__${name}`;
-    this.selector = `.${this.path}`;
-    this.modifiers = new Map();
+class BEMUtils {
+  static createProxy(obj, storage) {
+    const handler = {
+      get(target, prop, receiver) {
+        if (Reflect.has(target, prop)) {
+          return Reflect.get(target, prop, receiver);
+        }
 
-    // eslint-disable-next-line no-constructor-return
-    return new Proxy(this, {
-      get(target, prop) {
-        if (prop in target) return target[prop];
-        if (target.modifiers.has(prop)) return target.modifiers.get(prop);
+        if (storage && storage.has(prop)) {
+          return storage.get(prop);
+        }
+
         return undefined;
       },
-    });
-  }
 
-  addModifier(name, alias) {
-    const modifier = new Modifier(name, alias, this.path);
-    this.modifiers.set(alias, modifier);
-    return this;
-  }
-}
+      set(target, prop, value, receiver) {
+        if (Reflect.has(target, prop)) {
+          return Reflect.set(target, prop, value, receiver);
+        }
 
-class Block {
-  constructor(name, alias) {
-    this.name = name;
-    this.alias = alias;
-    this.path = name;
-    this.selector = `.${this.path}`;
-    this.elements = new Map();
-    this.modifiers = new Map();
-
-    // eslint-disable-next-line no-constructor-return
-    return new Proxy(this, {
-      get(target, prop) {
-        if (prop in target) return target[prop];
-        if (target.elements.has(prop)) return target.elements.get(prop);
-        if (target.modifiers.has(prop)) return target.modifiers.get(prop);
-        return undefined;
+        return false;
       },
-    });
-  }
+    };
 
-  addElement(name, alias) {
-    const element = new Element(name, alias, this.path);
-    this.elements.set(alias, element);
-    return element;
-  }
-
-  addModifier(name, alias) {
-    const modifier = new Modifier(name, alias, this.path);
-    this.modifiers.set(alias, modifier);
-    return this;
-  }
-}
-
-class BEM {
-  constructor() {
-    this.registry = new Map();
-
-    // eslint-disable-next-line no-constructor-return
-    return new Proxy(this, {
-      get(target, prop) {
-        if (prop in target) return target[prop];
-        if (target.registry.has(prop)) return target.registry.get(prop);
-        return undefined;
-      },
-    });
-  }
-
-  addBlock(name, alias) {
-    const block = new Block(name, alias);
-    this.registry.set(alias, block);
-    return block;
+    return new Proxy(obj, handler);
   }
 
   static splitPath(path) {
@@ -108,11 +49,80 @@ class BEM {
     }
     return path;
   }
+}
+
+class Modifier {
+  constructor(name, alias, parentPath) {
+    this.name = name;
+    this.alias = alias;
+    this.path = `${parentPath}--${name}`;
+    this.selector = `.${this.path}`;
+  }
+}
+
+class Element {
+  constructor(name, alias, parentPath) {
+    this.name = name;
+    this.alias = alias;
+    this.path = `${parentPath}__${name}`;
+    this.selector = `.${this.path}`;
+    this.modifiers = new Map();
+
+    // eslint-disable-next-line no-constructor-return
+    return BEMUtils.createProxy(this, this.modifiers);
+  }
+
+  addModifier(name, alias) {
+    const modifier = new Modifier(name, alias, this.path);
+    this.modifiers.set(alias, modifier);
+    return this;
+  }
+}
+
+class Block {
+  constructor(name, alias) {
+    this.name = name;
+    this.alias = alias;
+    this.path = name;
+    this.selector = `.${this.path}`;
+    this.elements = new Map();
+    this.modifiers = new Map();
+
+    // eslint-disable-next-line no-constructor-return
+    return BEMUtils.createProxy(this, new Map([...this.elements, ...this.modifiers]));
+  }
+
+  addElement(name, alias) {
+    const element = new Element(name, alias, this.path);
+    this.elements.set(alias, element);
+    return element;
+  }
+
+  addModifier(name, alias) {
+    const modifier = new Modifier(name, alias, this.path);
+    this.modifiers.set(alias, modifier);
+    return this;
+  }
+}
+
+class BEM {
+  constructor() {
+    this.registry = new Map();
+
+    // eslint-disable-next-line no-constructor-return
+    return BEMUtils.createProxy(this, this.registry);
+  }
+
+  createBlock(name, alias) {
+    const block = new Block(name, alias);
+    this.registry.set(alias, block);
+    return block;
+  }
 
   async load(jsonData) {
     if (jsonData.blocks && Array.isArray(jsonData.blocks)) {
       jsonData.blocks.forEach(blockData => {
-        const block = this.addBlock(blockData.name, blockData.alias);
+        const block = this.createBlock(blockData.name, blockData.alias);
 
         if (blockData.modifiers && Array.isArray(blockData.modifiers)) {
           blockData.modifiers.forEach(modifier => {
@@ -141,6 +151,6 @@ class BEM {
 import { fetchJson } from '../src/client/core/index.js'
 
 const a = new BEM();
-a.addBlock('blockaaa2', 'block2');
-a.addBlock('blockaaa1', 'block1');
-console.log(a.block1);
+const data = await fetchJson('./teste.json');
+a.load(data);
+console.log(a.elements);

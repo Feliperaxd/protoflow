@@ -1,3 +1,26 @@
 {
-
+  "blocks": [
+    {
+      "name": "header",
+      "alias": "header",
+      "modifiers": [
+        {
+          "name": "dark",
+          "alias": "dark"
+        }
+      ],
+      "elements": [
+        {
+          "name": "logo",
+          "alias": "logo",
+          "modifiers": [
+            {
+              "name": "small",
+              "alias": "small"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

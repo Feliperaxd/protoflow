@@ -1,4 +1,55 @@
 /* eslint-disable max-classes-per-file */
+class BEMUtils {
+  static createProxy(obj, storage) {
+    const handler = {
+      get(target, prop, receiver) {
+        if (Reflect.has(target, prop)) {
+          return Reflect.get(target, prop, receiver);
+        }
+
+        if (storage && storage.has(prop)) {
+          return storage.get(prop);
+        }
+
+        return undefined;
+      },
+
+      set(target, prop, value, receiver) {
+        if (Reflect.has(target, prop)) {
+          return Reflect.set(target, prop, value, receiver);
+        }
+
+        return false;
+      },
+    };
+
+    return new Proxy(obj, handler);
+  }
+
+  static splitPath(path) {
+    const [blockPart, modifier] = path.split('--');
+    const [block, element] = blockPart.split('__');
+
+    return {
+      block: block || null,
+      element: element || null,
+      modifier: modifier || null,
+    };
+  }
+
+  static getPath(block, element = null, modifier = null) {
+    let path = block;
+
+    if (element) {
+      path += `__${element}`;
+    }
+    if (modifier) {
+      path += `--${modifier}`;
+    }
+    return path;
+  }
+}
+
 class Modifier {
   constructor(name, alias, parentPath) {
     this.name = name;
@@ -80,39 +131,16 @@ class BEM {
     });
   }
 
-  addBlock(name, alias) {
+  createBlock(name, alias) {
     const block = new Block(name, alias);
     this.registry.set(alias, block);
     return block;
   }
 
-  static splitPath(path) {
-    const [blockPart, modifier] = path.split('--');
-    const [block, element] = blockPart.split('__');
-
-    return {
-      block: block || null,
-      element: element || null,
-      modifier: modifier || null,
-    };
-  }
-
-  static getPath(block, element = null, modifier = null) {
-    let path = block;
-
-    if (element) {
-      path += `__${element}`;
-    }
-    if (modifier) {
-      path += `--${modifier}`;
-    }
-    return path;
-  }
-
   async load(jsonData) {
     if (jsonData.blocks && Array.isArray(jsonData.blocks)) {
       jsonData.blocks.forEach(blockData => {
-        const block = this.addBlock(blockData.name, blockData.alias);
+        const block = this.createBlock(blockData.name, blockData.alias);
 
         if (blockData.modifiers && Array.isArray(blockData.modifiers)) {
           blockData.modifiers.forEach(modifier => {
@@ -141,6 +169,6 @@ class BEM {
 import { fetchJson } from '../src/client/core/index.js'
 
 const a = new BEM();
-a.addBlock('blockaaa2', 'block2');
-a.addBlock('blockaaa1', 'block1');
-console.log(a.block1);
+const data = await fetchJson('./teste.json');
+a.load(data);
+console.log(a.header);
