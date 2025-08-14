@@ -1,5 +1,6 @@
 import {
-  DomRegistry,
+  fetchJson,
+  BEMManager,
   reflowElement,
   switchStyleClass,
   loadTemplateAsElement,
@@ -36,8 +37,6 @@ export default class ColorSelector {
     this.allColors = [];
     this.isSliding = false;
     this.selectedColorIndex = null;
-
-    this.dom = this.#getDomRegistry();
   }
 
   // === Public Methods ===
@@ -79,15 +78,20 @@ export default class ColorSelector {
    * @async
    */
   async init() {
-    const colorCirlceUrl = new URL('../templates/_color-circle.html', import.meta.url).href;
+    const colorCirceUrl = new URL('../templates/color-circle.html', import.meta.url).href;
+    const bemDataUrl = new URL('./bem-data.json', import.meta.url).href;
+
     this.colorCircleTemplate = await loadTemplateAsElement(
-      colorCirlceUrl,
+      colorCirceUrl,
       'div',
     );
 
+    this.bem = new BEMManager();
+    this.bem.load(await fetchJson(bemDataUrl));
+
+
     this.#initElements();
     this.#bindEvents();
-    this.dom.checkAll();
   }
 
   /**
@@ -163,7 +167,7 @@ export default class ColorSelector {
    */
   #checkColorIndex(index) {
     if (index < 0 || index >= this.allColors.length || !this.allColors[index]) {
-      throw new Error(`Color don't found! color index: ${index}`);
+      throw new Error(`Color not found! color index: ${index}`);
     }
   }
 
@@ -267,13 +271,13 @@ export default class ColorSelector {
   #hideArrows() {
     switchStyleClass(
       this.leftArrow,
-      this.dom.getSelector('left-arrow-default', false),
-      this.dom.getSelector('left-arrow-hidden', false),
+      this.bem.colorSelector.leftArrow.default.path_,
+      this.bem.colorSelector.leftArrow.hidden.path_,
     );
     switchStyleClass(
       this.rightArrow,
-      this.dom.getSelector('right-arrow-default', false),
-      this.dom.getSelector('right-arrow-hidden', false),
+      this.bem.colorSelector.rightArrow.hidden.path_,
+      this.bem.colorSelector.rightArrow.default.path_,
     );
   }
 
@@ -284,10 +288,19 @@ export default class ColorSelector {
    * @private
    */
   #initElements() {
-    [this.carousel] = this.dom.getElements('carousel');
-    [this.train] = this.dom.getElements('train');
-    [this.leftArrow] = this.dom.getElements('left-arrow-default');
-    [this.rightArrow] = this.dom.getElements('right-arrow-default');
+    this.carousel = this.mainElement.querySelector(
+      this.bem.colorSelector.carousel.selector_,
+    );
+    this.train = this.mainElement.querySelector(
+      this.bem.colorSelector.train.default.selector_,
+    );
+    console.log(this.bem.colorSelector.train.default.selector_);
+    this.leftArrow = this.mainElement.querySelector(
+      this.bem.colorSelector.leftArrow.default.selector_,
+    );
+    this.rightArrow = this.mainElement.querySelector(
+      this.bem.colorSelector.rightArrow.default.selector_,
+    );
     this.train.innerHTML = '';
   }
 
@@ -306,11 +319,11 @@ export default class ColorSelector {
     this.#updateTrainPosition();
 
     this.train.classList.remove(
-      this.dom.getSelector('train-shake-animation', false),
+      this.bem.colorSelector.train.shake,
     );
     reflowElement(this.train);
     this.train.classList.add(
-      this.dom.getSelector('train-shake-animation', false),
+      this.bem.colorSelector.train.shake,
     );
   }
 
@@ -394,17 +407,17 @@ export default class ColorSelector {
 
     this.#setColorClassForIndexes(
       [this.selectedColorIndex],
-      this.dom.getSelector('color-circle-selected', false),
+      this.bem.colorSelector.colorCircle.selected.path_,
     );
 
     this.#setColorClassForIndexes(
       [leftColorIndex, rightColorIndex],
-      this.dom.getSelector('color-circle-default', false),
+      this.bem.colorSelector.colorCircle.default.path_,
     );
 
     this.#setColorClassForIndexes(
       this.#getHideColorsIndexes(),
-      this.dom.getSelector('color-circle-hidden', false),
+      this.bem.colorSelector.colorCircle.hidden.path_,
     );
   }
 
@@ -417,13 +430,13 @@ export default class ColorSelector {
   #showArrows() {
     switchStyleClass(
       this.leftArrow,
-      this.dom.getSelector('left-arrow-hidden', false),
-      this.dom.getSelector('left-arrow-default', false),
+      this.bem.colorSelector.leftArrow.default.path_,
+      this.bem.colorSelector.leftArrow.hidden.path_,
     );
     switchStyleClass(
       this.rightArrow,
-      this.dom.getSelector('right-arrow-hidden', false),
-      this.dom.getSelector('right-arrow-default', false),
+      this.bem.colorSelector.rightArrow.hidden.path_,
+      this.bem.colorSelector.rightArrow.default.path_,
     );
   }
 
@@ -459,82 +472,5 @@ export default class ColorSelector {
     } else {
       this.#showArrows();
     }
-  }
-
-  /**
-   * Creates and returns a new instance of DomRegistry containing the DOM structure
-   * configuration for the Color Selector component.
-   *
-   * The registry includes elements like arrows, carousel, train, and color circles,
-   * each with its associated CSS selector, name, and validation check flag.
-   *
-   * @private
-   * @returns {DomRegistry} A configured DomRegistry instance tied to this.mainElement.
-   */
-  #getDomRegistry() {
-    return new DomRegistry(
-      [
-        /* -- Left arrow -- */
-        {
-          selector: '.color-selector__left-arrow--default',
-          name: 'left-arrow-default',
-          check: false,
-        },
-        {
-          selector: '.color-selector__left-arrow--hidden',
-          name: 'left-arrow-hidden',
-          check: false,
-        },
-
-        /* -- Right arrow -- */
-        {
-          selector: '.color-selector__right-arrow--default',
-          name: 'right-arrow-default',
-          check: false,
-        },
-        {
-          selector: '.color-selector__right-arrow--hidden',
-          name: 'right-arrow-hidden',
-          check: false,
-        },
-
-        /* -- Color carousel -- */
-        {
-          selector: '.color-selector__carousel',
-          name: 'carousel',
-          check: false,
-        },
-
-        /* -- Carousel train -- */
-        {
-          selector: '.color-selector__train',
-          name: 'train',
-          check: false,
-        },
-        {
-          selector: '.color-selector__train--shake-animation',
-          name: 'train-shake-animation',
-          check: false,
-        },
-
-        /* -- Color circle -- */
-        {
-          selector: '.color-selector__color-circle--hidden',
-          name: 'color-circle-hidden',
-          check: false,
-        },
-        {
-          selector: '.color-selector__color-circle--default',
-          name: 'color-circle-default',
-          check: false,
-        },
-        {
-          selector: '.color-selector__color-circle--selected',
-          name: 'color-circle-selected',
-          check: false,
-        },
-      ],
-      this.mainElement,
-    );
   }
 }

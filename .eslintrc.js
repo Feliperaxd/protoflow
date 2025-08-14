@@ -15,5 +15,6 @@ module.exports = {
     indent: ['error', 2],
     'import/extensions': 'off',
     'arrow-parens': ['error', 'as-needed'],
+    'no-underscore-dangle': 'off',
   },
 };

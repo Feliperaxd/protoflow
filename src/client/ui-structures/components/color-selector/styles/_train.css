@@ -1,6 +1,6 @@
 @import url(../../../../styles/tokens.css);
 
-.color-selector__train {
+.color-selector__train--default {
   width: 100%;
   display: flex;
   align-items: center;
@@ -8,23 +8,23 @@
   transform: translateX(var(--trainPosition));
 }
 
-.color-selector__train:has(:only-child) {
+.color-selector__train--default:has(:only-child) {
   justify-content: center;
 }
 
-.color-selector__train:has(:nth-child(2)) {
+.color-selector__train--default:has(:nth-child(2)) {
   justify-content: flex-end;
 }
 
-.color-selector__train:has(:nth-child(3)) {
+.color-selector__train--default:has(:nth-child(3)) {
   justify-content: flex-start;
 }
 
-.color-selector__train--shake-animation {
-  animation: color-selector__train--shake 0.4s ease-in-out;
+.color-selector__train--shake {
+  animation: shake-animation--default 0.4s ease-in-out;
 }
 
-@keyframes color-selector__train--shake {
+@keyframes shake-animation--default {
   0% {
     transform: translateX(var(--trainPosition));
   }
