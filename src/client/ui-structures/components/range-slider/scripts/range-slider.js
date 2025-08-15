@@ -3,7 +3,7 @@ import {
   ResponsiveText,
   preventDefaults,
   getEventPositions,
-  getComputedCssNumber,
+  getCssPropertyNumber,
 } from '../../../../core/index.js';
 
 /**
@@ -109,10 +109,10 @@ export default class RangeSlider {
    */
   #initProperties() {
     this.symbol = this.style.getPropertyValue('--symbol').trim() || '';
-    this.minValue = getComputedCssNumber(this.mainElement, '--min-value');
-    this.maxValue = getComputedCssNumber(this.mainElement, '--max-value');
-    this.stepValue = getComputedCssNumber(this.mainElement, '--step-value');
-    this.defaultValue = getComputedCssNumber(this.mainElement, '--default-value');
+    this.minValue = getCssPropertyNumber(this.mainElement, '--min-value');
+    this.maxValue = getCssPropertyNumber(this.mainElement, '--max-value');
+    this.stepValue = getCssPropertyNumber(this.mainElement, '--step-value');
+    this.defaultValue = getCssPropertyNumber(this.mainElement, '--default-value');
     this.numberOfDecimalPlaces = Number(
       this.style.getPropertyValue('--number-of-decimal-places'),
     ) || 0;

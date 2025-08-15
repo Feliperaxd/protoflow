@@ -1,0 +1,15 @@
+{
+  "blocks": [
+    {
+      "name": "range-slider",
+      "alias": "slider",
+      "elements": [
+        { "name": "label", "alias": "label" },
+        { "name": "track", "alias": "track" },
+        { "name": "value", "alias": "value" },
+        { "name": "thumb", "alias": "thumb" },
+        { "name": "filled-track", "alias": "filledTrack" }
+      ]
+    }
+  ]
+}
