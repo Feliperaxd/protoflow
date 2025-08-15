@@ -89,7 +89,6 @@ export default class ColorSelector {
     this.bem = new BEMManager();
     this.bem.load(await fetchJson(bemDataUrl));
 
-
     this.#initElements();
     this.#bindEvents();
   }
@@ -276,8 +275,8 @@ export default class ColorSelector {
     );
     switchStyleClass(
       this.rightArrow,
-      this.bem.colorSelector.rightArrow.hidden.path_,
       this.bem.colorSelector.rightArrow.default.path_,
+      this.bem.colorSelector.rightArrow.hidden.path_,
     );
   }
 
@@ -294,7 +293,6 @@ export default class ColorSelector {
     this.train = this.mainElement.querySelector(
       this.bem.colorSelector.train.default.selector_,
     );
-    console.log(this.bem.colorSelector.train.default.selector_);
     this.leftArrow = this.mainElement.querySelector(
       this.bem.colorSelector.leftArrow.default.selector_,
     );
@@ -319,11 +317,11 @@ export default class ColorSelector {
     this.#updateTrainPosition();
 
     this.train.classList.remove(
-      this.bem.colorSelector.train.shake,
+      this.bem.colorSelector.train.shake.path_,
     );
     reflowElement(this.train);
     this.train.classList.add(
-      this.bem.colorSelector.train.shake,
+      this.bem.colorSelector.train.shake.path_,
     );
   }
 
@@ -430,8 +428,8 @@ export default class ColorSelector {
   #showArrows() {
     switchStyleClass(
       this.leftArrow,
-      this.bem.colorSelector.leftArrow.default.path_,
       this.bem.colorSelector.leftArrow.hidden.path_,
+      this.bem.colorSelector.leftArrow.default.path_,
     );
     switchStyleClass(
       this.rightArrow,
