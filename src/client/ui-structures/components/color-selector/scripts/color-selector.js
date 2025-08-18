@@ -73,7 +73,7 @@ export default class ColorSelector {
 
   /**
    * Initializes the color selector component.
-   * Must be awaited to ensure that color templates are loaded properly.
+   * Must be awaited to ensure that color templates and BEM data are loaded properly.
    *
    * @async
    */

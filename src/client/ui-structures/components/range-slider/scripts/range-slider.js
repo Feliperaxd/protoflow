@@ -1,4 +1,6 @@
 import {
+  fetchJson,
+  BEMManager,
   DomRegistry,
   ResponsiveText,
   preventDefaults,
@@ -25,6 +27,7 @@ export default class RangeSlider {
   constructor(mainElementID, onChangeCallback = null) {
     this.mainElement = document.getElementById(mainElementID);
     this.onChangeCallback = onChangeCallback;
+    this.style = getComputedStyle(this.mainElement);
 
     if (!this.mainElement) {
       throw new Error(`Slider element with id "${mainElementID}" not found`);
@@ -41,17 +44,7 @@ export default class RangeSlider {
     );
 
     this.dom = this.#getDomRegistry();
-    this.style = getComputedStyle(this.mainElement);
     this.dom.checkAll();
-
-    this.#initElements();
-    this.#initProperties();
-    this.responsiveText.init();
-
-    this.#onResize = this.#handleResize.bind(this);
-    this.#bindEvents();
-
-    this.changeValue(this.defaultValue);
   }
 
   // === Public Methods ===
@@ -87,6 +80,27 @@ export default class RangeSlider {
    */
   destroy() {
     window.removeEventListener('resize', this.#onResize);
+  }
+
+  /**
+   * Initializes the color selector component.
+   * Must be awaited to ensure that BEM data are loaded properly.
+   *
+   * @async
+   */
+  async init() {
+    const bemDataUrl = new URL('./bem-data.json', import.meta.url).href;
+    this.bem = new BEMManager();
+    this.bem.load(await fetchJson(bemDataUrl));
+
+    this.#initElements();
+    this.#initProperties();
+    this.responsiveText.init();
+
+    this.#onResize = this.#handleResize.bind(this);
+    this.#bindEvents();
+
+    this.changeValue(this.defaultValue);
   }
 
   // === Private Methods ===
