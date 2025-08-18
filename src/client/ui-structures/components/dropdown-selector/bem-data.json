@@ -1,0 +1,50 @@
+{
+  "blocks": [
+    {
+      "name": "dropdown-selector",
+      "alias": "selector",
+      "elements": [
+        {
+          "name": "accent-bar",
+          "alias": "bar",
+          "modifiers": [
+            {"name": "default", "alias": "default"},
+            {"name": "open", "alias": "open"}
+          ]
+        },
+        {
+          "name": "arrow",
+          "alias": "arrow",
+          "modifiers": [
+            {"name": "default", "alias": "default"},
+            {"name": "open", "alias": "open"}
+          ]
+        },
+        {
+          "name": "value",
+          "alias": "value",
+          "modifiers": [
+            {"name": "default", "alias": "default"},
+            {"name": "open", "alias": "open"}
+          ]
+        },
+        {
+          "name": "label",
+          "alias": "label",
+          "modifiers": [
+            {"name": "default", "alias": "default"},
+            {"name": "open", "alias": "open"}
+          ]
+        },
+        {
+          "name": "menu",
+          "alias": "menu",
+          "modifiers": [
+            {"name": "default", "alias": "default"},
+            {"name": "open", "alias": "open"}
+          ]
+        }
+      ]
+    }
+  ]
+}

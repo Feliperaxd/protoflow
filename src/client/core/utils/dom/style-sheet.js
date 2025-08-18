@@ -1,29 +1,44 @@
 /**
- * Gets the numeric value of a computed custom CSS variable.
- * Throws an error if the value cannot be parsed as a number.
+ * Gets the numeric value of a CSS custom property from an element.
+ * Works with both unitless numbers (e.g., '--max-value: 100')
+ *  and CSS values (e.g., '--height: 100px').
  *
- * @param {string} propertyName - The name of the CSS variable (e.g., '--min-value').
- * @returns {number} - The numeric value of the computed CSS variable.
+ * @param {HTMLElement} element - The element to read the CSS variable from.
+ * @param {string} propertyName - The CSS variable name (e.g., '--max-value').
+ * @returns {number} - The parsed number.
  * @throws {Error} - If the value is not a valid number.
  */
-export const getCssPropertyNumber = propertyName => {
-  const helper = document.createElement('div');
-  helper.style.height = `var(${propertyName})`;
-  helper.style.position = 'absolute';
-  helper.style.visibility = 'hidden';
-  document.body.appendChild(helper);
+export function getCssPropertyNumber(element, propertyName) {
+  const rawValue = getComputedStyle(element).getPropertyValue(propertyName).trim();
 
-  const computedValue = getComputedStyle(helper).height;
-  const value = parseFloat(computedValue);
-
-  helper.remove();
-
-  if (Number.isNaN(value)) {
-    throw new Error(`Invalid CSS value for ${propertyName}`);
+  // Handle unitless numbers first (common case)
+  if (/^-?\d*\.?\d+$/.test(rawValue)) {
+    const value = parseFloat(rawValue);
+    if (Number.isNaN(value)) {
+      throw new Error(`Invalid CSS number for ${propertyName}: "${rawValue}"`);
+    }
+    return value;
   }
 
-  return value;
-};
+  // Handle CSS values with units
+  const helper = document.createElement('div');
+  const [style] = helper.style;
+  style.position = 'absolute';
+  style.visibility = 'hidden';
+  style.setProperty(propertyName.startsWith('--') ? propertyName : `--${propertyName}`, rawValue);
+  document.body.appendChild(helper);
+
+  const computedValue = getComputedStyle(helper).getPropertyValue(propertyName);
+  const parsedValue = parseFloat(computedValue) || parseFloat(rawValue);
+
+  document.body.removeChild(helper);
+
+  if (Number.isNaN(parsedValue)) {
+    throw new Error(`Invalid CSS value for ${propertyName}: "${rawValue}"`);
+  }
+
+  return parsedValue;
+}
 
 /**
  * Clears all existing classes and applies a new one to a given DOM element.

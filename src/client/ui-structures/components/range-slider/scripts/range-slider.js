@@ -1,7 +1,6 @@
 import {
   fetchJson,
   BEMManager,
-  DomRegistry,
   ResponsiveText,
   preventDefaults,
   getEventPositions,
@@ -42,9 +41,6 @@ export default class RangeSlider {
       'responsive-text',
       '--responsive-text-ratio',
     );
-
-    this.dom = this.#getDomRegistry();
-    this.dom.checkAll();
   }
 
   // === Public Methods ===
@@ -54,7 +50,6 @@ export default class RangeSlider {
    * @param {number} value - The new value to set.
    */
   changeValue(value) {
-    console.log(this.numberOfDecimalPlaces);
     this.value = this.#clamp(value).toFixed(
       this.numberOfDecimalPlaces,
     );
@@ -100,7 +95,7 @@ export default class RangeSlider {
     this.#onResize = this.#handleResize.bind(this);
     this.#bindEvents();
 
-    this.changeValue(this.defaultValue);
+    this.changeValue(this.#clamp(this.defaultValue));
   }
 
   // === Private Methods ===
@@ -110,11 +105,21 @@ export default class RangeSlider {
    * @private
    */
   #initElements() {
-    [this.label] = this.dom.getElements('label');
-    [this.track] = this.dom.getElements('track');
-    [this.thumb] = this.dom.getElements('thumb');
-    [this.filledTrack] = this.dom.getElements('filled-track');
-    [this.valueLabel] = this.dom.getElements('value');
+    this.label = this.mainElement.querySelector(
+      this.bem.slider.label.selector_,
+    );
+    this.track = this.mainElement.querySelector(
+      this.bem.slider.track.selector_,
+    );
+    this.thumb = this.mainElement.querySelector(
+      this.bem.slider.thumb.selector_,
+    );
+    this.filledTrack = this.mainElement.querySelector(
+      this.bem.slider.filledTrack.selector_,
+    );
+    this.valueLabel = this.mainElement.querySelector(
+      this.bem.slider.value.selector_,
+    );
   }
 
   /**
@@ -256,7 +261,6 @@ export default class RangeSlider {
     );
     const ratio = offsetX / this.effectiveTrackWidth;
     const rawValue = this.minValue + ratio * (this.maxValue - this.minValue);
-
     this.changeValue(rawValue);
   }
 
@@ -298,55 +302,5 @@ export default class RangeSlider {
     const clamped = Math.min(Math.max(numericValue, this.minValue), this.maxValue);
     const steps = Math.round((clamped - this.minValue) / this.stepValue);
     return this.minValue + steps * this.stepValue;
-  }
-
-  /**
-   * Creates and returns a new instance of DomRegistry containing the DOM structure
-   * configuration for the Color Selector component.
-   *
-   * The registry includes elements like arrows, carousel, train, and color circles,
-   * each with its associated CSS selector, name, and validation check flag.
-   *
-   * @private
-   * @returns {DomRegistry} A configured DomRegistry instance tied to this.mainElement.
-   */
-  #getDomRegistry() {
-    return new DomRegistry(
-      [
-        /* -- Label -- */
-        {
-          selector: '.range-slider__label',
-          name: 'label',
-          check: false,
-        },
-
-        /* -- Track -- */
-        {
-          selector: '.range-slider__track',
-          name: 'track',
-          check: false,
-        },
-        {
-          selector: '.range-slider__filled-track',
-          name: 'filled-track',
-          check: false,
-        },
-
-        /* -- Thumb -- */
-        {
-          selector: '.range-slider__thumb',
-          name: 'thumb',
-          check: false,
-        },
-
-        /* -- Value -- */
-        {
-          selector: '.range-slider__value',
-          name: 'value',
-          check: false,
-        },
-      ],
-      this.mainElement,
-    );
   }
 }

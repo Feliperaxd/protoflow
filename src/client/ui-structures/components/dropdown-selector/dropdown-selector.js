@@ -1,7 +1,8 @@
 import {
   ResponsiveText,
   DomRegistry,
-  setExclusiveStyleClass,
+  BEMManager,
+  fetchJson,
   switchStyleClass,
   reflowElement,
   getCssPropertyNumber,
@@ -37,6 +38,10 @@ export default class DropdownSelector {
   }
 
   async init() {
+    const bemDataUrl = new URL('./bem-data.json', import.meta.url).href;
+    this.bem = new BEMManager();
+    this.bem.load(await fetchJson(bemDataUrl));
+
     this.responsiveText.init();
     this.#initElements();
     this.#bindEvents();
