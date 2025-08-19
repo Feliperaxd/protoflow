@@ -1,3 +1,5 @@
+import { reflowElement } from './elements.js';
+
 /**
  * Gets the numeric value of a CSS custom property from an element.
  * Works with both unitless numbers (e.g., '--max-value: 100')
@@ -59,7 +61,50 @@ export const setExclusiveStyleClass = (element, classToAdd) => {
  * @param {string} classToRemove - The class name to be removed.
  * @param {string} classToAdd - The class name to be added.
  */
-export const switchStyleClass = (element, classToRemove, classToAdd) => {
+export const switchStyleClass = (element, classToRemove, classToAdd, reflow = false) => {
   element.classList.remove(classToRemove);
+  if (reflow) reflowElement(element);
   element.classList.add(classToAdd);
 };
+
+/**
+ * Replaces CSS classes on multiple DOM elements, optionally with a sequential delay.
+ *
+ * @param {Array<{
+ *   element: HTMLElement,
+ *   remove: string,
+ *   add: string,
+ *   reflow?: boolean
+ * }>} replacements
+ *  - Each object contains:
+ *      element: The DOM element
+ *      remove: Class to remove
+ *      add: Class to add
+ *      reflow: Whether to force reflow (default: false)
+ * @param {number} [delay=0] - Optional delay in ms between each class switch.
+ */
+export function switchStyleClasses(itemStyleTransitions, delay = 0) {
+  let time = 0;
+
+  itemStyleTransitions.forEach(({
+    element,
+    remove,
+    add,
+    reflow = false,
+    callback = null,
+  }) => {
+    const executeTransition = () => {
+      switchStyleClass(element, remove, add, reflow);
+      if (callback && typeof callback === 'function') {
+        callback(element, { remove, add, reflow });
+      }
+    };
+
+    if (delay > 0) {
+      setTimeout(executeTransition, time);
+      time += delay;
+    } else {
+      executeTransition();
+    }
+  });
+}

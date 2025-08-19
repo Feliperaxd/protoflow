@@ -16,5 +16,9 @@ module.exports = {
     'import/extensions': 'off',
     'arrow-parens': ['error', 'as-needed'],
     'no-underscore-dangle': 'off',
+    'no-unused-vars': ['error', {
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+    }],
   },
 };

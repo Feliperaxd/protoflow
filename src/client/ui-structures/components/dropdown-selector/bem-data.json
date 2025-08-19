@@ -6,7 +6,7 @@
       "elements": [
         {
           "name": "accent-bar",
-          "alias": "bar",
+          "alias": "accentBar",
           "modifiers": [
             {"name": "default", "alias": "default"},
             {"name": "open", "alias": "open"}
@@ -39,6 +39,22 @@
         {
           "name": "menu",
           "alias": "menu",
+          "modifiers": [
+            {"name": "default", "alias": "default"},
+            {"name": "open", "alias": "open"}
+          ]
+        },
+        {
+          "name": "item",
+          "alias": "item",
+          "modifiers": [
+            {"name": "default", "alias": "default"},
+            {"name": "open", "alias": "open"}
+          ]
+        },
+        {
+          "name": "item-value",
+          "alias": "itemValue",
           "modifiers": [
             {"name": "default", "alias": "default"},
             {"name": "open", "alias": "open"}

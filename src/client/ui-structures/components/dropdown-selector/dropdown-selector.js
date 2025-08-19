@@ -1,10 +1,8 @@
 import {
-  ResponsiveText,
-  DomRegistry,
-  BEMManager,
   fetchJson,
-  switchStyleClass,
-  reflowElement,
+  BEMManager,
+  ResponsiveText,
+  switchStyleClasses,
   getCssPropertyNumber,
 } from '../../../core/index.js';
 
@@ -25,8 +23,6 @@ export default class DropdownSelector {
     this.menuIsOpen = false;
     this.runningAnimation = false;
     this.relativeArrowPosition = null;
-
-    this.dom = this.#getDomRegistry();
     this.responsiveText = new ResponsiveText(
       'responsive-text',
       '--responsive-text-ratio',
@@ -48,21 +44,28 @@ export default class DropdownSelector {
     this.relativeArrowPosition = this.#getRelativeArrowPosition();
   }
 
-  /* REFACTORY */
   #initElements() {
-    this.label = this.mainElement.querySelector('.dropdown-selector__label--default');
-    [this.accentBar] = this.dom.getElements('accent-bar');
-    [this.value] = this.dom.getElements('value');
-    [this.arrow] = this.dom.getElements('arrow');
-    [this.menu] = this.dom.getElements('menu');
-    this.menuItems = this.mainElement.querySelectorAll('.dropdown-selector__item--default');
-    this.menuItemsValue = this.mainElement.querySelectorAll(
-      '.dropdown-selector__item-value--default',
+    this.label = this.mainElement.querySelector(
+      this.bem.selector.label.default.selector_,
     );
-    /*
-    this.menuItems = this.dom.getElements('menu-item');
-    this.menuItemsValue = this.dom.getElements('menu-item-value');
-    */
+    this.accentBar = this.mainElement.querySelector(
+      this.bem.selector.accentBar.default.selector_,
+    );
+    this.value = this.mainElement.querySelector(
+      this.bem.selector.value.default.selector_,
+    );
+    this.arrow = this.mainElement.querySelector(
+      this.bem.selector.arrow.default.selector_,
+    );
+    this.menu = this.mainElement.querySelector(
+      this.bem.selector.menu.default.selector_,
+    );
+    this.menuItems = this.mainElement.querySelectorAll(
+      this.bem.selector.item.default.selector_,
+    );
+    this.menuItemsValue = this.mainElement.querySelectorAll(
+      this.bem.selector.itemValue.default.selector_,
+    );
   }
 
   #bindEvents() {
@@ -103,29 +106,32 @@ export default class DropdownSelector {
 
   #openMenu() {
     if (this.runningAnimation) return;
-
     this.runningAnimation = true;
+
     this.#setArrowProperties();
-
-    this.label.classList.remove('dropdown-selector__label--default');
-    reflowElement(this.label);
-    this.label.classList.add('dropdown-selector__label--open');
-
-    switchStyleClass(
-      this.arrow,
-      this.dom.getSelector('arrow', false),
-      this.dom.getSelector('arrow-open', false),
-    );
-    switchStyleClass(
-      this.accentBar,
-      this.dom.getSelector('accent-bar', false),
-      this.dom.getSelector('accent-bar-open', false),
-    );
-    switchStyleClass(
-      this.value,
-      this.dom.getSelector('value', false),
-      this.dom.getSelector('value-open', false),
-    );
+    switchStyleClasses([
+      {
+        element: this.label,
+        remove: this.bem.selector.label.default.selector_,
+        add: this.bem.selector.label.open.selector_,
+        reflow: true,
+      },
+      {
+        element: this.arrow,
+        remove: this.bem.selector.arrow.default.selector_,
+        add: this.bem.selector.arrow.open.selector_,
+      },
+      {
+        element: this.value,
+        remove: this.bem.selector.value.default.selector_,
+        add: this.bem.selector.value.open.selector_,
+      },
+      {
+        element: this.accentBar,
+        remove: this.bem.selector.accentBar.default.selector_,
+        add: this.bem.selector.accentBar.open.selector_,
+      },
+    ]);
     this.#showMenuItems();
 
     this.responsiveText.updateElements();
@@ -136,26 +142,29 @@ export default class DropdownSelector {
     if (this.runningAnimation) return;
 
     this.#setArrowProperties();
-
-    this.label.classList.remove('dropdown-selector__label--open');
-    reflowElement(this.label);
-    this.label.classList.add('dropdown-selector__label--default');
-
-    switchStyleClass(
-      this.arrow,
-      this.dom.getSelector('arrow-open', false),
-      this.dom.getSelector('arrow', false),
-    );
-    switchStyleClass(
-      this.accentBar,
-      this.dom.getSelector('accent-bar-open', false),
-      this.dom.getSelector('accent-bar', false),
-    );
-    switchStyleClass(
-      this.value,
-      this.dom.getSelector('value-open', false),
-      this.dom.getSelector('value', false),
-    );
+    switchStyleClasses([
+      {
+        element: this.label,
+        remove: this.bem.selector.label.default.selector_,
+        add: this.bem.selector.label.open.selector_,
+        reflow: true,
+      },
+      {
+        element: this.arrow,
+        remove: this.bem.selector.arrow.default.selector_,
+        add: this.bem.selector.arrow.open.selector_,
+      },
+      {
+        element: this.value,
+        remove: this.bem.selector.value.default.selector_,
+        add: this.bem.selector.value.open.selector_,
+      },
+      {
+        element: this.accentBar,
+        remove: this.bem.selector.accentBar.default.selector_,
+        add: this.bem.selector.accentBar.open.selector_,
+      },
+    ]);
     this.#hideMenuItems();
 
     this.responsiveText.updateElements();
@@ -163,128 +172,43 @@ export default class DropdownSelector {
   }
 
   #hideMenuItems() {
-    let time = 0;
-
     const items = [...this.menuItems].reverse();
-    items.forEach(item => {
-      setTimeout(
-        () => {
-          item.classList.remove('dropdown-selector__item--open');
-          item.classList.add('dropdown-selector__item--default');
-          this.responsiveText.updateElements();
-        },
-        time,
-      );
-      time += 100;
-    });
-
-    time = 0;
     const itemsValue = [...this.menuItemsValue].reverse();
-    itemsValue.forEach(item => {
-      setTimeout(
-        () => {
-          item.classList.remove('dropdown-selector__item-value--open');
-          item.classList.add('dropdown-selector__item-value--default');
-        },
-        time,
-      );
-      time += 70;
-    });
+
+    const itemReplacements = Array.from(items).map(element => ({
+      element,
+      remove: this.bem.selector.item.open.selector_,
+      add: this.bem.selector.item.default.selector_,
+    }));
+    switchStyleClasses(itemReplacements, 100);
+
+    const itemValueReplacements = Array.from(itemsValue).map(element => ({
+      element,
+      remove: this.bem.selector.itemValue.open.selector_,
+      add: this.bem.selector.itemValue.default.selector_,
+    }));
+    switchStyleClasses(itemValueReplacements, 70);
   }
 
   #showMenuItems() {
-    const itemHeight = getCssPropertyNumber('--menu-item-height');
+    const itemHeight = getCssPropertyNumber(this.mainElement, '--menu-item-height');
 
-    let time = 0;
-    this.menuItems.forEach(item => {
-      setTimeout(
-        () => {
-          item.classList.remove('dropdown-selector__item--default');
-          item.classList.add('dropdown-selector__item--open');
-        },
-        time,
-      );
-      time += 50;
-    });
+    const itemReplacements = Array.from(this.menuItems).map(element => ({
+      element,
+      remove: this.bem.selector.item.default.selector_,
+      add: this.bem.selector.item.open.selector_,
+    }));
+    switchStyleClasses(itemReplacements, 50);
 
-    time = 0;
-    this.menuItemsValue.forEach(item => {
-      setTimeout(
-        () => {
-          item.classList.remove('dropdown-selector__item-value--default');
-          item.classList.add('dropdown-selector__item-value--open');
-          this.responsiveText.updateElement(item, itemHeight);
-        },
-        time,
-      );
-      time += 120;
-    });
-  }
-
-  #getDomRegistry() {
-    return new DomRegistry(
-      [
-        /* -- Value -- */
-        {
-          selector: '.dropdown-selector__value--open',
-          name: 'value-open',
-          check: false,
-        },
-        {
-          selector: '.dropdown-selector__value--default',
-          name: 'value',
-          check: false,
-        },
-
-        /* -- Arrow -- */
-        {
-          selector: '.dropdown-selector__arrow--open',
-          name: 'arrow-open',
-          check: false,
-        },
-        {
-          selector: '.dropdown-selector__arrow--default',
-          name: 'arrow',
-          check: false,
-        },
-
-        /* -- Label -- */
-        {
-          selector: '.dropdown-selector__label--open',
-          name: 'label-open',
-          check: false,
-        },
-        {
-          selector: '.dropdown-selector__label--default',
-          name: 'label',
-          check: false,
-        },
-
-        /* -- Accent bar -- */
-        {
-          selector: '.dropdown-selector__accent-bar--open',
-          name: 'accent-bar-open',
-          check: false,
-        },
-        {
-          selector: '.dropdown-selector__accent-bar--default',
-          name: 'accent-bar',
-          check: false,
-        },
-
-        /* -- Menu -- */
-        {
-          selector: '.dropdown-selector__menu--open',
-          name: 'menu-open',
-          check: false,
-        },
-        {
-          selector: '.dropdown-selector__menu--default',
-          name: 'menu',
-          check: false,
-        },
-      ],
-    );
+    const itemValueReplacements = Array.from(this.menuItemsValue).map(element => ({
+      element,
+      remove: this.bem.selector.itemValue.default.selector_,
+      add: this.bem.selector.itemValue.open.selector_,
+      callback: _ => {
+        this.responsiveText.updateElement(element, itemHeight);
+      },
+    }));
+    switchStyleClasses(itemValueReplacements, 120);
   }
 }
 
