@@ -1,7 +1,6 @@
 import {
   fetchJson,
   BEMManager,
-  reflowElement,
   switchStyleClass,
   loadTemplateAsElement,
   setExclusiveStyleClass,
@@ -316,12 +315,11 @@ export default class ColorSelector {
 
     this.#updateTrainPosition();
 
-    this.train.classList.remove(
+    switchStyleClass(
+      this.train,
       this.bem.colorSelector.train.shake.path_,
-    );
-    reflowElement(this.train);
-    this.train.classList.add(
       this.bem.colorSelector.train.shake.path_,
+      true,
     );
   }
 

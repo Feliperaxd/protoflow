@@ -2,18 +2,28 @@ import { reflowElement } from './elements.js';
 
 /**
  * Gets the numeric value of a CSS custom property from an element.
- * Works with both unitless numbers (e.g., '--max-value: 100')
- *  and CSS values (e.g., '--height: 100px').
+ * Supports unitless numbers, unit-based values (e.g., "100px"),
+ * and expressions like "calc(...)". Always returns a unitless number.
  *
  * @param {HTMLElement} element - The element to read the CSS variable from.
- * @param {string} propertyName - The CSS variable name (e.g., '--max-value').
- * @returns {number} - The parsed number.
- * @throws {Error} - If the value is not a valid number.
+ * @param {string} propertyName - The CSS variable name (e.g., "--menu-item-height").
+ * @returns {number} - The computed numeric value (typically in pixels).
+ * @throws {Error} - If the property is missing or cannot be resolved to a number.
  */
 export function getCssPropertyNumber(element, propertyName) {
+  if (!(element instanceof Element)) {
+    throw new Error('Element is required and must be a DOM Element.');
+  }
+
   const rawValue = getComputedStyle(element).getPropertyValue(propertyName).trim();
 
-  // Handle unitless numbers first (common case)
+  if (!rawValue) {
+    throw new Error(
+      `CSS custom property "${propertyName}" is not set or resolves to an empty value.`
+    );
+  }
+
+  // Fast path: pure number (no units)
   if (/^-?\d*\.?\d+$/.test(rawValue)) {
     const value = parseFloat(rawValue);
     if (Number.isNaN(value)) {
@@ -22,24 +32,29 @@ export function getCssPropertyNumber(element, propertyName) {
     return value;
   }
 
-  // Handle CSS values with units
+  // Resolve via a real CSS property (width) in the actual layout context
   const helper = document.createElement('div');
-  const [style] = helper.style;
+  const { style } = helper;
   style.position = 'absolute';
   style.visibility = 'hidden';
-  style.setProperty(propertyName.startsWith('--') ? propertyName : `--${propertyName}`, rawValue);
-  document.body.appendChild(helper);
+  style.boxSizing = 'content-box';
+  style.margin = '0';
+  style.padding = '0';
+  style.border = '0';
+  style.width = rawValue;
 
-  const computedValue = getComputedStyle(helper).getPropertyValue(propertyName);
-  const parsedValue = parseFloat(computedValue) || parseFloat(rawValue);
+  element.appendChild(helper);
+  const { width } = getComputedStyle(helper);
+  element.removeChild(helper);
+  const numeric = parseFloat(width);
 
-  document.body.removeChild(helper);
-
-  if (Number.isNaN(parsedValue)) {
-    throw new Error(`Invalid CSS value for ${propertyName}: "${rawValue}"`);
+  if (Number.isNaN(numeric)) {
+    throw new Error(
+      `Invalid CSS value for ${propertyName}: "${rawValue}" (resolved width: "${width}")`,
+    );
   }
 
-  return parsedValue;
+  return numeric;
 }
 
 /**

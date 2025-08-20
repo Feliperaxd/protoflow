@@ -101,7 +101,15 @@ export default class DropdownSelector {
   }
 
   #getRelativeMenuHeight() {
-    return 200;
+    return 400;
+  }
+
+  #getFirstVisibleItems() {
+    const maxVisibleItems = getCssPropertyNumber(
+      this.mainElement,
+      '--menu-max-visible-items',
+    );
+    return Array.from(this.menuItems).slice(0, maxVisibleItems);
   }
 
   #openMenu() {
@@ -112,24 +120,24 @@ export default class DropdownSelector {
     switchStyleClasses([
       {
         element: this.label,
-        remove: this.bem.selector.label.default.selector_,
-        add: this.bem.selector.label.open.selector_,
+        remove: this.bem.selector.label.default.path_,
+        add: this.bem.selector.label.open.path_,
         reflow: true,
       },
       {
         element: this.arrow,
-        remove: this.bem.selector.arrow.default.selector_,
-        add: this.bem.selector.arrow.open.selector_,
+        remove: this.bem.selector.arrow.default.path_,
+        add: this.bem.selector.arrow.open.path_,
       },
       {
         element: this.value,
-        remove: this.bem.selector.value.default.selector_,
-        add: this.bem.selector.value.open.selector_,
+        remove: this.bem.selector.value.default.path_,
+        add: this.bem.selector.value.open.path_,
       },
       {
         element: this.accentBar,
-        remove: this.bem.selector.accentBar.default.selector_,
-        add: this.bem.selector.accentBar.open.selector_,
+        remove: this.bem.selector.accentBar.default.path_,
+        add: this.bem.selector.accentBar.open.path_,
       },
     ]);
     this.#showMenuItems();
@@ -140,33 +148,32 @@ export default class DropdownSelector {
 
   #closeMenu() {
     if (this.runningAnimation) return;
-
+    console.log(this.#getFirstVisibleItems());
     this.#setArrowProperties();
     switchStyleClasses([
       {
         element: this.label,
-        remove: this.bem.selector.label.default.selector_,
-        add: this.bem.selector.label.open.selector_,
+        remove: this.bem.selector.label.open.path_,
+        add: this.bem.selector.label.default.path_,
         reflow: true,
       },
       {
         element: this.arrow,
-        remove: this.bem.selector.arrow.default.selector_,
-        add: this.bem.selector.arrow.open.selector_,
+        remove: this.bem.selector.arrow.open.path_,
+        add: this.bem.selector.arrow.default.path_,
       },
       {
         element: this.value,
-        remove: this.bem.selector.value.default.selector_,
-        add: this.bem.selector.value.open.selector_,
+        remove: this.bem.selector.value.open.path_,
+        add: this.bem.selector.value.default.path_,
       },
       {
         element: this.accentBar,
-        remove: this.bem.selector.accentBar.default.selector_,
-        add: this.bem.selector.accentBar.open.selector_,
+        remove: this.bem.selector.accentBar.open.path_,
+        add: this.bem.selector.accentBar.default.path_,
       },
     ]);
     this.#hideMenuItems();
-
     this.responsiveText.updateElements();
     this.menuIsOpen = false;
   }
@@ -177,15 +184,15 @@ export default class DropdownSelector {
 
     const itemReplacements = Array.from(items).map(element => ({
       element,
-      remove: this.bem.selector.item.open.selector_,
-      add: this.bem.selector.item.default.selector_,
+      remove: this.bem.selector.item.open.path_,
+      add: this.bem.selector.item.default.path_,
     }));
-    switchStyleClasses(itemReplacements, 100);
+    switchStyleClasses(itemReplacements, 80);
 
     const itemValueReplacements = Array.from(itemsValue).map(element => ({
       element,
-      remove: this.bem.selector.itemValue.open.selector_,
-      add: this.bem.selector.itemValue.default.selector_,
+      remove: this.bem.selector.itemValue.open.path_,
+      add: this.bem.selector.itemValue.default.path_,
     }));
     switchStyleClasses(itemValueReplacements, 70);
   }
@@ -195,20 +202,24 @@ export default class DropdownSelector {
 
     const itemReplacements = Array.from(this.menuItems).map(element => ({
       element,
-      remove: this.bem.selector.item.default.selector_,
-      add: this.bem.selector.item.open.selector_,
+      remove: this.bem.selector.item.default.path_,
+      add: this.bem.selector.item.open.path_,
     }));
-    switchStyleClasses(itemReplacements, 50);
+    switchStyleClasses(itemReplacements, 100);
 
     const itemValueReplacements = Array.from(this.menuItemsValue).map(element => ({
       element,
-      remove: this.bem.selector.itemValue.default.selector_,
-      add: this.bem.selector.itemValue.open.selector_,
+      remove: this.bem.selector.itemValue.default.path_,
+      add: this.bem.selector.itemValue.open.path_,
       callback: _ => {
         this.responsiveText.updateElement(element, itemHeight);
       },
     }));
-    switchStyleClasses(itemValueReplacements, 120);
+    switchStyleClasses(itemValueReplacements, 130);
+    setTimeout(
+      _ => this.menu.scrollTo({ top: 0, behavior: 'smooth' });,
+      3000,
+    );
   }
 }
 

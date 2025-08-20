@@ -10,10 +10,11 @@
 :root {
   --main-height: 100px;
 
-  --menu-item-height: calc(var(--main-height) * 0.8);
+  --menu-item-height: calc(var(--main-height) * 0.6);
   --menu-open-duration: .3s;
   --menu-number-of-items: 100;
-  --menu-max-visible-items: 3;
+  --menu-max-visible-items: 5;
+  --teste: calc(var(--menu-item-height) * var(--menu-max-visible-items));
 }
 
 .dropdown-selector {
