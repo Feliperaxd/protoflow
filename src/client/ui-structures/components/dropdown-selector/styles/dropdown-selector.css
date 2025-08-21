@@ -14,6 +14,8 @@
   --menu-open-duration: .3s;
   --menu-number-of-items: 100;
   --menu-max-visible-items: 5;
+  --menu-item-append-delay: 100;
+  --menu-item-value-append-delay: 130;
   --teste: calc(var(--menu-item-height) * var(--menu-max-visible-items));
 }
 

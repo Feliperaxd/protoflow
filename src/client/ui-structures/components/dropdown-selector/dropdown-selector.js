@@ -23,6 +23,22 @@ export default class DropdownSelector {
     this.menuIsOpen = false;
     this.runningAnimation = false;
     this.relativeArrowPosition = null;
+    this.maxVisibleItems = getCssPropertyNumber(
+      this.mainElement,
+      '--menu-max-visible-items',
+    );
+    this.itemHeight = getCssPropertyNumber(
+      this.mainElement,
+      '--menu-item-height'
+    );
+    this.itemAppendDelay = getCssPropertyNumber(
+      this.mainElement,
+      '--menu-item-append-delay'
+    );
+    this.itemValueAppendDelay = getCssPropertyNumber(
+      this.mainElement,
+      '--menu-item-value-append-delay'
+    );
     this.responsiveText = new ResponsiveText(
       'responsive-text',
       '--responsive-text-ratio',
@@ -66,6 +82,10 @@ export default class DropdownSelector {
     this.menuItemsValue = this.mainElement.querySelectorAll(
       this.bem.selector.itemValue.default.selector_,
     );
+    this.firstItems = this.#getFirstVisibleItems();
+    this.firstItemsValues = this.firstItems.map(item => item.firstElementChild);
+    this.overflowItems = this.#getOverflowItems();
+    this.overflowItemsValues = this.overflowItems.map(item => item.firstElementChild);
   }
 
   #bindEvents() {
@@ -105,11 +125,11 @@ export default class DropdownSelector {
   }
 
   #getFirstVisibleItems() {
-    const maxVisibleItems = getCssPropertyNumber(
-      this.mainElement,
-      '--menu-max-visible-items',
-    );
-    return Array.from(this.menuItems).slice(0, maxVisibleItems);
+    return Array.from(this.menuItems).slice(0, this.maxVisibleItems);
+  }
+
+  #getOverflowItems() {
+    return Array.from(this.menuItems).slice(this.maxVisibleItems);
   }
 
   #openMenu() {
@@ -148,8 +168,9 @@ export default class DropdownSelector {
 
   #closeMenu() {
     if (this.runningAnimation) return;
-    console.log(this.#getFirstVisibleItems());
+
     this.#setArrowProperties();
+    this.menu.scrollTop = 0;
     switchStyleClasses([
       {
         element: this.label,
@@ -178,48 +199,86 @@ export default class DropdownSelector {
     this.menuIsOpen = false;
   }
 
-  #hideMenuItems() {
-    const items = [...this.menuItems].reverse();
-    const itemsValue = [...this.menuItemsValue].reverse();
-
-    const itemReplacements = Array.from(items).map(element => ({
-      element,
-      remove: this.bem.selector.item.open.path_,
-      add: this.bem.selector.item.default.path_,
-    }));
-    switchStyleClasses(itemReplacements, 80);
-
-    const itemValueReplacements = Array.from(itemsValue).map(element => ({
-      element,
-      remove: this.bem.selector.itemValue.open.path_,
-      add: this.bem.selector.itemValue.default.path_,
-    }));
-    switchStyleClasses(itemValueReplacements, 70);
-  }
-
-  #showMenuItems() {
-    const itemHeight = getCssPropertyNumber(this.mainElement, '--menu-item-height');
-
-    const itemReplacements = Array.from(this.menuItems).map(element => ({
+  #showFirstItems(onCompleteCallback = null) {
+    const itemReplacements = this.firstItems.map(element => ({
       element,
       remove: this.bem.selector.item.default.path_,
       add: this.bem.selector.item.open.path_,
     }));
-    switchStyleClasses(itemReplacements, 100);
+    switchStyleClasses(itemReplacements, this.itemAppendDelay);
 
-    const itemValueReplacements = Array.from(this.menuItemsValue).map(element => ({
+    const itemValueReplacements = this.firstItemsValues.map((element, index) => ({
       element,
       remove: this.bem.selector.itemValue.default.path_,
       add: this.bem.selector.itemValue.open.path_,
-      callback: _ => {
-        this.responsiveText.updateElement(element, itemHeight);
-      },
+      callback: (index === array.length - 1 && typeof onCompleteCallback === 'function')
+        ? () => {
+          this.responsiveText.updateElement(element, itemHeight);
+          onCompleteCallback();
+        }
+        : () => {
+          this.responsiveText.updateElement(element, itemHeight);
+        }
     }));
-    switchStyleClasses(itemValueReplacements, 130);
-    setTimeout(
-      _ => this.menu.scrollTo({ top: 0, behavior: 'smooth' });,
-      3000,
-    );
+    switchStyleClasses(itemValueReplacements, this.itemValueAppendDelay);
+  }
+
+  #showOverflowItems(onCompleteCallback = null) {
+    const itemReplacements = this.overflowItems.map(element => ({
+      element,
+      remove: this.bem.selector.item.default.path_,
+      add: this.bem.selector.item.open.path_,
+    }));
+    switchStyleClasses(itemReplacements);
+
+    const itemValueReplacements = this.overflowItemsValues.map(element => ({
+      element,
+      remove: this.bem.selector.itemValue.default.path_,
+      add: this.bem.selector.itemValue.open.path_,
+      callback: (index === array.length - 1 && typeof onCompleteCallback === 'function')
+        ? () => { onCompleteCallback(); }
+        : undefined
+    }));
+    switchStyleClasses(itemValueReplacements);
+  };
+  }
+
+  #hideMenuItems() {
+    const visibleItems = this.#getFirstVisibleItems();
+    const visibleItemsValues = visibleItems.map(item => item.firstElementChild);
+
+    const visibleItemsReplacements = visibleItems.reverse().map(element => ({
+      element,
+      remove: this.bem.selector.item.open.path_,
+      add: this.bem.selector.item.default.path_,
+    }));
+    switchStyleClasses(visibleItemsReplacements, 80);
+
+    const visibleItemsValueReplacements = visibleItemsValues.reverse().map(element => ({
+      element,
+      remove: this.bem.selector.itemValue.open.path_,
+      add: this.bem.selector.itemValue.default.path_,
+    }));
+    switchStyleClasses(visibleItemsValueReplacements, 70);
+
+    if (this.menu.children.length > this.maxVisibleItems) {
+      const hiddenItems = this.#getFirstHiddenItems();
+      const hiddenItemsValues = hiddenItems.map(item => item.firstElementChild);
+
+      const hiddenItemsReplacements = hiddenItems.map(element => ({
+        element,
+        remove: this.bem.selector.item.open.path_,
+        add: this.bem.selector.item.default.path_,
+      }));
+      switchStyleClasses(hiddenItemsReplacements);
+
+      const hiddenItemsValuesReplacements = hiddenItemsValues.map(element => ({
+        element,
+        remove: this.bem.selector.itemValue.open.path_,
+        add: this.bem.selector.itemValue.default.path_,
+      }));
+      switchStyleClasses(hiddenItemsValuesReplacements);
+    }
   }
 }
 
