@@ -189,7 +189,7 @@
     top: var(--arrow-top-default);
   }
   70% {
-    top: var(--arrow-top-open);
+    top: calc(var(--arrow-top-open) + var(--arrow-size));
     transform: rotateX(0) rotateZ(90deg);
   }
   100% {

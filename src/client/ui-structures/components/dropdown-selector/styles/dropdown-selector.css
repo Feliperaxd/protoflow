@@ -9,14 +9,13 @@
 
 :root {
   --main-height: 100px;
-
+  --arrow-size: calc(var(--main-height) * 0.35);
   --menu-item-height: calc(var(--main-height) * 0.6);
-  --menu-open-duration: .3s;
+  --menu-open-duration: calc(var(--menu-item-append-delay) * var(--menu-max-visible-items) * 1ms);
   --menu-number-of-items: 100;
-  --menu-max-visible-items: 5;
+  --menu-max-visible-items: 4;
   --menu-item-append-delay: 100;
   --menu-item-value-append-delay: 130;
-  --teste: calc(var(--menu-item-height) * var(--menu-max-visible-items));
 }
 
 .dropdown-selector {

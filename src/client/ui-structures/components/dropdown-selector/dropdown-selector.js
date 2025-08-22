@@ -29,15 +29,15 @@ export default class DropdownSelector {
     );
     this.itemHeight = getCssPropertyNumber(
       this.mainElement,
-      '--menu-item-height'
+      '--menu-item-height',
     );
     this.itemAppendDelay = getCssPropertyNumber(
       this.mainElement,
-      '--menu-item-append-delay'
+      '--menu-item-append-delay',
     );
     this.itemValueAppendDelay = getCssPropertyNumber(
       this.mainElement,
-      '--menu-item-value-append-delay'
+      '--menu-item-value-append-delay',
     );
     this.responsiveText = new ResponsiveText(
       'responsive-text',
@@ -121,7 +121,7 @@ export default class DropdownSelector {
   }
 
   #getRelativeMenuHeight() {
-    return 400;
+    return this.firstItems.length * this.itemHeight;
   }
 
   #getFirstVisibleItems() {
@@ -133,10 +133,11 @@ export default class DropdownSelector {
   }
 
   #openMenu() {
-    if (this.runningAnimation) return;
-    this.runningAnimation = true;
+    if (this.runningAnimation || this.menuIsOpen) return;
 
+    this.runningAnimation = true;
     this.#setArrowProperties();
+
     switchStyleClasses([
       {
         element: this.label,
@@ -160,17 +161,25 @@ export default class DropdownSelector {
         add: this.bem.selector.accentBar.open.path_,
       },
     ]);
-    this.#showMenuItems();
 
-    this.responsiveText.updateElements();
-    this.menuIsOpen = true;
+    this.#showFirstItems(
+      _ => {
+        this.#showOverflowItems(
+          __ => {
+            this.menuIsOpen = true;
+          },
+        );
+      },
+    );
   }
 
   #closeMenu() {
-    if (this.runningAnimation) return;
+    if (this.runningAnimation || !this.menuIsOpen) return;
 
-    this.#setArrowProperties();
     this.menu.scrollTop = 0;
+    this.runningAnimation = true;
+    this.#setArrowProperties();
+
     switchStyleClasses([
       {
         element: this.label,
@@ -194,12 +203,19 @@ export default class DropdownSelector {
         add: this.bem.selector.accentBar.default.path_,
       },
     ]);
-    this.#hideMenuItems();
-    this.responsiveText.updateElements();
-    this.menuIsOpen = false;
+
+    this.#hideOverflowItems(
+      _ => {
+        this.#hideFirstItems(
+          __ => {
+            this.menuIsOpen = false;
+          },
+        );
+      },
+    );
   }
 
-  #showFirstItems(onCompleteCallback = null) {
+  #showFirstItems(callback = null) {
     const itemReplacements = this.firstItems.map(element => ({
       element,
       remove: this.bem.selector.item.default.path_,
@@ -211,19 +227,17 @@ export default class DropdownSelector {
       element,
       remove: this.bem.selector.itemValue.default.path_,
       add: this.bem.selector.itemValue.open.path_,
-      callback: (index === array.length - 1 && typeof onCompleteCallback === 'function')
-        ? () => {
-          this.responsiveText.updateElement(element, itemHeight);
-          onCompleteCallback();
-        }
-        : () => {
-          this.responsiveText.updateElement(element, itemHeight);
-        }
+      callback: (
+        index === this.firstItemsValues.length - 1
+        && typeof callback === 'function'
+      )
+        ? () => { callback(); }
+        : undefined,
     }));
     switchStyleClasses(itemValueReplacements, this.itemValueAppendDelay);
   }
 
-  #showOverflowItems(onCompleteCallback = null) {
+  #showOverflowItems(callback = null) {
     const itemReplacements = this.overflowItems.map(element => ({
       element,
       remove: this.bem.selector.item.default.path_,
@@ -231,54 +245,66 @@ export default class DropdownSelector {
     }));
     switchStyleClasses(itemReplacements);
 
-    const itemValueReplacements = this.overflowItemsValues.map(element => ({
+    const itemValueReplacements = this.overflowItemsValues.map((element, index) => ({
       element,
       remove: this.bem.selector.itemValue.default.path_,
       add: this.bem.selector.itemValue.open.path_,
-      callback: (index === array.length - 1 && typeof onCompleteCallback === 'function')
-        ? () => { onCompleteCallback(); }
-        : undefined
+      callback: (
+        index === this.overflowItems.length - 1
+        && typeof callback === 'function'
+      )
+        ? () => { callback(); }
+        : undefined,
     }));
     switchStyleClasses(itemValueReplacements);
-  };
   }
 
-  #hideMenuItems() {
-    const visibleItems = this.#getFirstVisibleItems();
-    const visibleItemsValues = visibleItems.map(item => item.firstElementChild);
-
-    const visibleItemsReplacements = visibleItems.reverse().map(element => ({
-      element,
-      remove: this.bem.selector.item.open.path_,
-      add: this.bem.selector.item.default.path_,
-    }));
-    switchStyleClasses(visibleItemsReplacements, 80);
-
-    const visibleItemsValueReplacements = visibleItemsValues.reverse().map(element => ({
-      element,
-      remove: this.bem.selector.itemValue.open.path_,
-      add: this.bem.selector.itemValue.default.path_,
-    }));
-    switchStyleClasses(visibleItemsValueReplacements, 70);
-
-    if (this.menu.children.length > this.maxVisibleItems) {
-      const hiddenItems = this.#getFirstHiddenItems();
-      const hiddenItemsValues = hiddenItems.map(item => item.firstElementChild);
-
-      const hiddenItemsReplacements = hiddenItems.map(element => ({
+  #hideFirstItems(callback = null) {
+    const itemReplacements = this.firstItems.reverse()
+      .map(element => ({
         element,
         remove: this.bem.selector.item.open.path_,
         add: this.bem.selector.item.default.path_,
       }));
-      switchStyleClasses(hiddenItemsReplacements);
+    switchStyleClasses(itemReplacements, this.itemAppendDelay);
 
-      const hiddenItemsValuesReplacements = hiddenItemsValues.map(element => ({
+    const itemValueReplacements = this.firstItemsValues.reverse()
+      .map((element, index) => ({
         element,
         remove: this.bem.selector.itemValue.open.path_,
         add: this.bem.selector.itemValue.default.path_,
+        callback: (
+          index === this.firstItemsValues.length - 1
+          && typeof callback === 'function'
+        )
+          ? () => { callback(); }
+          : undefined,
       }));
-      switchStyleClasses(hiddenItemsValuesReplacements);
-    }
+    switchStyleClasses(itemValueReplacements, this.itemValueAppendDelay);
+  }
+
+  #hideOverflowItems(callback = null) {
+    const itemReplacements = this.overflowItems.reverse()
+      .map(element => ({
+        element,
+        remove: this.bem.selector.item.open.path_,
+        add: this.bem.selector.item.default.path_,
+      }));
+    switchStyleClasses(itemReplacements);
+
+    const itemValueReplacements = this.overflowItemsValues.reverse()
+      .map((element, index) => ({
+        element,
+        remove: this.bem.selector.itemValue.open.path_,
+        add: this.bem.selector.itemValue.default.path_,
+        callback: (
+          index === this.overflowItems.length - 1
+          && typeof callback === 'function'
+        )
+          ? () => { callback(); }
+          : undefined,
+      }));
+    switchStyleClasses(itemValueReplacements);
   }
 }
 

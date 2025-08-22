@@ -2,7 +2,7 @@
 
 .dropdown-selector__arrow--open,
 .dropdown-selector__arrow--default {
-  height: 60%;
+  height: var(--arrow-size);
   aspect-ratio: 1 / 1;
 
   right: 0;
@@ -46,7 +46,7 @@
     opacity: 1;
   }
   70% {
-    top: var(--arrow-top-open);
+    top:  var(--arrow-top-open);
     opacity: 0;
     transform: rotateX(0) rotateZ(90deg);
   }
@@ -59,7 +59,7 @@
 
 @keyframes dropdown-selector__arrow-to-top-animation {
   0% {
-    top: var(--arrow-top-open);
+    top: calc(var(--arrow-top-open) + var(--arrow-size));
     opacity: 0;
     transform: rotateX(180deg) rotateZ(90deg);
   }
