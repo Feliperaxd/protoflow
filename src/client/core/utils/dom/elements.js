@@ -35,3 +35,11 @@ export async function loadTemplateAsElement(path, containerTag) {
   temp.innerHTML = html.trim();
   return temp.firstElementChild;
 }
+
+export function scrollTo(element, position, callback) {
+  const startX = element.scrollLeft;
+  const startY = element.scrollTop;
+  const distanceX = position.x - startX;
+  const distanceY = position.y - startY;
+
+}

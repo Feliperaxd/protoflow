@@ -82,10 +82,16 @@ export default class DropdownSelector {
     this.menuItemsValue = this.mainElement.querySelectorAll(
       this.bem.selector.itemValue.default.selector_,
     );
+
     this.firstItems = this.#getFirstVisibleItems();
     this.firstItemsValues = this.firstItems.map(item => item.firstElementChild);
     this.overflowItems = this.#getOverflowItems();
     this.overflowItemsValues = this.overflowItems.map(item => item.firstElementChild);
+
+    this.firstItemsReversed = [...this.firstItems].reverse();
+    this.firstItemsValuesReversed = [...this.firstItemsValues].reverse();
+    this.overflowItemsReversed = [...this.overflowItems].reverse();
+    this.overflowItemsValuesReversed = [...this.overflowItemsValues].reverse();
   }
 
   #bindEvents() {
@@ -176,7 +182,6 @@ export default class DropdownSelector {
   #closeMenu() {
     if (this.runningAnimation || !this.menuIsOpen) return;
 
-    this.menu.scrollTop = 0;
     this.runningAnimation = true;
     this.#setArrowProperties();
 
@@ -260,7 +265,7 @@ export default class DropdownSelector {
   }
 
   #hideFirstItems(callback = null) {
-    const itemReplacements = this.firstItems.reverse()
+    const itemReplacements = this.firstItemsReversed
       .map(element => ({
         element,
         remove: this.bem.selector.item.open.path_,
@@ -268,7 +273,7 @@ export default class DropdownSelector {
       }));
     switchStyleClasses(itemReplacements, this.itemAppendDelay);
 
-    const itemValueReplacements = this.firstItemsValues.reverse()
+    const itemValueReplacements = this.firstItemsValuesReversed
       .map((element, index) => ({
         element,
         remove: this.bem.selector.itemValue.open.path_,
@@ -284,7 +289,7 @@ export default class DropdownSelector {
   }
 
   #hideOverflowItems(callback = null) {
-    const itemReplacements = this.overflowItems.reverse()
+    const itemReplacements = this.overflowItemsReversed
       .map(element => ({
         element,
         remove: this.bem.selector.item.open.path_,
@@ -292,7 +297,7 @@ export default class DropdownSelector {
       }));
     switchStyleClasses(itemReplacements);
 
-    const itemValueReplacements = this.overflowItemsValues.reverse()
+    const itemValueReplacements = this.overflowItemsValuesReversed
       .map((element, index) => ({
         element,
         remove: this.bem.selector.itemValue.open.path_,
