@@ -1,9 +1,12 @@
 import {
+  scrollTo,
   fetchJson,
   BEMManager,
   ResponsiveText,
+  switchStyleClass,
   switchStyleClasses,
   getCssPropertyNumber,
+  loadTemplateAsElement,
 } from '../../../core/index.js';
 
 export default class DropdownSelector {
@@ -23,6 +26,9 @@ export default class DropdownSelector {
     this.menuIsOpen = false;
     this.runningAnimation = false;
     this.relativeArrowPosition = null;
+    this.allValues = [];
+    this.selectedValueIndex = null;
+
     this.maxVisibleItems = getCssPropertyNumber(
       this.mainElement,
       '--menu-max-visible-items',
@@ -50,14 +56,19 @@ export default class DropdownSelector {
   }
 
   async init() {
+    const menuItemTemplateUrl = new URL('./templates/menuItem.html', import.meta.url).href;
     const bemDataUrl = new URL('./bem-data.json', import.meta.url).href;
+
     this.bem = new BEMManager();
     this.bem.load(await fetchJson(bemDataUrl));
+    this.menuItemTemplate = await loadTemplateAsElement(menuItemTemplateUrl, 'li');
 
     this.responsiveText.init();
     this.#initElements();
     this.#bindEvents();
     this.relativeArrowPosition = this.#getRelativeArrowPosition();
+
+    this.#updateUi();
   }
 
   #initElements() {
@@ -76,6 +87,38 @@ export default class DropdownSelector {
     this.menu = this.mainElement.querySelector(
       this.bem.selector.menu.default.selector_,
     );
+    this.menuItems = null;
+    this.menuItemsValue = null;
+
+    this.firstItems = null;
+    this.firstItemsValues = null;
+    this.overflowItems = null;
+    this.overflowItemsValues = null;
+
+    this.firstItemsReversed = null;
+    this.firstItemsValuesReversed = null;
+    this.overflowItemsReversed = null;
+    this.overflowItemsValuesReversed = null;
+
+    this.menu.innerHTML = '';
+  }
+
+  addValue(id, name, value) {
+    const menuItem = this.menuItemTemplate.cloneNode(true);
+    const menuItemValue = menuItem.firstElementChild;
+
+    menuItemValue.textContent = name;
+    this.menu.appendChild(menuItem);
+    this.allValues.push({
+      id,
+      name,
+      value,
+      element: menuItem,
+    });
+    this.#updateUi();
+  }
+
+  #refreshMenuItems() {
     this.menuItems = this.mainElement.querySelectorAll(
       this.bem.selector.item.default.selector_,
     );
@@ -116,6 +159,24 @@ export default class DropdownSelector {
       '--arrow-top-open',
       `${this.#getRelativeMenuHeight()}px`,
     );
+  }
+
+  #selectValue(valueIndex) {
+    this.selectedValueIndex = valueIndex;
+    const newSelectedValue = this.allValues[valueIndex];
+    this.value.textContent = newSelectedValue?.name ?? 'N/A :(';
+  }
+
+  #getValue() {
+    return this.allValues[this.selectedValueIndex];
+  }
+
+  #updateUi() {
+    if (this.allValues.length <= 1) {
+      this.#selectValue(0);
+      //Add Remove ARROW
+    }
+    this.#refreshMenuItems();
   }
 
   #getRelativeArrowPosition() {
@@ -181,43 +242,47 @@ export default class DropdownSelector {
 
   #closeMenu() {
     if (this.runningAnimation || !this.menuIsOpen) return;
-
+    O MENU PEQUENO NAO FECHA ACHO Q {E NO T|IS OPEN}
     this.runningAnimation = true;
     this.#setArrowProperties();
 
-    switchStyleClasses([
-      {
-        element: this.label,
-        remove: this.bem.selector.label.open.path_,
-        add: this.bem.selector.label.default.path_,
-        reflow: true,
-      },
-      {
-        element: this.arrow,
-        remove: this.bem.selector.arrow.open.path_,
-        add: this.bem.selector.arrow.default.path_,
-      },
-      {
-        element: this.value,
-        remove: this.bem.selector.value.open.path_,
-        add: this.bem.selector.value.default.path_,
-      },
-      {
-        element: this.accentBar,
-        remove: this.bem.selector.accentBar.open.path_,
-        add: this.bem.selector.accentBar.default.path_,
-      },
-    ]);
+    const close = () => {
+      switchStyleClasses([
+        {
+          element: this.label,
+          remove: this.bem.selector.label.open.path_,
+          add: this.bem.selector.label.default.path_,
+          reflow: true,
+        },
+        {
+          element: this.arrow,
+          remove: this.bem.selector.arrow.open.path_,
+          add: this.bem.selector.arrow.default.path_,
+        },
+        {
+          element: this.accentBar,
+          remove: this.bem.selector.accentBar.open.path_,
+          add: this.bem.selector.accentBar.default.path_,
+        },
+      ]);
 
-    this.#hideOverflowItems(
-      _ => {
-        this.#hideFirstItems(
-          __ => {
-            this.menuIsOpen = false;
-          },
-        );
-      },
-    );
+      this.#hideOverflowItems(
+        _ => {
+          this.#hideFirstItems(
+            __ => {
+              this.menuIsOpen = false;
+              switchStyleClass(
+                this.value,
+                this.bem.selector.value.open.path_,
+                this.bem.selector.value.default.path_,
+              );
+            },
+          );
+        },
+      );
+    };
+
+    scrollTo(this.menu, { y: 0 }, close);
   }
 
   #showFirstItems(callback = null) {
@@ -314,4 +379,7 @@ export default class DropdownSelector {
 }
 
 const dropdown = new DropdownSelector('selector-example');
-dropdown.init();
+await dropdown.init();
+dropdown.addValue(1, 'PETG', 'Teste');
+dropdown.addValue(1, 'PLA', 'Teste');
+dropdown.addValue(1, 'ABS', 'Teste');

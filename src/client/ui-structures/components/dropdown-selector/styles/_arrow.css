@@ -27,7 +27,7 @@
 .dropdown-selector__arrow--open {
   animation:
     dropdown-selector__arrow-to-bottom-animation
-    var(--menu-open-duration)
+    calc(var(--menu-open-duration) * .9)
     ease-in
     forwards;
 }
@@ -35,7 +35,7 @@
 .dropdown-selector__arrow--default {
   animation:
     dropdown-selector__arrow-to-top-animation
-    calc(var(--menu-open-duration) * 1.43)
+    calc(var(--menu-open-duration) * 2)
     ease-out
     forwards;
 }

@@ -18,7 +18,7 @@
 .dropdown-selector__value--open {
   animation:
     fade-out-slide-down--default
-    calc(var(--menu-open-duration) * 0.2)
+    calc(var(--menu-open-duration) * .2)
     ease-in
     forwards;
 }
@@ -26,7 +26,7 @@
 .dropdown-selector__value--default {
   animation:
     fade-in-slide-up--default
-    var(--menu-open-duration)
+    calc(var(--menu-open-duration) * .6)
     ease-out
     forwards;
 }

@@ -80,10 +80,7 @@ export default class ColorSelector {
     const colorCirceUrl = new URL('../templates/color-circle.html', import.meta.url).href;
     const bemDataUrl = new URL('./bem-data.json', import.meta.url).href;
 
-    this.colorCircleTemplate = await loadTemplateAsElement(
-      colorCirceUrl,
-      'div',
-    );
+    this.colorCircleTemplate = await loadTemplateAsElement(colorCirceUrl, 'div');
 
     this.bem = new BEMManager();
     this.bem.load(await fetchJson(bemDataUrl));
@@ -298,6 +295,7 @@ export default class ColorSelector {
     this.rightArrow = this.mainElement.querySelector(
       this.bem.colorSelector.rightArrow.default.selector_,
     );
+
     this.train.innerHTML = '';
   }
 
