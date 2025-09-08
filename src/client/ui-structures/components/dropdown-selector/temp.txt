@@ -138,3 +138,53 @@
   #getRelativeMenuHeight() {
     return 200;
   }*/
+
+
+
+
+
+
+  #closeMenu() {
+    if (this.runningAnimation || !this.menuIsOpen) return;
+    O MENU PEQUENO NAO FECHA ACHO Q {E NO T|IS OPEN}
+    this.runningAnimation = true;
+    this.#setArrowProperties();
+
+    const close = () => {
+      switchStyleClasses([
+        {
+          element: this.label,
+          remove: this.bem.selector.label.open.path_,
+          add: this.bem.selector.label.default.path_,
+          reflow: true,
+        },
+        {
+          element: this.arrow,
+          remove: this.bem.selector.arrow.open.path_,
+          add: this.bem.selector.arrow.default.path_,
+        },
+        {
+          element: this.accentBar,
+          remove: this.bem.selector.accentBar.open.path_,
+          add: this.bem.selector.accentBar.default.path_,
+        },
+      ]);
+
+      this.#hideOverflowItems(
+        _ => {
+          this.#hideFirstItems(
+            __ => {
+              this.menuIsOpen = false;
+              switchStyleClass(
+                this.value,
+                this.bem.selector.value.open.path_,
+                this.bem.selector.value.default.path_,
+              );
+            },
+          );
+        },
+      );
+    };
+
+    scrollTo(this.menu, { y: 0 }, close);
+  }

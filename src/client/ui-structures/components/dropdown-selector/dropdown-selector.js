@@ -229,20 +229,18 @@ export default class DropdownSelector {
       },
     ]);
 
-    this.#showFirstItems(
-      _ => {
-        this.#showOverflowItems(
-          __ => {
-            this.menuIsOpen = true;
-          },
-        );
-      },
-    );
+    this.#showFirstItems(() => {
+      if (this.overflowItems.length > 0) {
+        this.#showOverflowItems(() => { this.menuIsOpen = true; });
+      } else {
+        this.menuIsOpen = true;
+      }
+    });
   }
 
   #closeMenu() {
     if (this.runningAnimation || !this.menuIsOpen) return;
-    O MENU PEQUENO NAO FECHA ACHO Q {E NO T|IS OPEN}
+
     this.runningAnimation = true;
     this.#setArrowProperties();
 
@@ -266,20 +264,13 @@ export default class DropdownSelector {
         },
       ]);
 
-      this.#hideOverflowItems(
-        _ => {
-          this.#hideFirstItems(
-            __ => {
-              this.menuIsOpen = false;
-              switchStyleClass(
-                this.value,
-                this.bem.selector.value.open.path_,
-                this.bem.selector.value.default.path_,
-              );
-            },
-          );
-        },
-      );
+      if (this.overflowItems.length > 0) { // create isEmpty
+        this.#hideOverflowItems(() => {
+          this.#hideFirstItems(() => { this.menuIsOpen = false; });
+        });
+      } else {
+        this.#hideFirstItems(() => { this.menuIsOpen = false; });
+      }
     };
 
     scrollTo(this.menu, { y: 0 }, close);
@@ -383,3 +374,11 @@ await dropdown.init();
 dropdown.addValue(1, 'PETG', 'Teste');
 dropdown.addValue(1, 'PLA', 'Teste');
 dropdown.addValue(1, 'ABS', 'Teste');
+dropdown.addValue(1, 'ABS', 'Teste');
+
+dropdown.addValue(1, 'ABS', 'Teste');
+
+dropdown.addValue(1, 'ABS', 'Teste');
+
+dropdown.addValue(1, 'ABS', 'Teste');
+
