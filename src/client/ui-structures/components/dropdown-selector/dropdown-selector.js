@@ -27,7 +27,7 @@ export default class DropdownSelector {
     this.runningAnimation = false;
     this.relativeArrowPosition = null;
     this.allValues = [];
-    this.selectedValueIndex = null;
+    this.selectedValue = null;
 
     this.maxVisibleItems = getCssPropertyNumber(
       this.mainElement,
@@ -65,6 +65,7 @@ export default class DropdownSelector {
 
     this.responsiveText.init();
     this.#initElements();
+    this.#refreshMenuItems();
     this.#bindEvents();
     this.relativeArrowPosition = this.#getRelativeArrowPosition();
 
@@ -130,6 +131,7 @@ export default class DropdownSelector {
     this.firstItemsValues = this.firstItems.map(item => item.firstElementChild);
     this.overflowItems = this.#getOverflowItems();
     this.overflowItemsValues = this.overflowItems.map(item => item.firstElementChild);
+    this.allItems = this.firstItems.concat(this.overflowItems);
 
     this.firstItemsReversed = [...this.firstItems].reverse();
     this.firstItemsValuesReversed = [...this.firstItemsValues].reverse();
@@ -140,13 +142,21 @@ export default class DropdownSelector {
   #bindEvents() {
     this.arrow.addEventListener('click', () => this.#openMenu());
     this.value.addEventListener('click', () => { console.log('clickvalue'); });
-    window.addEventListener('click', e => {
+    window.addEventListener('click', e => { //Talvez usar onclick
       if (!this.mainElement.contains(e.target)) {
         this.#closeMenu();
       }
     });
     this.mainElement.addEventListener('animationend', () => {
       this.runningAnimation = false;
+    });
+
+    this.allItems.forEach((item, index) => {
+      item.addEventListener('click', () => {
+        console.log('adlkslkdsajsad');
+        this.#selectValue(index);
+        this.#closeMenu(() => this.#showSelectedValue());
+      });
     });
   }
 
@@ -162,9 +172,16 @@ export default class DropdownSelector {
   }
 
   #selectValue(valueIndex) {
-    this.selectedValueIndex = valueIndex;
-    const newSelectedValue = this.allValues[valueIndex];
-    this.value.textContent = newSelectedValue?.name ?? 'N/A :(';
+    this.selectedValue = this.allValues[valueIndex];
+  }
+
+  #showSelectedValue() {
+    this.value.textContent = this.selectedValue?.name ?? 'N/A :('; //ISSO BUGA O TAMANHO
+    switchStyleClass(
+      this.value,
+      this.bem.selector.value.open.path_,
+      this.bem.selector.value.default.path_,
+    );
   }
 
   #getValue() {
@@ -174,9 +191,14 @@ export default class DropdownSelector {
   #updateUi() {
     if (this.allValues.length <= 1) {
       this.#selectValue(0);
-      //Add Remove ARROW
     }
     this.#refreshMenuItems();
+    this.allItems.forEach((item, index) => {
+      item.onclick = () => {
+        this.#selectValue(index);
+        this.#closeMenu(() => this.#showSelectedValue());
+      };
+    });
   }
 
   #getRelativeArrowPosition() {
@@ -199,7 +221,7 @@ export default class DropdownSelector {
     return Array.from(this.menuItems).slice(this.maxVisibleItems);
   }
 
-  #openMenu() {
+  #openMenu(callback) {
     if (this.runningAnimation || this.menuIsOpen) return;
 
     this.runningAnimation = true;
@@ -231,14 +253,18 @@ export default class DropdownSelector {
 
     this.#showFirstItems(() => {
       if (this.overflowItems.length > 0) {
-        this.#showOverflowItems(() => { this.menuIsOpen = true; });
+        this.#showOverflowItems(() => {
+          this.menuIsOpen = true;
+          if (callback) callback();
+        });
       } else {
         this.menuIsOpen = true;
+        if (callback) callback();
       }
     });
   }
 
-  #closeMenu() {
+  #closeMenu(callback) {
     if (this.runningAnimation || !this.menuIsOpen) return;
 
     this.runningAnimation = true;
@@ -266,10 +292,16 @@ export default class DropdownSelector {
 
       if (this.overflowItems.length > 0) { // create isEmpty
         this.#hideOverflowItems(() => {
-          this.#hideFirstItems(() => { this.menuIsOpen = false; });
+          this.#hideFirstItems(() => {
+            this.menuIsOpen = false;
+            if (callback) callback();
+          });
         });
       } else {
-        this.#hideFirstItems(() => { this.menuIsOpen = false; });
+        this.#hideFirstItems(() => {
+          this.menuIsOpen = false;
+          if (callback) callback();
+        });
       }
     };
 
@@ -375,10 +407,6 @@ dropdown.addValue(1, 'PETG', 'Teste');
 dropdown.addValue(1, 'PLA', 'Teste');
 dropdown.addValue(1, 'ABS', 'Teste');
 dropdown.addValue(1, 'ABS', 'Teste');
-
 dropdown.addValue(1, 'ABS', 'Teste');
-
 dropdown.addValue(1, 'ABS', 'Teste');
-
 dropdown.addValue(1, 'ABS', 'Teste');
-
