@@ -148,7 +148,7 @@ class BEM {
   }
 }
 
-import { fetchJson } from '../src/client/core/index.js'
+import { fetchJson } from '../../src/client/core/index.js'
 
 const a = new BEM();
 const data = await fetchJson('./teste.json');

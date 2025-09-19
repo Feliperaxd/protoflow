@@ -176,7 +176,7 @@ export default class DropdownSelector {
   }
 
   #showSelectedValue() {
-    this.value.textContent = this.selectedValue?.name ?? 'N/A :('; //ISSO BUGA O TAMANHO
+    this.value.textContent = this.selectedValue?.name ?? 'N/A :(';
     switchStyleClass(
       this.value,
       this.bem.selector.value.open.path_,
@@ -184,13 +184,22 @@ export default class DropdownSelector {
     );
   }
 
+  #hideSelectedValue() {
+    switchStyleClass(
+      this.value,
+      this.bem.selector.value.default.path_,
+      this.bem.selector.value.open.path_,
+    );
+  }
+
   #getValue() {
-    return this.allValues[this.selectedValueIndex];
+    return this.selectedValue;
   }
 
   #updateUi() {
     if (this.allValues.length <= 1) {
       this.#selectValue(0);
+      this.#showSelectedValue();
     }
     this.#refreshMenuItems();
     this.allItems.forEach((item, index) => {
@@ -226,6 +235,7 @@ export default class DropdownSelector {
 
     this.runningAnimation = true;
     this.#setArrowProperties();
+    this.#hideSelectedValue();
 
     switchStyleClasses([
       {
@@ -238,11 +248,6 @@ export default class DropdownSelector {
         element: this.arrow,
         remove: this.bem.selector.arrow.default.path_,
         add: this.bem.selector.arrow.open.path_,
-      },
-      {
-        element: this.value,
-        remove: this.bem.selector.value.default.path_,
-        add: this.bem.selector.value.open.path_,
       },
       {
         element: this.accentBar,
@@ -294,12 +299,14 @@ export default class DropdownSelector {
         this.#hideOverflowItems(() => {
           this.#hideFirstItems(() => {
             this.menuIsOpen = false;
+            this.#showSelectedValue();
             if (callback) callback();
           });
         });
       } else {
         this.#hideFirstItems(() => {
           this.menuIsOpen = false;
+          this.#showSelectedValue();
           if (callback) callback();
         });
       }
@@ -410,3 +417,14 @@ dropdown.addValue(1, 'ABS', 'Teste');
 dropdown.addValue(1, 'ABS', 'Teste');
 dropdown.addValue(1, 'ABS', 'Teste');
 dropdown.addValue(1, 'ABS', 'Teste');
+
+
+// TODO Melhorias sugeridas:
+//
+// 1. Criar método genérico de toggle para mostrar/esconder itens.
+// 2. Usar event delegation em vez de adicionar onclick em cada item.
+// 3. Chamar onChangeCallback dentro do #selectValue.
+// 4. Separar responsabilidades de métodos grandes (ex: #updateUi).
+// 5. Tornar getValue() público.
+// 6. Evitar recalcular DOM toda hora (usar cache de itens).
+// 7. Melhorar consistência nos nomes de variáveis e métodos.
