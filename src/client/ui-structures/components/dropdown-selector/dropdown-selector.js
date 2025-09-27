@@ -428,3 +428,22 @@ dropdown.addValue(1, 'ABS', 'Teste');
 // 5. Tornar getValue() público.
 // 6. Evitar recalcular DOM toda hora (usar cache de itens).
 // 7. Melhorar consistência nos nomes de variáveis e métodos.
+
+#toggleItems(items, itemsValues, open, delay, callback) {
+    const replacements = items.map(el => ({
+        element: el,
+        remove: this.bem.selector.item[open ? 'default' : 'open'].path_,
+        add: this.bem.selector.item[open ? 'open' : 'default'].path_,
+    }));
+    switchStyleClasses(replacements, delay);
+
+    const valueReplacements = itemsValues.map((el, index) => ({
+        element: el,
+        remove: this.bem.selector.itemValue[open ? 'default' : 'open'].path_,
+        add: this.bem.selector.itemValue[open ? 'open' : 'default'].path_,
+        callback: (
+            index === itemsValues.length - 1 && typeof callback === 'function'
+        ) ? callback : undefined,
+    }));
+    switchStyleClasses(valueReplacements, this.itemValueAppendDelay);
+}
