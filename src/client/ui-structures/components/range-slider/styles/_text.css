@@ -7,11 +7,11 @@
   letter-spacing: var(--letter-spacing-default);
 }
 
-.range-slider__label[responsive-text] {
-  --responsive-text-ratio: 20;
+.range-slider__label[responsive-font-size] {
+  --responsive-font-size-ratio: 20;
 }
 
-.range-slider__value[responsive-text] {
-  --responsive-text-ratio: 26;
+.range-slider__value[responsive-font-size] {
+  --responsive-font-size-ratio: 26;
   margin-left: calc(var(--main-height) * 0.25);
 }

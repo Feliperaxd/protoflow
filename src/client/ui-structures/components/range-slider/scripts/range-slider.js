@@ -1,7 +1,7 @@
 import {
   fetchJson,
   BEMManager,
-  ResponsiveText,
+  ResponsiveSize,
   preventDefaults,
   getEventPositions,
   getCssPropertyNumber,
@@ -36,11 +36,6 @@ export default class RangeSlider {
         && this.onChangeCallback !== null) {
       throw new Error('Expected "onChangeCallback" to be a function');
     }
-
-    this.responsiveText = new ResponsiveText(
-      'responsive-text',
-      '--responsive-text-ratio',
-    );
   }
 
   // === Public Methods ===
@@ -90,7 +85,6 @@ export default class RangeSlider {
 
     this.#initElements();
     this.#initProperties();
-    this.responsiveText.init();
 
     this.#onResize = this.#handleResize.bind(this);
     this.#bindEvents();

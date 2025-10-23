@@ -1,0 +1,44 @@
+{
+  "blocks": [
+    {
+      "name": "color-selector",
+      "alias": "colorSelector",
+      "elements": [
+        {
+          "name": "left-arrow",
+          "alias": "leftArrow",
+          "modifiers": [
+            { "name": "default", "alias": "default" },
+            { "name": "hidden", "alias": "hidden" }
+          ]
+        },
+        {
+          "name": "right-arrow",
+          "alias": "rightArrow",
+          "modifiers": [
+            { "name": "default", "alias": "default" },
+            { "name": "hidden", "alias": "hidden" }
+          ]
+        },
+        {
+          "name": "train",
+          "alias": "train",
+          "modifiers": [
+            { "name": "shake", "alias": "shake" },
+            { "name": "default", "alias": "default" }
+          ]
+        },
+        {
+          "name": "color-circle",
+          "alias": "colorCircle",
+          "modifiers": [
+            { "name": "default", "alias": "default" },
+            { "name": "selected", "alias": "selected" },
+            { "name": "hidden", "alias": "hidden" }
+          ]
+        },
+        { "name": "carousel", "alias": "carousel" }
+      ]
+    }
+  ]
+}

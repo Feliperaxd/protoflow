@@ -1,0 +1,27 @@
+body {
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  background-color: #1c1c1c;
+}
+
+.button {
+  width: 300px;
+  aspect-ratio: 2 / 0.5;
+  display: grid;
+  place-items: center;
+  background-color: #0b8b65;
+  --adaptative-size-trigger: '.teste';
+  --adaptative-size-anchor: 'width';
+  --adaptative-size-target: 'border-radius';
+  --adaptative-size-ratio: 25;
+  --adaptative-size-unit: 'px'
+}
+
+.button222 > p {
+  color: #fafafa;
+  text-align: center;
+  font-family: 'arial black';
+  --adaptative-size: '.aaaa' 'height' 'border' 'rem' 2333
+}
+

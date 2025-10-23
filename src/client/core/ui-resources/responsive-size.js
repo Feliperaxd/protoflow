@@ -1,37 +1,39 @@
 /**
- * ResponsiveText - Dynamically resizes text based on parent element size.
+ * ResponsiveSize - Dynamically resizes a CSS property based on parent element size.
  */
-export default class ResponsiveText {
+export default class ResponsiveSize {
   /** @type {() => void} */
   #onResize;
 
   /**
    * @param {string} attribute - Attribute or selector to target responsive elements.
-   * @param {string} ratioVar - CSS variable that holds the font-size ratio.
-   * @param {string} [unit='px'] - Font size unit (e.g., px, rem, em).
+   * @param {string} ratioVar - CSS variable that holds the size ratio.
+   * @param {string} property - CSS property to resize
+   *  (camelCase, e.g. 'fontSize', 'borderRadius').
+   * @param {string} [unit='px'] - Unit for the resized property (e.g., px, rem, em).
    * @param {number} [debounceDelay=100] - Delay in milliseconds for debouncing resize events.
    * @param {boolean} [observeDOM=false] - Whether to observe DOM mutations.
-   * @param {string} [baseDimension='width'] - Base dimension used to calculate font size
+   * @param {string} [baseDimension='width'] - Base dimension used to calculate size
    *  ('width' or 'height').
    */
   constructor(
-    attribute,
+    anchorElement,
+    targetElements,
     ratioVar,
+    property,
     unit = 'px',
     debounceDelay = 100,
     observeDOM = false,
     baseDimension = 'width',
   ) {
-    if (typeof attribute !== 'string' || !attribute) {
-      throw new Error('Attribute must be a non-empty string');
-    }
-
     if (typeof ratioVar !== 'string' || !ratioVar) {
       throw new Error('Ratio CSS variable name must be a non-empty string');
     }
 
-    this.attribute = attribute;
+    this.anchorElement = anchorElement;
+    this.targetElements = targetElements;
     this.ratioVar = ratioVar;
+    this.property = property;
     this.unit = unit;
     this.debounceDelay = debounceDelay;
     this.observeDOM = observeDOM;
@@ -50,7 +52,7 @@ export default class ResponsiveText {
 
   /**
    * Initializes listeners and resizes elements.
-   * @returns {ResponsiveText}
+   * @returns {ResponsiveSize}
    */
   init() {
     this.updateElements();
@@ -97,12 +99,6 @@ export default class ResponsiveText {
 
   // === Private Methods ===
 
-  /**
-   * Handles window resize events with debouncing to optimize performance.
-   * @private
-   * @method #handleResize
-   * @listens window:resize
-   */
   #handleResize() {
     clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
@@ -110,24 +106,10 @@ export default class ResponsiveText {
     }, this.debounceDelay);
   }
 
-  /**
-   * Gets all DOM elements that should have responsive sizing.
-   * @private
-   * @method #getResponsiveElements
-   * @returns {NodeList} List of responsive elements
-   */
   #getResponsiveElements() {
     return document.querySelectorAll(`${this.attribute}, [${this.attribute}]`);
   }
 
-  /**
-   * Resizes all responsive elements with optional base and ratio parameters.
-   * @private
-   * @method #resizeAll
-   * @param {number} [base] - Optional base dimension to apply to all elements
-   * @param {number} [sizeRatio] - Optional size ratio to apply to all elements
-   * @returns {number} Count of successfully resized elements
-   */
   #resizeAll(base, sizeRatio) {
     let successCount = 0;
 
@@ -139,13 +121,6 @@ export default class ResponsiveText {
     return successCount;
   }
 
-  /**
-   * Gets the base dimension (width/height) of the parent element.
-   * @private
-   * @method #getBaseDimension
-   * @param {HTMLElement} element - The child element
-   * @returns {number} Parent's dimension in pixels
-   */
   #getBaseDimension(element) {
     const parent = element.parentElement;
     return this.baseDimension === 'height'
@@ -153,26 +128,10 @@ export default class ResponsiveText {
       : parent.offsetWidth;
   }
 
-  /**
-   * Gets the size ratio from the element's CSS variable.
-   * @private
-   * @method #getSizeRatio
-   * @param {HTMLElement} element - The element to check
-   * @returns {number} Size ratio value
-   */
   #getSizeRatio(element) {
     return parseFloat(getComputedStyle(element).getPropertyValue(this.ratioVar));
   }
 
-  /**
-   * Resizes a single element based on its ratio and parent dimension.
-   * @private
-   * @method #resizeOne
-   * @param {HTMLElement} element - Element to resize
-   * @param {number} [base] - Optional: base dimension to use (skips auto-detection)
-   * @param {number} [sizeRatio] - Optional: size ratio to use (skips auto-detection)
-   * @returns {boolean} True if resizing was successful, false otherwise
-   */
   #resizeOne(element, base, sizeRatio) {
     const ratio = typeof sizeRatio === 'number' ? sizeRatio : this.#getSizeRatio(element);
     const dimension = typeof base === 'number' ? base : this.#getBaseDimension(element);
@@ -181,19 +140,13 @@ export default class ResponsiveText {
       return false;
     }
 
-    const fontSize = dimension / ratio;
+    const value = dimension / ratio;
 
     // eslint-disable-next-line no-param-reassign
-    element.style.fontSize = `${fontSize}${this.unit}`;
+    element.style[this.property] = `${value}${this.unit}`;
     return true;
   }
 
-  /**
-   * Observes DOM changes to detect new responsive elements.
-   * @private
-   * @method #observeDOM
-   * @listens MutationObserver
-   */
   #observeDOM() {
     this.observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
@@ -209,11 +162,6 @@ export default class ResponsiveText {
     });
   }
 
-  /**
-   * Stops observing DOM changes.
-   * @private
-   * @method #stopObserving
-   */
   #stopObserving() {
     if (this.observer) {
       this.observer.disconnect();

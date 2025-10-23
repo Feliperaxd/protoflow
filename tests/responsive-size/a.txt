@@ -1,0 +1,20 @@
+--adaptative-size-anchor: '.teste';
+--adaptative-size-base-dimension: 'width';
+--adaptative-size-target: 'border-radius';
+--adaptative-size-ratio: 25;
+--adaptative-size-unit: 'px'
+
+
+trigger
+Anchor
+Target
+Unit
+Ratio
+
+
+
+A unidade de medida de saida
+A propriedade que vai ser alterada
+A taxa que vai usar para o calculo
+O elemento que vai ser usado como base para alterar a propriedade do outro
+A propriedade do elemento base

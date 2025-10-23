@@ -1,0 +1,14 @@
+
+.standard-button {
+  width: 500px;
+  aspect-ratio: 3 / 1;
+  border-radius: 1em;
+
+  display: grid;
+  place-content: center;
+}
+
+.standard-button--default {
+  background: var(--color-background-primary-emphasis);
+  --responsive-border-radius-ratio: 30;
+}
