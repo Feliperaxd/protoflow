@@ -5,6 +5,12 @@ body {
   background-color: #1c1c1c;
 }
 
+.teste {
+  width: 500px;
+  aspect-ratio: 2 / 0.5;
+  background-color: #041031;
+}
+
 .button {
   width: 300px;
   aspect-ratio: 2 / 0.5;
@@ -15,13 +21,12 @@ body {
   --adaptative-size-anchor: 'width';
   --adaptative-size-target: 'border-radius';
   --adaptative-size-ratio: 25;
-  --adaptative-size-unit: 'px'
+  --adaptative-size-unit: 'px';
 }
 
-.button222 > p {
+.button > p {
   color: #fafafa;
   text-align: center;
   font-family: 'arial black';
-  --adaptative-size: '.aaaa' 'height' 'border' 'rem' 2333
 }
 

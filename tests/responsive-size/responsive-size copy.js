@@ -13,10 +13,35 @@ class AdaptativeSize {
   constructor(debounceDelay = 100, observeDOM = false) {
     this.debounceDelay = debounceDelay;
     this.observeDOM = observeDOM;
-    this.ruleMap = {
+    this.dataMap = this.#getDataMap();
+  }
+
+  #getDataMap() {
+    this.dataMap = {
       ...AdaptativeSize.#getShorthandProperties(),
       ...AdaptativeSize.#getLonghandProperties(),
     };
+
+    Object.keys(this.dataMap).forEach(selector => {
+      const mappings = this.#getTargetsAndTriggers(selector);
+      this.dataMap[selector].elementMappings = mappings;
+    });
+  }
+
+  #getTargetsAndTriggers(targetSelector) {
+    const data = this.dataMap[targetSelector];
+    const elements = document.querySelectorAll(targetSelector);
+
+    const elementPairs = Array.from(elements).map(element => ({
+      targetElement: element,
+      triggerElement: element.closest(
+        data.cssProperties[
+          `--${ADAPTATIVE_SIZE_ROOT}-${ADAPTATIVE_SIZE_KEYS[0]}`
+        ],
+      ),
+    }));
+
+    return elementPairs;
   }
 
   static #parseShorthandProperty(propertyValue) {
@@ -39,11 +64,22 @@ class AdaptativeSize {
       key => key === `--${ADAPTATIVE_SIZE_ROOT}`,
     );
 
-    props.forEach(({ selector, _, value }) => {
+    props.forEach(({ selector, value }) => {
       if (!grouped[selector]) {
-        grouped[selector] = {};
+        grouped[selector] = {
+          cssProperties: {},
+        };
       }
-      grouped[selector] = AdaptativeSize.#parseShorthandProperty(value) COLOCAR REPLACE PRA TIRAR ASPAS LEMBRANDO QUE É DICT;
+
+      const parsedProperties = AdaptativeSize.#parseShorthandProperty(value);
+
+      Object.keys(parsedProperties).forEach(prop => {
+        const val = parsedProperties[prop];
+        grouped[selector]
+          .cssProperties[prop] = typeof val === 'string'
+            ? val.replace(/^['"]+|['"]+$/g, '')
+            : val;
+      });
     });
 
     return grouped;
@@ -59,11 +95,14 @@ class AdaptativeSize {
 
       props.forEach(({ selector, property, value }) => {
         if (!grouped[selector]) {
-          grouped[selector] = {};
+          grouped[selector] = {
+            cssProperties: {},
+          };
         }
-        grouped[selector][property] = typeof value === 'string'
-          ? value.replace(/^['"]+|['"]+$/g, '')
-          : value;
+        grouped[selector]
+          .cssProperties[property] = typeof value === 'string'
+            ? value.replace(/^['"]+|['"]+$/g, '')
+            : value;
       });
     });
 
@@ -72,4 +111,5 @@ class AdaptativeSize {
 }
 
 const adaptativeSize = new AdaptativeSize();
-console.log(adaptativeSize.ruleMap);
+adaptativeSize.something();
+console.log(adaptativeSize.dataMap);
