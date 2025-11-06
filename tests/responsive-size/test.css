@@ -5,28 +5,26 @@ body {
   background-color: #1c1c1c;
 }
 
+.teste, .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .teste {
-  width: 500px;
-  aspect-ratio: 2 / 0.5;
-  background-color: #041031;
+  width: 80vw;
+  aspect-ratio: 3 / 1;
+  background-color: aqua;
 }
 
 .button {
-  width: 300px;
-  aspect-ratio: 2 / 0.5;
-  display: grid;
-  place-items: center;
-  background-color: #0b8b65;
-  --adaptative-size-trigger: '.teste';
-  --adaptative-size-anchor: 'width';
-  --adaptative-size-target: 'border-radius';
-  --adaptative-size-ratio: 25;
-  --adaptative-size-unit: 'px';
+  aspect-ratio: 4 / 1;
+  background-color: red;
+  --adaptative-size: '.teste' 'width' 'width' 'px' 0.5;
 }
 
 .button > p {
-  color: #fafafa;
-  text-align: center;
+  color: white;
   font-family: 'arial black';
 }
 

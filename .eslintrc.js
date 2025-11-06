@@ -20,5 +20,10 @@ module.exports = {
       argsIgnorePattern: '^_',
       varsIgnorePattern: '^_',
     }],
+    'operator-linebreak': [
+      'error',
+      'before',
+      { overrides: { '=': 'after' } },
+    ],
   },
 };
