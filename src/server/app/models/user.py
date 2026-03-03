@@ -1,44 +1,38 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Enum, Integer, String, Text, TIMESTAMP
+from sqlalchemy import Enum, Integer, String, Text, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from db.base import Base
-from enums import UserStatus
+from enums import UserDocumentType, UserStatus
 
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = 'users'
 
     # === Identity ===
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     uid: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 
-    # === Authentication ===
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    password_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    # === Relations ===
+    avatar_url_id: Mapped[int | None] = mapped_column(Integer)
 
-    # === Profile ===
+    # === Core ===
     name: Mapped[str] = mapped_column(String(150), nullable=False)
     phone: Mapped[str | None] = mapped_column(String(50))
-    avatar_url_id: Mapped[int | None] = mapped_column(BigInteger)
-
-    # === Documents ===
-    document_type: Mapped[int | None] = mapped_column(Integer)
-    document_number: Mapped[str | None] = mapped_column(String(70))
-
-    # === Metadata ===
+    email: Mapped[str] = mapped_column(String(255), index=True, unique=True, nullable=False)
+    password_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    document_type: Mapped[UserDocumentType] = mapped_column(
+        Enum(UserDocumentType, name='user_doc_type_enum'), nullable=False
+    )
+    document_number: Mapped[str] = mapped_column(String(70), nullable=False)
     internal_note: Mapped[str | None] = mapped_column(Text)
 
-    # === Status ===
-    status: Mapped[UserStatus] = mapped_column(
-        Enum(UserStatus),
-        default=UserStatus.ACTIVE,
-        nullable=False,
-    )
-
     # === Activity ===
+    status: Mapped[UserStatus] = mapped_column(
+        Enum(UserStatus, name='user_status_enum'), default=UserStatus.ACTIVE, nullable=False
+    )
     last_login_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True))
     email_verified_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True))
     terms_accepted_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True))
