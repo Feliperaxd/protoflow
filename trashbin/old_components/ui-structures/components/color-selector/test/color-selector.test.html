@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Base styles -->
+  <link rel="stylesheet" href="../../../../styles/tokens.css">
+  <link rel="stylesheet" href="../../../../styles/globals.css">
+  <link rel="stylesheet" href="../../../../styles/icon-mask.css">
+
+  <!-- Component style -->
+  <link rel="stylesheet" href="../styles/color-selector.css">
+
+  <!-- Example style -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #FAFAFA;
+    }
+  </style>
+</head>
+<body class="container">
+
+  <!-- Color selector -->
+  <div class="color-selector" id="color-selector-example">
+
+    <!-- Left arrow -->
+    <div class="icon-mask color-selector__left-arrow--default"
+          style="--icon-mask-url:url(../assets/icons/arrow-icon-mask.svg)">
+    </div>
+
+    <!-- Color carousel -->
+    <div class="color-selector__carousel">
+      <div class="color-selector__train--default"></div>
+    </div>
+
+    <!-- Right arrow -->
+    <div class="icon-mask color-selector__right-arrow--default"
+          style="--icon-mask-url:url(../assets/icons/arrow-icon-mask.svg)">
+    </div>
+
+  </div>
+
+  <!-- Component script -->
+  <script type="module" src="./color-selector.test.js"></script>
+</body>
+</html>

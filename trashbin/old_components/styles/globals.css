@@ -1,4 +1,4 @@
-@import url(./variables.css);
+@import url(./tokens.css);
 
 * {
   margin: 0;
@@ -9,7 +9,7 @@
 body {
   width: 100vw;
   height: 100vh;
-  background-color: var(--color-gray-900);
+  background-color: var(--color-background-primary-default);
 }
 
 .container {
