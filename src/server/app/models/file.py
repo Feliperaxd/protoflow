@@ -4,8 +4,8 @@ from sqlalchemy import BigInteger, Enum, Integer, String, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from db.base import Base
-from enums import FileStatus
+from database.connection import Base
+from enums.file import FileStatus
 
 
 class File(Base):
@@ -16,14 +16,14 @@ class File(Base):
     uid: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 
     # === Core ===
-    type: Mapped[str] = mapped_column(String(50), nullable=False)
-    filename: Mapped[str] = mapped_column(String(250), nullable=False)
     url: Mapped[str] = mapped_column(String(500), nullable=False)
+    filename: Mapped[str] = mapped_column(String(250), nullable=False)
+    mime_type: Mapped[str] = mapped_column(String(100), nullable=False)
     size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
     status: Mapped[FileStatus] = mapped_column(
         Enum(FileStatus, name='file_status_enum'),
         default=FileStatus.ACTIVE,
-        nullable=False
+        nullable=False,
     )
 
     # === Audit ===

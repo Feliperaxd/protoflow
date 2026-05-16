@@ -57,5 +57,3 @@ class UserUpdate(BaseModel):
     @classmethod
     def _validate_document(cls, value, info):
         return validate_document_number(value, info)
-
-FAZER A ROUTERS

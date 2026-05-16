@@ -1,10 +1,11 @@
 from enum import Enum
 
 
-class UserStatu(str, Enum):
+class UserStatus(str, Enum):
+    BANNED = 'banned'
     ACTIVE = 'active'
     INACTIVE = 'inactive'
-    BANNED = 'banned'
+    SUSPENDED = 'suspended'
 
 class UserRole(str, Enum):
     ADMIN = 'admin'
