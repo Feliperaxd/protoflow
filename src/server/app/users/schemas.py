@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import Annotated, TypeAlias
 
 from pydantic import BaseModel, BeforeValidator, EmailStr, field_validator
 from pydantic_core.core_schema import ValidationInfo
 
-from enums.user import UserDocumentType, UserRole
+from .enums import UserDocumentType, UserRole, UserStatus
 from utils.validators import Validators
 
 
@@ -16,6 +17,7 @@ def validate_document_number(
     value: str | None,
     info: ValidationInfo,
 ) -> str | None:
+    
     if value is None:
         return value
 
@@ -32,13 +34,19 @@ def validate_document_number(
 
 class UserCreate(BaseModel):
     name: str
+    phone: PHONE
     email: EmailStr
     password: str
-    role: UserRole
-    phone: PHONE
     document_type: UserDocumentType
     document_number: str
+    role: UserRole
+    bio: str
 
+    @field_validator('phone')
+    @classmethod
+    def _validate_phone(cls, value):
+        return Validators.phone(value)
+    
     @field_validator('document_number')
     @classmethod
     def _validate_document(cls, value, info):
@@ -46,14 +54,30 @@ class UserCreate(BaseModel):
 
 class UserUpdate(BaseModel):
     name: str | None = None
-    email: EmailStr | None = None
-    password: str | None = None
-    role: UserRole | None = None
     phone: PHONE | None = None
-    document_type: UserDocumentType | None = None
-    document_number: str | None = None
+    bio: str | None = None
 
-    @field_validator('document_number')
+    @field_validator('phone')
     @classmethod
-    def _validate_document(cls, value, info):
-        return validate_document_number(value, info)
+    def _validate_phone(cls, value):
+        if value is None:
+            return value
+        
+        return Validators.phone(value)
+
+class UserAdminUpdate(BaseModel):
+    role: UserRole | None = None
+    status: UserStatus | None = None
+    internal_note: str | None = None
+    
+class UserEmailVerification(BaseModel):
+    email_verified_at: datetime
+
+
+class UserTermsAcceptance(BaseModel):
+    terms_accepted_at: datetime
+
+
+class UserLoginUpdate(BaseModel):
+    last_login_at: datetime
+    

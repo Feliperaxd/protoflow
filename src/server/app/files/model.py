@@ -4,8 +4,8 @@ from sqlalchemy import BigInteger, Enum, Integer, String, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from database.connection import Base
-from enums.file import FileStatus
+from database.base import Base
+from .enums import FileStatus
 
 
 class File(Base):

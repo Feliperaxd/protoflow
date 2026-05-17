@@ -5,6 +5,21 @@ _CNPJ_WEIGHTS_FIRST = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
 _CNPJ_WEIGHTS_SECOND = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
 
 
+class InvalidCPFError(ValueError):
+    def __init__(self, reason: str, cpf: str) -> None:
+        super().__init__(f'{reason} | CPF: {cpf}')
+
+
+class InvalidCNPJError(ValueError):
+    def __init__(self, reason: str, cnpj: str) -> None:
+        super().__init__(f'{reason} | CNPJ: {cnpj}')
+
+
+class InvalidPhoneError(ValueError):
+    def __init__(self, reason: str, phone: str) -> None:
+        super().__init__(f'{reason} | Phone: {phone}')
+
+
 class Validators:
 
     @staticmethod
@@ -28,32 +43,28 @@ class Validators:
         """
         Validates and normalizes a Brazilian CNPJ number.
 
-        Accepts formatted (e.g. '12.345.678/0001-90') or unformatted input.
-        Strips all non-digit characters before validation.
-
         Args:
             value (str): Raw CNPJ string, formatted or unformatted.
 
         Returns:
-            str: Normalized CNPJ containing only digits (e.g. '12345678000190').
+            str: Normalized CNPJ containing only digits.
 
         Raises:
-            ValueError: If the CNPJ does not have 14 digits, consists of
-                repeated digits, or fails the check digit validation.
+            InvalidCNPJError: If the CNPJ fails any validation step.
         """
         cnpj = re.sub(r'\D', '', value)
 
         if len(cnpj) != 14:
-            raise ValueError('CNPJ must have 14 digits!')
+            raise InvalidCNPJError('Must have 14 digits', cnpj)
 
         if cnpj == cnpj[0] * 14:
-            raise ValueError('CNPJ is invalid!')
+            raise InvalidCNPJError('All digits are the same', cnpj)
 
         first_digit = Validators._calc_cnpj_digit(cnpj, _CNPJ_WEIGHTS_FIRST)
         second_digit = Validators._calc_cnpj_digit(cnpj, _CNPJ_WEIGHTS_SECOND)
 
         if int(cnpj[12]) != first_digit or int(cnpj[13]) != second_digit:
-            raise ValueError('CNPJ is invalid!')
+            raise InvalidCNPJError('Check digits do not match', cnpj)
 
         return cnpj
 
@@ -62,26 +73,22 @@ class Validators:
         """
         Validates and normalizes a Brazilian CPF number.
 
-        Accepts formatted (e.g. '123.456.789-09') or unformatted input.
-        Strips all non-digit characters before validation.
-
         Args:
             value (str): Raw CPF string, formatted or unformatted.
 
         Returns:
-            str: Normalized CPF containing only digits (e.g. '12345678909').
+            str: Normalized CPF containing only digits.
 
         Raises:
-            ValueError: If the CPF does not have 11 digits, consists of
-                repeated digits, or fails the check digit validation.
+            InvalidCPFError: If the CPF fails any validation step.
         """
         cpf = re.sub(r'\D', '', value)
 
         if len(cpf) != 11:
-            raise ValueError('CPF must have 11 digits!')
+            raise InvalidCPFError('Must have 11 digits', cpf)
 
         if cpf == cpf[0] * 11:
-            raise ValueError('CPF is invalid!')
+            raise InvalidCPFError('All digits are the same', cpf)
 
         total = sum(int(cpf[i]) * (10 - i) for i in range(9))
         first_digit = (total * 10 % 11) % 10
@@ -90,7 +97,7 @@ class Validators:
         second_digit = (total * 10 % 11) % 10
 
         if int(cpf[9]) != first_digit or int(cpf[10]) != second_digit:
-            raise ValueError('CPF is invalid!')
+            raise InvalidCPFError('Check digits do not match', cpf)
 
         return cpf
 
@@ -99,37 +106,30 @@ class Validators:
         """
         Validates and normalizes a Brazilian phone number.
 
-        Accepts formatted (e.g. '(47) 99999-9999') or unformatted input.
-        Strips all non-digit characters before validation.
-        Supports landlines (10 digits) and mobile numbers (11 digits).
-
         Args:
             value (str): Raw phone string, formatted or unformatted.
 
         Returns:
-            str: Normalized phone number containing only digits
-                (e.g. '47999999999').
+            str: Normalized phone number containing only digits.
 
         Raises:
-            ValueError: If the number does not have 10 or 11 digits,
-                has an invalid area code (DDD), or if an 11-digit number
-                does not start with 9 after the area code.
+            InvalidPhoneError: If the phone number fails any validation step.
         """
         phone = re.sub(r'\D', '', value)
 
         if len(phone) not in (10, 11):
-            raise ValueError(
-                'Phone number must have 10 digits (landline) '
-                'or 11 digits (mobile).'
+            raise InvalidPhoneError(
+                'Must have 10 digits (landline) or 11 digits (mobile)', phone
             )
 
         area_code = int(phone[:2])
         if not (11 <= area_code <= 99):
-            raise ValueError('Invalid area code (DDD)!')
+            raise InvalidPhoneError('Invalid area code (DDD)', phone)
 
         if len(phone) == 11 and phone[2] != '9':
-            raise ValueError(
-                'Mobile numbers must start with 9 after the area code!'
+            raise InvalidPhoneError(
+                'Mobile numbers must start with 9 after the area code', phone
             )
 
         return phone
+    
