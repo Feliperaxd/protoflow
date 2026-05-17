@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from database import Base, engine
-from models import File, User
+from users import model
 
 app = FastAPI()
 

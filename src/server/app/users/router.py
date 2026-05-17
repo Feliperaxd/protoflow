@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.repositories.user_repository import UserRepository
 from app.services.user_service import UserService
-from app.schemas.user import UserCreate, UserUpdate, UserResponse
+from server.app.users.schema import UserCreate, UserUpdate, UserResponse
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
