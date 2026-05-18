@@ -3,14 +3,13 @@ import string
 
 
 class UID:
-
     _CHARS = string.ascii_uppercase + string.digits
 
     @staticmethod
     def generate(
         prefix: str | None = None,
         left_size: int = 2,
-        right_size: int = 5,
+        right_size: int = 3,
     ) -> str:
         """
         Generate a random public UID.
@@ -23,6 +22,7 @@ class UID:
         Returns:
             str: Generated UID.
         """
+
         left = ''.join(
             secrets.choice(UID._CHARS)
             for _ in range(left_size)

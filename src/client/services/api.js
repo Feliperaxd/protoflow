@@ -1,6 +1,6 @@
 const BASE_URL = 'http://localhost:8000';
 
-export async function request(path, options = {}) {
+export default async function request(path, options = {}) {
   const response = await fetch(`${BASE_URL}${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...options,

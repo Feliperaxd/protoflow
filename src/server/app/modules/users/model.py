@@ -4,8 +4,8 @@ from sqlalchemy import Enum, ForeignKey, Integer, String, Text, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from database.base import Base
-from .enums import UserDocumentType, UserRole, UserStatus
+from app.database.base import Base
+from app.modules.users.enums import UserDocumentType, UserRole, UserStatus
 
 
 class User(Base):
@@ -35,7 +35,7 @@ class User(Base):
         Enum(UserRole, name='user_role_enum'),
         nullable=False,
     )
-    bio: Mapped[str | None] = mapped_column(String(500), nullable=True) 
+    bio: Mapped[str | None] = mapped_column(String(500), nullable=True)
     internal_note: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     # === Activity ===

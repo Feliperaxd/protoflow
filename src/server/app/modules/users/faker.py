@@ -1,6 +1,6 @@
 from faker import Faker
 
-from users.enums import UserDocumentType, UserRole
+from app.modules.users.enums import UserDocumentType, UserRole
 
 
 class FakeUser:
@@ -15,7 +15,7 @@ class FakeUser:
 
         return {
             'name': cls._fake.name(),
-            'phone': cls._fake.msisdn()[3:], 
+            'phone': cls._fake.msisdn()[3:],
             'email': cls._fake.email(),
             'password': cls._password(),
             'document_type': document_type,
@@ -40,7 +40,7 @@ class FakeUser:
             return cls._fake.cpf()
 
         return cls._fake.cnpj()
-    
+
     @classmethod
     def _password(cls) -> str:
         """Generate a random valid password."""
@@ -54,4 +54,3 @@ class FakeUser:
         cls._fake.random.shuffle(chars)
 
         return "".join(chars)
-    

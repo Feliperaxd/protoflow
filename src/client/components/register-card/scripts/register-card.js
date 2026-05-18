@@ -1,24 +1,6 @@
-import { createUser } from '../../services/user.js';
+import { createUser } from '../../../services/user.js';
 
 const form = document.getElementById('register-form');
-
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  await handleSubmit();
-});
-
-
-async function handleSubmit() {
-  const data = getFormData();
-
-  try {
-    const user = await createUser(data);
-    onSuccess(user);
-  } catch (error) {
-    onError(error);
-  }
-}
-
 
 function getFormData() {
   const data = new FormData(form);
@@ -34,12 +16,26 @@ function getFormData() {
   };
 }
 
-
 function onSuccess(user) {
   console.log('Usuário criado:', user);
 }
 
-
 function onError(error) {
   console.error('Erro:', error.message);
 }
+
+async function handleSubmit() {
+  const data = getFormData();
+
+  try {
+    const user = await createUser(data);
+    onSuccess(user);
+  } catch (error) {
+    onError(error);
+  }
+}
+
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  await handleSubmit();
+});

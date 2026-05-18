@@ -4,8 +4,8 @@ from typing import Annotated, TypeAlias
 from pydantic import BaseModel, BeforeValidator, EmailStr, field_validator
 from pydantic_core.core_schema import ValidationInfo
 
-from .enums import UserDocumentType, UserRole, UserStatus
-from utils.validators import Validators
+from app.modules.users.enums import UserDocumentType, UserRole, UserStatus
+from app.utils.validators import Validators
 
 
 CPF: TypeAlias = Annotated[str, BeforeValidator(Validators.cpf)]
@@ -17,7 +17,7 @@ def validate_document_number(
     value: str | None,
     info: ValidationInfo,
 ) -> str | None:
-    
+
     if value is None:
         return value
 
@@ -46,7 +46,7 @@ class UserCreate(BaseModel):
     @classmethod
     def _validate_phone(cls, value):
         return Validators.phone(value)
-    
+
     @field_validator('document_number')
     @classmethod
     def _validate_document(cls, value, info):
@@ -62,14 +62,14 @@ class UserUpdate(BaseModel):
     def _validate_phone(cls, value):
         if value is None:
             return value
-        
+
         return Validators.phone(value)
 
 class UserAdminUpdate(BaseModel):
     role: UserRole | None = None
     status: UserStatus | None = None
     internal_note: str | None = None
-    
+
 class UserEmailVerification(BaseModel):
     email_verified_at: datetime
 
@@ -80,4 +80,3 @@ class UserTermsAcceptance(BaseModel):
 
 class UserLoginUpdate(BaseModel):
     last_login_at: datetime
-    

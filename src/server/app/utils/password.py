@@ -14,4 +14,3 @@ class PasswordHash:
     def check(password: str, hashed: bytes) -> bool:
         """Check whether a plain-text password matches a bcrypt hash."""
         return bcrypt.checkpw(password.encode('utf-8'), hashed)
-    

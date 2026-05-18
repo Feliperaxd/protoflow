@@ -1,4 +1,4 @@
-import { request } from './api.js';
+import request from './api.js';
 
 export function createUser(data) {
   return request('/users/', {

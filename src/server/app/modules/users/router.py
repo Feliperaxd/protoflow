@@ -3,13 +3,12 @@ from sqlalchemy.orm import Session
 
 from dependencies.auth import get_current_user, require_admin, require_owner
 from dependencies.services import get_user_service
-from users.model import User
-from users.schemas import UserAdminUpdate, UserCreate, UserUpdate
-from users.service import UserService
+from modules.users.model import User
+from modules.users.schemas import UserAdminUpdate, UserCreate, UserUpdate
+from modules.users.service import UserService
 
 router = APIRouter(prefix='/users', tags=['users'])
 
-APRENDER COMO USAR ISSO
 @router.post('/', status_code=status.HTTP_201_CREATED)
 def create(
     data: UserCreate,
