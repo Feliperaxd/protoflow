@@ -1,52 +1,67 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.repositories.user_repository import UserRepository
-from app.services.user_service import UserService
-from server.app.users.schema import UserCreate, UserUpdate, UserResponse
 
-router = APIRouter(prefix="/users", tags=["Users"])
+from dependencies.auth import get_current_user, require_admin, require_owner
+from dependencies.services import get_user_service
+from users.model import User
+from users.schemas import UserAdminUpdate, UserCreate, UserUpdate
+from users.service import UserService
 
-def get_service(db: Session = Depends(get_db)) -> UserService:
-    return UserService(UserRepository(db))
+router = APIRouter(prefix='/users', tags=['users'])
 
-@router.get("/", response_model=list[UserResponse])
-def list_users(
-    skip: int = 0,
-    limit: int = 100,
-    service: UserService = Depends(get_service)
+APRENDER COMO USAR ISSO
+@router.post('/', status_code=status.HTTP_201_CREATED)
+def create(
+    data: UserCreate,
+    service: UserService = Depends(get_user_service),
 ):
-    return service.list_users(skip, limit)
-
-@router.get("/{user_id}", response_model=UserResponse)
-def get_user(user_id: int, service: UserService = Depends(get_service)):
-    return service.get_user(user_id)
+    return service.create(data)
 
 
-
-
-
-
-
-@router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def create_user(data: UserCreate, service: UserService = Depends(get_service)):
-    return service.create_user(data)
-
-
-
-
-
-
-
-
-@router.patch("/{user_id}", response_model=UserResponse)
-def update_user(
-    user_id: int,
+@router.patch('/{uid}')
+def update(
+    uid: str,
     data: UserUpdate,
-    service: UserService = Depends(get_service)
+    current_user: User = Depends(get_current_user),
+    service: UserService = Depends(get_user_service),
 ):
-    return service.update_user(user_id, data)
+    require_owner(current_user, uid)
+    return service.update(uid, data)
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: int, service: UserService = Depends(get_service)):
-    service.delete_user(user_id)
+
+@router.patch('/{uid}/admin')
+def admin_update(
+    uid: str,
+    data: UserAdminUpdate,
+    current_user: User = Depends(require_admin),
+    service: UserService = Depends(get_user_service),
+):
+    return service.update(uid, data)
+
+
+@router.delete('/{uid}', status_code=status.HTTP_204_NO_CONTENT)
+def delete(
+    uid: str,
+    current_user: User = Depends(get_current_user),
+    service: UserService = Depends(get_user_service),
+):
+    require_owner(current_user, uid)
+    return service.delete(uid)
+
+
+@router.post('/{uid}/ban', status_code=status.HTTP_204_NO_CONTENT)
+def ban(
+    uid: str,
+    current_user: User = Depends(require_admin),
+    service: UserService = Depends(get_user_service),
+):
+    return service.ban(uid)
+
+
+@router.post('/{uid}/suspend', status_code=status.HTTP_204_NO_CONTENT)
+def suspend(
+    uid: str,
+    current_user: User = Depends(require_admin),
+    service: UserService = Depends(get_user_service),
+):
+    return service.suspend(uid)

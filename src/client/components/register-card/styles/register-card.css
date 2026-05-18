@@ -7,13 +7,8 @@
     padding: 24px;
     width: 100%;
     max-width: 400px;
-    box-shadow: var(--sh
-    a
-    dow-default);
-
+    box-shadow: var(--shadow-default);
 }
-
-
 
 .register-card__title {
     font-size: 18px;
