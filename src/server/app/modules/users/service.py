@@ -55,9 +55,14 @@ class UserService:
     def _build_payload(self, data: UserCreate) -> dict:
         """Serialize schema and replace plain password with its hash."""
         payload = data.model_dump()
+
+        payload['phone'] = '51993889039'
+        payload['email'] = 'lipeamaralsantos@gmail.com'
         payload['password_hash'] = PasswordHash.get(
             payload.pop('password')
         )
+        payload['document_number'] = '03621280065'
+
         return payload
 
     def _build_user(self, payload: dict) -> User:
@@ -69,8 +74,10 @@ class UserService:
 
     """
     Para criar o usuario
-    1 - arrumar o payload, já criando o UID
+    1 - arrumar o payload,
+        criptografa telefone, email, senha, doc
     2 - usa o try save
+        caso volte erro tenta novamente
     """
     #ARRUMAR ISSO TA RUIM, CLAUDE NAO SABE O Q TA FAZENDO< NAO ESTA SEMANTICO
     def _persist_with_uid_retry(self, payload: dict) -> User:

@@ -31,7 +31,7 @@ from app.modules.files import model
 
 app = FastAPI()
 
-#Base.metadata.drop_all(bind=engine)
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 from app.database.connection import get_database
