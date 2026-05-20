@@ -22,29 +22,28 @@ if __name__ == '__main__':
 
 
 
-
 from fastapi import FastAPI
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from app.database import Base, engine
 from app.modules.users import model
 from app.modules.files import model
+from app.database.connection import get_database
+from app.modules.users.schemas import UserCreate
+from app.modules.users.service import UserService
+from app.modules.users.faker import FakeUser
 
 app = FastAPI()
 
 Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
-from app.database.connection import get_database
-from app.modules.users.enums import UserDocumentType
-from app.modules.users.enums import UserRole
-from app.modules.users.schemas import UserCreate
-from app.modules.users.service import UserService
-from app.modules.users.faker import FakeUser
-
-for _ in range(1000):
+for i in range(1000):
     session = next(get_database())
     service = UserService(session)
     service.create(UserCreate(**FakeUser.get_for_create()))
-    print(_)
+    print(i)
     session.close()
 

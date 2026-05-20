@@ -9,33 +9,40 @@ from app.modules.users.errors import (
 from app.modules.users.model import User
 from app.modules.users.schemas import UserAdminUpdate, UserCreate, UserUpdate
 from app.utils.uid import UID
-from app.utils.password import PasswordHash
-
-_UNIQUE_CONSTRAINTS = {
-    'ix_users_email': EMAIL_ALREADY_REGISTERED,
-    'ix_users_phone': PHONE_ALREADY_REGISTERED,
-    'ix_users_document_number': DOCUMENT_ALREADY_REGISTERED,
-}
+from app.utils.encryption import Encryptor
+from app.utils.hashing import Hasher
 
 
 class UserService:
     """Service layer for user management operations."""
 
     _UID_PREFIX = '<version>'
-    _MAX_UID_RETRIES = 5
+    _MAX_UID_RETRIES = 5    
+    _UNIQUE_CONSTRAINTS = {
+        'ix_users_email': EMAIL_ALREADY_REGISTERED,
+        'ix_users_phone': PHONE_ALREADY_REGISTERED,
+        'ix_users_document_number': DOCUMENT_ALREADY_REGISTERED,
+    }
 
     def __init__(self, session):
         self.session = session
-
-    # -------------------------
-    # Public interface
-    # -------------------------
+        self._encryptor = Encryptor()
 
     def create(self, data: UserCreate) -> User:
-        """Validate, hash password, generate UID and persist a new user."""
-        payload = self._build_payload(data)
-        return self._persist_with_uid_retry(payload)
+        """Validate, encrypt sensitive fields, hash password and persist a new user.
 
+        Raises:
+            AppError: If email, phone or document number is already registered.
+            AppError: If a unique UID could not be generated after max retries.
+        """
+        payload = self._build_payload(data)
+
+        for _ in range(self._MAX_UID_RETRIES):
+            user = self._try_save(self._build_user(payload))
+            if user: return user
+            
+        raise UID_GENERATION_FAILED        
+        
     def update(self, uid: str, data: UserUpdate | UserAdminUpdate) -> User:
         ...
 
@@ -48,21 +55,15 @@ class UserService:
     def suspend(self, uid: str) -> None:
         ...
 
-    # -------------------------
-    # Private helpers
-    # -------------------------
-
     def _build_payload(self, data: UserCreate) -> dict:
-        """Serialize schema and replace plain password with its hash."""
+        """Serialize schema and encrypt sensitive fields."""
         payload = data.model_dump()
 
-        payload['phone'] = '51993889039'
-        payload['email'] = 'lipeamaralsantos@gmail.com'
-        payload['password_hash'] = PasswordHash.get(
-            payload.pop('password')
-        )
-        payload['document_number'] = '03621280065'
-
+        payload['password_hash'] = Hasher.generate(payload.pop('password'))
+        document_number = payload.get('document_number')
+        if document_number is not None:
+            payload['document_number'] = self._encryptor.encrypt(document_number)
+        
         return payload
 
     def _build_user(self, payload: dict) -> User:
@@ -72,46 +73,31 @@ class UserService:
             **payload,
         )
 
-    """
-    Para criar o usuario
-    1 - arrumar o payload,
-        criptografa telefone, email, senha, doc
-    2 - usa o try save
-        caso volte erro tenta novamente
-    """
-    #ARRUMAR ISSO TA RUIM, CLAUDE NAO SABE O Q TA FAZENDO< NAO ESTA SEMANTICO
-    def _persist_with_uid_retry(self, payload: dict) -> User:
-        """
-        Persist a user, retrying with a new UID on collision.
+    def _try_save(self, user: User) -> User:
+        """Persist a user, raising AppError on constraint violations.
 
         - On success: returns the saved User.
-        - On duplicate email/phone/document: raises AppError immediately.
-        - On UID collision: generates a new UID and retries.
-        - After max retries: raises UID_GENERATION_FAILED.
+        - On duplicate email, phone or document: raises the corresponding AppError.
+        - On UID collision: returns None to signal a retry is needed.
+
+        Raises:
+            AppError: If a unique constraint on email, phone or document is violated.
         """
-        for _ in range(self._MAX_UID_RETRIES):
-            user = self._build_user(payload)
+        try:
+            self.session.add(user)
+            self.session.commit()
+            self.session.refresh(user)
+            return user
 
-            try:
-                self.session.add(user)
-                self.session.commit()
-                self.session.refresh(user)
-                return user  # sucesso — sai aqui
+        except IntegrityError as e:
+            self.session.rollback()
+            error = str(e.orig).lower()
 
-            except IntegrityError as e:
-                self.session.rollback()
-                error_str = str(e.orig).lower()
+            for constraint, app_error in self._UNIQUE_CONSTRAINTS.items():
+                if constraint in error:
+                    raise app_error from e
 
-                # erro conhecido (email, phone, document) — volta pro front
-                for constraint, app_error in _UNIQUE_CONSTRAINTS.items():
-                    if constraint in error_str:
-                        raise app_error from e
+            if 'ix_users_uid' in error or '"uid"' in error:
+                return None
 
-                # colisão de UID — tenta de novo com um novo UID
-                if 'ix_users_uid' in error_str or '"uid"' in error_str:
-                    continue
-
-                # erro desconhecido — relança
-                raise
-
-        raise UID_GENERATION_FAILED
+            raise

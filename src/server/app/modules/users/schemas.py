@@ -14,13 +14,9 @@ PHONE: TypeAlias = Annotated[str, BeforeValidator(Validators.phone)]
 
 
 def validate_document_number(
-    value: str | None,
+    value: str,
     info: ValidationInfo,
-) -> str | None:
-
-    if value is None:
-        return value
-
+) -> str: 
     document_type = info.data.get('document_type')
 
     if document_type == UserDocumentType.CPF:
@@ -34,22 +30,24 @@ def validate_document_number(
 
 class UserCreate(BaseModel):
     name: str
-    phone: PHONE
+    phone: PHONE | None
     email: EmailStr
     password: str
-    document_type: UserDocumentType
-    document_number: str
+    document_type: UserDocumentType | None
+    document_number: str | None
     role: UserRole
-    bio: str
+    bio: str | None
 
     @field_validator('phone')
     @classmethod
     def _validate_phone(cls, value):
+        if value is None: return value
         return Validators.phone(value)
 
     @field_validator('document_number')
     @classmethod
     def _validate_document(cls, value, info):
+        if value is None: return value
         return validate_document_number(value, info)
 
 class UserUpdate(BaseModel):
@@ -60,9 +58,7 @@ class UserUpdate(BaseModel):
     @field_validator('phone')
     @classmethod
     def _validate_phone(cls, value):
-        if value is None:
-            return value
-
+        if value is None: return value
         return Validators.phone(value)
 
 class UserAdminUpdate(BaseModel):

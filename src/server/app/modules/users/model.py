@@ -30,7 +30,7 @@ class User(Base):
     document_type: Mapped[UserDocumentType | None] = mapped_column(
         Enum(UserDocumentType, name='user_doc_type_enum'), nullable=True
     )
-    document_number: Mapped[str | None] = mapped_column(String(14), nullable=True)
+    document_number: Mapped[str | None] = mapped_column(String(100), nullable=True)
     role: Mapped[UserRole] = mapped_column(
         Enum(UserRole, name='user_role_enum'),
         nullable=False,

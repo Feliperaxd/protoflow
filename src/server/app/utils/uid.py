@@ -22,7 +22,6 @@ class UID:
         Returns:
             str: Generated UID.
         """
-
         left = ''.join(
             secrets.choice(UID._CHARS)
             for _ in range(left_size)

@@ -33,7 +33,6 @@ class Validators:
         Returns:
             int: Calculated check digit (0-9).
         """
-
         total = sum(int(cnpj[i]) * weights[i] for i in range(len(weights)))
         remainder = total % 11
         return 0 if remainder < 2 else 11 - remainder
@@ -52,7 +51,6 @@ class Validators:
         Raises:
             InvalidCNPJError: If the CNPJ fails any validation step.
         """
-
         cnpj = re.sub(r'\D', '', value)
 
         if len(cnpj) != 14:
@@ -83,7 +81,6 @@ class Validators:
         Raises:
             InvalidCPFError: If the CPF fails any validation step.
         """
-
         cpf = re.sub(r'\D', '', value)
 
         if len(cpf) != 11:
@@ -117,7 +114,6 @@ class Validators:
         Raises:
             InvalidPhoneError: If the phone number fails any validation step.
         """
-
         phone = re.sub(r'\D', '', value)
 
         if len(phone) not in (10, 11):
