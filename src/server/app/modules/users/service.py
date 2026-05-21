@@ -41,7 +41,13 @@ class UserService:
         for _ in range(self._MAX_UID_RETRIES):
             user = self._try_save(self._build_user(payload))
             if user: return user
-
+             
+             USAR ESSE TRY AQUI MAS DAI TEM QUE COLOCAR TBM QUE SE TIVER ix_users_UId
+               for _ in range(self._MAX_UID_RETRIES):
+            try:
+                return self._try_commit(self._build_user(payload))
+            except IntegrityError:
+                continue
         raise UID_GENERATION_FAILED
 
     def update(

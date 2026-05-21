@@ -12,12 +12,11 @@ class BaseService:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def _try_commit(self, instance) -> object | None:
+    def _try_commit(self, instance) -> object:
         """Persist any pending changes to the database.
 
         - On success: returns the saved instance.
         - On known unique constraint: raises the corresponding AppError.
-        - On UID collision: returns None to signal a retry is needed.
 
         Args:
             instance: The model instance to persist.
@@ -27,7 +26,6 @@ class BaseService:
 
         Returns:
             object: The persisted instance, refreshed from the database.
-            None: If a UID collision occurred, signaling a retry is needed.
         """
         try:
             self.session.add(instance)
@@ -42,8 +40,5 @@ class BaseService:
             for constraint, app_error in self._UNIQUE_CONSTRAINTS.items():
                 if constraint in error:
                     raise app_error from e
-
-            if 'ix_users_uid' in error or '"uid"' in error:
-                return None
 
             raise
