@@ -4,11 +4,11 @@ from sqlalchemy import BigInteger, Enum, Integer, String, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from app.database.base import Base
+from app.database.base import OrmBase
 from app.modules.files.enums import FileStatus
 
 
-class File(Base):
+class File(OrmBase):
     __tablename__ = 'files'
 
     # === Identity ===

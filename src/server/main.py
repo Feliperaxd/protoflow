@@ -27,7 +27,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from app.database import Base, engine
+from app.database.base import OrmBase
+from app.database.connection import engine
 from app.modules.users import model
 from app.modules.files import model
 from app.database.connection import get_database
@@ -37,8 +38,8 @@ from app.modules.users.faker import FakeUser
 
 app = FastAPI()
 
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
+OrmBase.metadata.drop_all(bind=engine)
+OrmBase.metadata.create_all(bind=engine)
 
 for i in range(1000):
     session = next(get_database())

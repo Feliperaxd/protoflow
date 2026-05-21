@@ -4,11 +4,11 @@ from sqlalchemy import Enum, ForeignKey, Integer, String, Text, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from app.database.base import Base
+from app.database.base import OrmBase
 from app.modules.users.enums import UserDocumentType, UserRole, UserStatus
 
 
-class User(Base):
+class User(OrmBase):
     __tablename__ = 'users'
 
     # === Identity ===
@@ -22,7 +22,7 @@ class User(Base):
 
     # === Core ===
     name: Mapped[str] = mapped_column(String(150), nullable=False)
-    phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(50), nullable=True,)
     email: Mapped[str] = mapped_column(
         String(255), index=True, unique=True, nullable=False
     )
@@ -31,6 +31,9 @@ class User(Base):
         Enum(UserDocumentType, name='user_doc_type_enum'), nullable=True
     )
     document_number: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    document_number_hash: Mapped[str | None] = mapped_column(
+        String(100), unique=True, nullable=True
+    )
     role: Mapped[UserRole] = mapped_column(
         Enum(UserRole, name='user_role_enum'),
         nullable=False,
