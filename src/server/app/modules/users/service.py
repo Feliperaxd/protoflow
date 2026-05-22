@@ -22,7 +22,7 @@ class UserService(BaseService):
     _UID_PREFIX: str = '<version>'
     _MAX_UID_RETRIES: int = 5
     _NOT_FOUND_ERROR: AppError = USER_NOT_FOUND
-    _CONSTRAINT_ERROR_MAP: dict[str, AppError] = {
+    _UNIQUE_ERRORS: dict[str, AppError] = {
         'ix_users_email': EMAIL_ALREADY_REGISTERED,
         'users_document_number_hash_key': DOCUMENT_ALREADY_REGISTERED,
     }
@@ -61,14 +61,23 @@ class UserService(BaseService):
 
         raise UID_GENERATION_FAILED
 
-    def update(
-        self,
-        id: int,
-        data: UserUpdate | UserAdminUpdate
-    ) -> User:
+    def update(self, id: int, data: UserUpdate | UserAdminUpdate) -> User:
+        """Fetch a user by ID, apply changes and persist.
 
-        user = self._load_one()
+        Args:
+            id (int): The user's internal database ID.
+            data (UserUpdate | UserAdminUpdate): The validated schema with fields to update.
 
+        Raises:
+            AppError: If the user is not found.
+            AppError: If email, phone or document number is already registered.
+
+        Returns:
+            User: The updated user, refreshed from the database.
+        """
+        user = self._load_one(User, id=id)
+        payload = self._build_payload(data, exclude_unset=True)
+        return self._update_fields(user, payload)
 
     def delete(self, uid: str) -> None:
         ...

@@ -9,12 +9,12 @@ class BaseService:
 
     Subclasses should override class attributes to configure behaviour:
 
-        _UNIQUE_CONSTRAINTS: maps database constraint names to the AppError
+        _UNIQUE_ERRORS: maps database constraint names to the AppError
             that should be raised when that constraint is violated.
         _NOT_FOUND_ERROR: the AppError raised when _load() finds no record.
     """
 
-    _UNIQUE_CONSTRAINTS: dict[str, AppError] = {}
+    _UNIQUE_ERRORS: dict[str, AppError] = {}
     _NOT_FOUND_ERROR: AppError | None = None
 
     def __init__(self, session: Session) -> None:
@@ -115,7 +115,7 @@ class BaseService:
             self.session.rollback()
             error = str(e.orig).lower()
 
-            for constraint, app_error in self._UNIQUE_CONSTRAINTS.items():
+            for constraint, app_error in self._UNIQUE_ERRORS.items():
                 if constraint in error:
                     raise app_error from e
 

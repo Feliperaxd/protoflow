@@ -72,6 +72,18 @@ INVALID_DOCUMENT_NUMBER = AppError(
     status_code=400,
 )
 
+INVALID_DOCUMENT_TYPE = AppError(
+    code='INVALID_DOCUMENT_TYPE',
+    detail='Invalid document type.',
+    status_code=400,
+)
+
+DOCUMENT_FIELDS_REQUIRED_TOGETHER = AppError(
+    code='DOCUMENT_FIELDS_REQUIRED_TOGETHER',
+    detail='document_type and document_number must be updated together.',
+    status_code=400,
+)
+
 WEAK_PASSWORD = AppError(
     code='WEAK_PASSWORD',
     detail='The password does not meet the security requirements.',
