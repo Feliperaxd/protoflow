@@ -60,4 +60,4 @@ for i in range(1000):
 
 session = next(get_database())
 service = UserService(session)
-print(service.get_full(id=1))
+print(service.get_full(email='lipeamaralsantos@gmail.com'))

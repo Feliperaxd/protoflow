@@ -10,9 +10,9 @@ from app.modules.users.errors import (
 from app.modules.users.model import User
 from app.modules.users.schemas import (
     UserCreate,
-    UserFullResponse, 
-    UserFullUpdate,  
-    UserPublicResponse, 
+    UserFullResponse,
+    UserFullUpdate,
+    UserPublicResponse,
     UserPublicUpdate,
 )
 from app.services.base import BaseService
@@ -68,30 +68,14 @@ class UserService(BaseService, StatusMixin, TimestampMixin):
 
         raise UID_GENERATION_FAILED
 
-    def get_public(self, id: int) -> UserPublicResponse:
-        """Fetch a user by internal ID, returning public fields only."""
-        return self._build_public_response(self._load_one(User, id=id))
+    def get_public(self, **filters) -> User:
+        """Fetch a public user data by any filter (id, uid, email)."""
+        return self._build_public_response(self._load_one(User, **filters))
 
-    def get_public_by_uid(self, uid: str) -> UserPublicResponse:
-        """Fetch a user by UID, returning public fields only."""
-        return self._build_public_response(self._load_one(User, uid=uid))
+    def get_full(self, **filters) -> UserFullResponse:
+        """Fetch a full user data by any filter (id, uid, email)."""
+        return self._build_full_response(self._load_one(User, **filters))
 
-    def get_public_by_email(self, email: str) -> UserPublicResponse:
-        """Fetch a user by email, returning public fields only."""
-        return self._build_public_response(self._load_one(User, email=email))
-    
-    def get_full(self, id: int) -> UserFullResponse:
-        """Fetch a user by internal ID, returning all fields."""
-        return self._build_full_response(self._load_one(User, id=id))
-
-    def get_full_by_uid(self, uid: str) -> UserFullResponse:
-        """Fetch a user by UID, returning all fields."""
-        return self._build_full_response(self._load_one(User, uid=uid))
-
-    def get_full_by_email(self, email: str) -> UserFullResponse:
-        """Fetch a user by email, returning all fields."""
-        return self._build_full_response(self._load_one(User, email=email))
-    
     def update(self, id: int, data: UserFullUpdate | UserPublicUpdate) -> User:
         """Fetch a user by ID, apply changes and persist.
 
@@ -189,4 +173,3 @@ class UserService(BaseService, StatusMixin, TimestampMixin):
             )
 
         return UserFullResponse(**data)
-    
