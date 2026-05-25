@@ -33,18 +33,20 @@ from app.modules.users import model
 from app.modules.files import model
 from app.database.connection import get_database
 from app.modules.users.schemas import UserCreate
-from app.modules.users.schemas import UserAdminUpdate
 from app.modules.users.service import UserService
 from app.modules.users.enums import UserDocumentType
 from app.modules.users.faker import FakeUser
 from app.utils.exceptions import AppError
 from app.utils.exception_handlers import app_error_handler, validation_error_handler
+from pydantic import ValidationError
 
 app = FastAPI()
 
+app.add_exception_handler(AppError, app_error_handler)
 app.add_exception_handler(ValidationError, validation_error_handler)
 
 """
+
 OrmBase.metadata.drop_all(bind=engine)
 OrmBase.metadata.create_all(bind=engine)
 
@@ -58,4 +60,4 @@ for i in range(1000):
 
 session = next(get_database())
 service = UserService(session)
-service.update(id=3, data=UserAdminUpdate(name='AAAAAAAAAAAAAAAAAAAAAAAA', document_type=UserDocumentType.CNPJ))
+print(service.get_full(id=1))

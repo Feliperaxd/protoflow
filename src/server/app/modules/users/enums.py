@@ -4,6 +4,7 @@ from enum import Enum
 class UserStatus(str, Enum):
     BANNED = 'banned'
     ACTIVE = 'active'
+    DELETED = 'deleted'
     INACTIVE = 'inactive'
     SUSPENDED = 'suspended'
 

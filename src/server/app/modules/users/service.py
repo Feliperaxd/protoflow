@@ -1,22 +1,29 @@
 from sqlalchemy.exc import IntegrityError
 
+from app.modules.users.enums import UserStatus
 from app.modules.users.errors import (
     DOCUMENT_ALREADY_REGISTERED,
     EMAIL_ALREADY_REGISTERED,
-    PHONE_ALREADY_REGISTERED,
     UID_GENERATION_FAILED,
-    USER_NOT_FOUND
+    USER_NOT_FOUND,
 )
-from app.utils.uid import UID
-from app.utils.hashing import Hasher
 from app.modules.users.model import User
+from app.modules.users.schemas import (
+    UserCreate,
+    UserFullResponse, 
+    UserFullUpdate,  
+    UserPublicResponse, 
+    UserPublicUpdate,
+)
 from app.services.base import BaseService
+from app.services.mixins import StatusMixin, TimestampMixin
 from app.utils.encryption import Encryptor
 from app.utils.exceptions import AppError
-from app.modules.users.schemas import UserAdminUpdate, UserCreate, UserUpdate
+from app.utils.hashing import Hasher
+from app.utils.uid import UID
 
 
-class UserService(BaseService):
+class UserService(BaseService, StatusMixin, TimestampMixin):
     """Service layer for user management operations."""
 
     _UID_PREFIX: str = '<version>'
@@ -61,7 +68,31 @@ class UserService(BaseService):
 
         raise UID_GENERATION_FAILED
 
-    def update(self, id: int, data: UserUpdate | UserAdminUpdate) -> User:
+    def get_public(self, id: int) -> UserPublicResponse:
+        """Fetch a user by internal ID, returning public fields only."""
+        return self._build_public_response(self._load_one(User, id=id))
+
+    def get_public_by_uid(self, uid: str) -> UserPublicResponse:
+        """Fetch a user by UID, returning public fields only."""
+        return self._build_public_response(self._load_one(User, uid=uid))
+
+    def get_public_by_email(self, email: str) -> UserPublicResponse:
+        """Fetch a user by email, returning public fields only."""
+        return self._build_public_response(self._load_one(User, email=email))
+    
+    def get_full(self, id: int) -> UserFullResponse:
+        """Fetch a user by internal ID, returning all fields."""
+        return self._build_full_response(self._load_one(User, id=id))
+
+    def get_full_by_uid(self, uid: str) -> UserFullResponse:
+        """Fetch a user by UID, returning all fields."""
+        return self._build_full_response(self._load_one(User, uid=uid))
+
+    def get_full_by_email(self, email: str) -> UserFullResponse:
+        """Fetch a user by email, returning all fields."""
+        return self._build_full_response(self._load_one(User, email=email))
+    
+    def update(self, id: int, data: UserFullUpdate | UserPublicUpdate) -> User:
         """Fetch a user by ID, apply changes and persist.
 
         Args:
@@ -79,18 +110,41 @@ class UserService(BaseService):
         payload = self._build_payload(data, exclude_unset=True)
         return self._update_fields(user, payload)
 
-    def delete(self, uid: str) -> None:
-        ...
+    def delete(self, id: int) -> None:
+        """Soft delete a user by setting their status to DELETED."""
+        self._set_status(User, id, UserStatus.DELETED)
 
-    def ban(self, uid: str) -> None:
-        ...
+    def ban(self, id: int) -> None:
+        """Ban a user by setting their status to BANNED."""
+        self._set_status(User, id, UserStatus.BANNED)
 
-    def suspend(self, uid: str) -> None:
-        ...
+    def suspend(self, id: int) -> None:
+        """Suspend a user by setting their status to SUSPENDED."""
+        self._set_status(User, id, UserStatus.SUSPENDED)
+
+    def activate(self, id: int) -> None:
+        """Activate a user by setting their status to ACTIVE."""
+        self._set_status(User, id, UserStatus.ACTIVE)
+
+    def deactivate(self, id: int) -> None:
+        """Deactivate a user by setting their status to INACTIVE."""
+        self._set_status(User, id, UserStatus.INACTIVE)
+
+    def verify_email(self, id: int) -> None:
+        """Set the email verification timestamp."""
+        self._set_timestamp(User, id, 'email_verified_at')
+
+    def accept_terms(self, id: int) -> None:
+        """Set the terms acceptance timestamp."""
+        self._set_timestamp(User, id, 'terms_accepted_at')
+
+    def record_login(self, id: int) -> None:
+        """Set the last login timestamp."""
+        self._set_timestamp(User, id, 'last_login_at')
 
     def _build_payload(
         self,
-        data: UserCreate | UserUpdate | UserAdminUpdate,
+        data: UserCreate | UserFullUpdate | UserPublicUpdate,
         *,
         exclude_unset: bool = False,
     ) -> dict:
@@ -114,3 +168,25 @@ class UserService(BaseService):
             **payload,
         )
 
+    def _build_public_response(self, user: User) -> UserPublicResponse:
+        """Build public response, decrypting sensitive fields."""
+        data = user.__dict__.copy()
+
+        if user.document_number:
+            data['document_number'] = self._encryptor.decrypt(
+                user.document_number
+            )
+
+        return UserPublicResponse(**data)
+
+    def _build_full_response(self, user: User) -> UserFullResponse:
+        """Build full response, decrypting sensitive fields."""
+        data = user.__dict__.copy()
+
+        if user.document_number:
+            data['document_number'] = self._encryptor.decrypt(
+                user.document_number
+            )
+
+        return UserFullResponse(**data)
+    

@@ -27,4 +27,4 @@ async def validation_error_handler(request: Request, exc: ValidationError) -> JS
         for error in exc.errors()
     ]
 
-    return JSONResponse(status_code=400, content={'errors': errors})
+    return JSONResponse(status_code=422, content={'errors': errors})

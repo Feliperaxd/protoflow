@@ -13,8 +13,7 @@ class File(OrmBase):
 
     # === Identity ===
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    uid: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-
+    
     # === Core ===
     url: Mapped[str] = mapped_column(String(500), nullable=False)
     filename: Mapped[str] = mapped_column(String(250), nullable=False)
