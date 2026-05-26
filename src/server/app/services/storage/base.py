@@ -5,7 +5,7 @@ class BaseStorage(ABC):
     """Abstract base class for file storage backends."""
 
     @abstractmethod
-    def save(self, file: bytes, filename: str) -> str:
+    def save(self, file: bytes, filename: str, file_uuid: str) -> str:
         """Save a file and return its public URL."""
 
     @abstractmethod

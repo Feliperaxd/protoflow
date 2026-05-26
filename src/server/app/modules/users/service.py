@@ -5,6 +5,7 @@ from app.modules.users.errors import (
     DOCUMENT_ALREADY_REGISTERED,
     EMAIL_ALREADY_REGISTERED,
     UID_GENERATION_FAILED,
+    USER_ALREADY_DELETED,
     USER_NOT_FOUND,
 )
 from app.modules.users.model import User
@@ -100,32 +101,45 @@ class UserService(BaseService, StatusMixin, TimestampMixin):
 
     def ban(self, id: int) -> None:
         """Ban a user by setting their status to BANNED."""
+        self._ensure_not_deleted(id)
         self._set_status(User, id, UserStatus.BANNED)
 
     def suspend(self, id: int) -> None:
         """Suspend a user by setting their status to SUSPENDED."""
+        self._ensure_not_deleted(id)
         self._set_status(User, id, UserStatus.SUSPENDED)
 
     def activate(self, id: int) -> None:
         """Activate a user by setting their status to ACTIVE."""
+        self._ensure_not_deleted(id)
         self._set_status(User, id, UserStatus.ACTIVE)
 
     def deactivate(self, id: int) -> None:
         """Deactivate a user by setting their status to INACTIVE."""
+        self._ensure_not_deleted(id)
         self._set_status(User, id, UserStatus.INACTIVE)
 
     def verify_email(self, id: int) -> None:
         """Set the email verification timestamp."""
+        self._ensure_not_deleted(id)
         self._set_timestamp(User, id, 'email_verified_at')
 
     def accept_terms(self, id: int) -> None:
         """Set the terms acceptance timestamp."""
+        self._ensure_not_deleted(id)
         self._set_timestamp(User, id, 'terms_accepted_at')
 
     def record_login(self, id: int) -> None:
         """Set the last login timestamp."""
+        self._ensure_not_deleted(id)
         self._set_timestamp(User, id, 'last_login_at')
 
+    def _ensure_not_deleted(self, id: int) -> None:
+        """Raise AppError if the user has been deleted."""
+        user = self._load_one(User, id=id)
+        if user.status == UserStatus.DELETED:
+            raise USER_ALREADY_DELETED
+    
     def _build_payload(
         self,
         data: UserCreate | UserFullUpdate | UserPublicUpdate,

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Upload Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        input, button {
+            display: block;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            white-space: pre;
+            background: #f4f4f4;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>File Upload Test</h2>
+    <input type="file" id="file">
+    <button onclick="upload()">Upload</button>
+    <div id="result"></div>
+
+    <script>
+        async function upload() {
+            const file = document.getElementById('file').files[0];
+            if (!file) return alert('Select a file first.');
+
+            const form = new FormData();
+            form.append('file', file);
+
+            const response = await fetch('http://localhost:8000/files', {
+                method: 'POST',
+                body: form,
+            });
+
+            const data = await response.json();
+            document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>

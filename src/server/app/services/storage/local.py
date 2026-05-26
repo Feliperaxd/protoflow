@@ -11,10 +11,10 @@ class LocalStorage(BaseStorage):
         self._base_path = Path(base_path)
         self._base_path.mkdir(parents=True, exist_ok=True)
 
-    def save(self, file: bytes, filename: str) -> str:
+    def save(self, file: bytes, filename: str, file_uuid: str) -> str:
         """Save a file and return its relative URL."""
         ext = Path(filename).suffix
-        unique_name = f'{uuid.uuid4().hex}{ext}'
+        unique_name = f'{file_uuid}{ext}'
         path = self._base_path / unique_name
         path.write_bytes(file)
         return f'/uploads/{unique_name}'

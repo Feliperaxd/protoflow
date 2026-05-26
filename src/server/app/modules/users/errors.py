@@ -20,6 +20,12 @@ PHONE_ALREADY_REGISTERED = AppError(
     status_code=409,
 )
 
+USER_ALREADY_DELETED = AppError(
+    code='USER_ALREADY_DELETED',
+    detail='This user has been deleted and cannot be modified.',
+    status_code=409,
+)
+
 DOCUMENT_ALREADY_REGISTERED = AppError(
     code='DOCUMENT_ALREADY_REGISTERED',
     detail='The document number is already in use.',
