@@ -11,12 +11,14 @@ from app.services.base import BaseService
 from app.services.mixins import StatusMixin
 from app.services.storage.base import BaseStorage
 from app.services.storage.local import LocalStorage
+from app.utils.exceptions import AppError
 
 
 class FileService(BaseService, StatusMixin):
     """Service layer for file management operations."""
 
-    _NOT_FOUND_ERROR = FILE_NOT_FOUND
+    _NOT_FOUND_ERROR: AppError = FILE_NOT_FOUND
+    _ALREADY_DELETED_ERROR: AppError = FILE_ALREADY_DELETED
 
     _MAX_SIZE_IMAGE: int = 10 * 1024 * 1024     # 10 MB
     _MAX_SIZE_MODEL: int = 50 * 1024 * 1024     # 50 MB
@@ -119,9 +121,3 @@ class FileService(BaseService, StatusMixin):
 
         if len(file) > max_size:
             raise FILE_TOO_LARGE
-
-    def _ensure_not_deleted(self, id: int) -> None:
-        """Raise AppError if the file has been deleted."""
-        file = self._load_one(File, id=id)
-        if file.status == FileStatus.DELETED:
-            raise FILE_ALREADY_DELETED

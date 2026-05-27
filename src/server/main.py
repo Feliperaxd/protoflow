@@ -18,7 +18,7 @@ from app.utils.exception_handlers import (
     validation_error_handler,
 )
 from app.utils.exceptions import AppError
-
+"""
 app = FastAPI()
 
 app.add_exception_handler(AppError, app_error_handler)
@@ -37,7 +37,7 @@ async def upload_file(file: UploadFile):
         filename=file.filename,
         mime_type=file.content_type,
     )
-
+"""
 
 """
 # --- reset e seed ---
@@ -61,10 +61,9 @@ service = UserService(session)
 print(service.get_full(email='lipeamaralsantos@gmail.com'))
 """
 
-OrmBase.metadata.create_all(bind=engine)
-
 """
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)
 """
+

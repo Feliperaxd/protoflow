@@ -29,6 +29,8 @@ class UserService(BaseService, StatusMixin, TimestampMixin):
 
     _UID_PREFIX: str = '<version>'
     _MAX_UID_RETRIES: int = 5
+    
+    _ALREADY_DELETED_ERROR: AppError = USER_ALREADY_DELETED
     _NOT_FOUND_ERROR: AppError = USER_NOT_FOUND
     _UNIQUE_ERRORS: dict[str, AppError] = {
         'ix_users_email': EMAIL_ALREADY_REGISTERED,
@@ -134,12 +136,6 @@ class UserService(BaseService, StatusMixin, TimestampMixin):
         self._ensure_not_deleted(id)
         self._set_timestamp(User, id, 'last_login_at')
 
-    def _ensure_not_deleted(self, id: int) -> None:
-        """Raise AppError if the user has been deleted."""
-        user = self._load_one(User, id=id)
-        if user.status == UserStatus.DELETED:
-            raise USER_ALREADY_DELETED
-    
     def _build_payload(
         self,
         data: UserCreate | UserFullUpdate | UserPublicUpdate,
