@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
 
 from app.modules.addresses.enums import AddressStatus
@@ -42,4 +44,5 @@ class AddressResponse(BaseModel):
     postal_code: str
     country: str
     status: AddressStatus
-    
+    created_at: datetime
+    updated_at: datetime

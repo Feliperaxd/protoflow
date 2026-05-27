@@ -5,7 +5,10 @@ from pydantic import ValidationError
 from app.utils.exceptions import AppError
 
 
-async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
+async def app_error_handler(
+    request: Request,
+    exc: AppError
+) -> JSONResponse:
     """Handle AppError exceptions and return a structured JSON response."""
     return JSONResponse(
         status_code=exc.status_code,
@@ -16,7 +19,10 @@ async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
     )
 
 
-async def validation_error_handler(request: Request, exc: ValidationError) -> JSONResponse:
+async def validation_error_handler(
+    request: Request,
+    exc: ValidationError
+) -> JSONResponse:
     """Handle Pydantic ValidationError and return a structured JSON response."""
     errors = [
         {

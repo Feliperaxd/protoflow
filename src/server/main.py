@@ -18,6 +18,7 @@ from app.utils.exception_handlers import (
     validation_error_handler,
 )
 from app.utils.exceptions import AppError
+
 """
 app = FastAPI()
 

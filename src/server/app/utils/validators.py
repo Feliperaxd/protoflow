@@ -22,22 +22,6 @@ class InvalidPhoneError(ValueError):
 
 class Validators:
     @staticmethod
-    def _calc_cnpj_digit(cnpj: str, weights: list[int]) -> int:
-        """
-        Calculates a single CNPJ check digit.
-
-        Args:
-            cnpj (str): CNPJ string containing only digits.
-            weights (list[int]): Multiplication weights for each digit position.
-
-        Returns:
-            int: Calculated check digit (0-9).
-        """
-        total = sum(int(cnpj[i]) * weights[i] for i in range(len(weights)))
-        remainder = total % 11
-        return 0 if remainder < 2 else 11 - remainder
-
-    @staticmethod
     def cnpj(value: str) -> str:
         """
         Validates and normalizes a Brazilian CNPJ number.
@@ -131,3 +115,19 @@ class Validators:
             )
 
         return phone
+
+    @staticmethod
+    def _calc_cnpj_digit(cnpj: str, weights: list[int]) -> int:
+        """
+        Calculates a single CNPJ check digit.
+
+        Args:
+            cnpj (str): CNPJ string containing only digits.
+            weights (list[int]): Multiplication weights for each digit position.
+
+        Returns:
+            int: Calculated check digit (0-9).
+        """
+        total = sum(int(cnpj[i]) * weights[i] for i in range(len(weights)))
+        remainder = total % 11
+        return 0 if remainder < 2 else 11 - remainder

@@ -1,10 +1,11 @@
 from datetime import datetime
 
 from sqlalchemy import Enum, ForeignKey, Integer, String, Text, TIMESTAMP
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.database.base import OrmBase
+from app.modules.files.model import File
 from app.modules.users.enums import UserDocumentType, UserRole, UserStatus
 
 
@@ -16,13 +17,16 @@ class User(OrmBase):
     uid: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 
     # === Relations ===
-    avatar_url_id: Mapped[int | None] = mapped_column(
+    avatar_file_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey('files.id'), nullable=True
+    )
+    avatar: Mapped[File | None] = relationship(
+        'File', foreign_keys=[avatar_file_id], lazy='joined'
     )
 
     # === Core ===
     name: Mapped[str] = mapped_column(String(150), nullable=False)
-    phone: Mapped[str | None] = mapped_column(String(50), nullable=True,)
+    phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
     email: Mapped[str] = mapped_column(
         String(255), index=True, unique=True, nullable=False
     )

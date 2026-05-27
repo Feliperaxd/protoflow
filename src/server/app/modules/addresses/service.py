@@ -41,15 +41,14 @@ class AddressService(BaseService, StatusMixin):
             self._try_commit(instance)
         )
 
-    def get(self, id: int) -> AddressResponse:
-        """Fetch an address by internal ID."""
-        return AddressResponse.model_validate(
-            self._load_one(Address, id=id)
-        )
+    def get_one(self, **filters) -> AddressResponse:
+        """Fetch a single address by any filter."""
+        address = self._load_one(Address, **filters)
+        return AddressResponse.model_validate(address)
 
-    def get_by_user(self, user_id: int) -> list[AddressResponse]:
-        """Fetch all addresses for a user."""
-        instances = self._load_all_by(Address, user_id=user_id)
+    def get_all(self, **filters) -> list[AddressResponse]:
+        """Fetch all addresses, optionally filtered."""
+        instances = self._load_all(Address, **filters)
         return [AddressResponse.model_validate(a) for a in instances]
 
     def update(self, id: int, data: AddressUpdate) -> AddressResponse:

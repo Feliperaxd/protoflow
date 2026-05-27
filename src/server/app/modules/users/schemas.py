@@ -92,10 +92,14 @@ class UserFullUpdate(UserBase):
 
         return self
 
+class AvatarResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    url: str
 
-class UserPublicResponse(BaseModel):
+class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
+    id: int
     uid: str
     name: str
     email: str
@@ -105,17 +109,10 @@ class UserPublicResponse(BaseModel):
     role: UserRole
     bio: str | None
     status: UserStatus
+    avatar: AvatarResponse | None
+    internal_note: str | None
     email_verified_at: datetime | None
     terms_accepted_at: datetime | None
-    created_at: datetime
-
-
-class UserFullResponse(UserPublicResponse):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    avatar_url_id: int | None
-    internal_note: str | None
     last_login_at: datetime | None
+    created_at: datetime
     updated_at: datetime
-    

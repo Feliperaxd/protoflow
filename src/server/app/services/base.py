@@ -38,16 +38,20 @@ class BaseService:
             raise self._NOT_FOUND_ERROR
         return instance
 
-    def _load_all(self, model) -> list:
-        """Fetch all records of a model.
+    def _load_all(self, model, **filters) -> list:
+        """Fetch all records of a model, optionally filtered.
 
         Args:
             model: The SQLAlchemy model class to query.
+            **filters: Column filters passed to filter_by (e.g. user_id=1).
 
         Returns:
-            list: All records of the given model.
+            list: All matching records.
         """
-        return self.session.query(model).all()
+        query = self.session.query(model)
+        if filters:
+            query = query.filter_by(**filters)
+        return query.all()
 
     def _exists(self, model, **filters) -> bool:
         """Check whether a record matching the filters exists.
@@ -59,7 +63,8 @@ class BaseService:
         Returns:
             bool: True if a matching record exists, False otherwise.
         """
-        return self.session.query(model).filter_by(**filters).first() is not None
+        instance = self.session.query(model).filter_by(**filters).first()
+        return instance is not None
 
     def _update_fields(self, instance, payload: dict) -> object:
         """Apply a dict of fields to an instance and commit.
