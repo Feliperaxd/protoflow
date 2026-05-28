@@ -2,6 +2,8 @@ import os
 
 from cryptography.fernet import Fernet, InvalidToken
 
+from app.config.settings import ENCRYPTION_KEY
+
 
 class Encryptor:
     """Symmetric encryption using Fernet (AES-128-CBC + HMAC)."""
@@ -29,9 +31,8 @@ class Encryptor:
     @staticmethod
     def _load_key() -> bytes:
         """Load the encryption key from environment variables."""
-        key = os.getenv('ENCRYPTION_KEY')
-        if not key:
+        if not ENCRYPTION_KEY:
             raise EnvironmentError(
                 'ENCRYPTION_KEY is not defined in environment variables.'
             )
-        return key.encode()
+        return ENCRYPTION_KEY.encode()

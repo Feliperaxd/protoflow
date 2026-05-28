@@ -12,7 +12,7 @@ class File(OrmBase):
     __tablename__ = 'files'
 
     # === Identity ===
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     uuid: Mapped[str] = mapped_column(String(50), nullable=False)
 
     # === Core ===
