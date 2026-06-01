@@ -1,16 +1,14 @@
-import os
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from jose import JWTError, jwt
+from jose import jwt
 
 from app.config.settings import (
-    SECRET_KEY,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
     JWT_ALGORITHM,
     REFRESH_TOKEN_EXPIRE_DAYS,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
+    SECRET_KEY,
 )
-from app.database.connection import get_database
 from app.modules.auth.errors import (
     INVALID_CREDENTIALS,
     INVALID_REFRESH_TOKEN,
@@ -25,6 +23,37 @@ from app.utils.hashing import Hasher
 
 class AuthService(BaseService):
     """Service layer for authentication operations."""
+
+    def __init__(self, session, user_service=None) -> None:
+        super().__init__(session)
+        from app.modules.users.service import UserService
+        self._user_service = user_service or UserService(session)
+
+    # --- public ---
+
+    def register(self, name: str, email: str, password: str) -> TokenResponse:
+        """Create a new user and return access and refresh tokens.
+
+        Args:
+            name (str): The user's name.
+            email (str): The user's email.
+            password (str): The plain-text password.
+
+        Raises:
+            AppError: If the email is already registered.
+
+        Returns:
+            TokenResponse: The access and refresh tokens.
+        """
+        from app.modules.users.schemas import UserCreate
+
+        user = self._user_service.create(UserCreate(
+            name=name,
+            email=email,
+            password=password,
+        ))
+
+        return self._generate_tokens(user.id)
 
     def login(self, email: str, password: str) -> TokenResponse:
         """Validate credentials and return access and refresh tokens.
@@ -43,17 +72,10 @@ class AuthService(BaseService):
         if not user or not Hasher.check_password(password, user.password_hash):
             raise INVALID_CREDENTIALS
 
-        access_token = self._create_access_token(user.id)
-        refresh_token, refresh_token_hash = self._create_refresh_token()
-        self._store_refresh_token(user.id, refresh_token_hash)
-
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-        )
+        return self._generate_tokens(user.id)
 
     def refresh(self, raw_token: str) -> TokenResponse:
-        """Validate refresh token and return a new access token.
+        """Validate refresh token and return new tokens.
 
         Args:
             raw_token (str): The raw refresh token.
@@ -79,14 +101,7 @@ class AuthService(BaseService):
         stored.revoked_at = now
         self.session.commit()
 
-        access_token = self._create_access_token(stored.user_id)
-        new_refresh_token, new_hash = self._create_refresh_token()
-        self._store_refresh_token(stored.user_id, new_hash)
-
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=new_refresh_token,
-        )
+        return self._generate_tokens(stored.user_id)
 
     def logout(self, raw_token: str) -> None:
         """Revoke a refresh token.
@@ -107,6 +122,19 @@ class AuthService(BaseService):
 
         stored.revoked_at = datetime.now(timezone.utc)
         self.session.commit()
+
+    # --- private ---
+
+    def _generate_tokens(self, user_id: int) -> TokenResponse:
+        """Generate and store access and refresh tokens for a user."""
+        access_token = self._create_access_token(user_id)
+        refresh_token, refresh_token_hash = self._create_refresh_token()
+        self._store_refresh_token(user_id, refresh_token_hash)
+
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
 
     def _create_access_token(self, user_id: int) -> str:
         """Generate a signed JWT access token."""
@@ -133,3 +161,4 @@ class AuthService(BaseService):
         )
         self.session.add(instance)
         self.session.commit()
+        
