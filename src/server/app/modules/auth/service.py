@@ -14,9 +14,10 @@ from app.modules.auth.errors import (
     INVALID_REFRESH_TOKEN,
     TOKEN_EXPIRED,
 )
-from app.modules.auth.schemas import TokenResponse
+from app.modules.auth.schemas import RegisterRequest, TokenResponse
 from app.modules.refresh_tokens.model import RefreshToken
 from app.modules.users.model import User
+from app.modules.users.service import UserService
 from app.services.base import BaseService
 from app.utils.hashing import Hasher
 
@@ -26,18 +27,13 @@ class AuthService(BaseService):
 
     def __init__(self, session, user_service=None) -> None:
         super().__init__(session)
-        from app.modules.users.service import UserService
         self._user_service = user_service or UserService(session)
 
-    # --- public ---
-
-    def register(self, name: str, email: str, password: str) -> TokenResponse:
+    def register(self, data: RegisterRequest) -> TokenResponse:
         """Create a new user and return access and refresh tokens.
 
         Args:
-            name (str): The user's name.
-            email (str): The user's email.
-            password (str): The plain-text password.
+            data (RegisterRequest): The validated schema with registration data.
 
         Raises:
             AppError: If the email is already registered.
@@ -48,9 +44,13 @@ class AuthService(BaseService):
         from app.modules.users.schemas import UserCreate
 
         user = self._user_service.create(UserCreate(
-            name=name,
-            email=email,
-            password=password,
+            name=data.name,
+            email=data.email,
+            password=data.password,
+            phone=data.phone,
+            document_type=data.document_type,
+            document_number=data.document_number,
+            role=UserRole.CUSTOMER,
         ))
 
         return self._generate_tokens(user.id)
@@ -161,4 +161,3 @@ class AuthService(BaseService):
         )
         self.session.add(instance)
         self.session.commit()
-        

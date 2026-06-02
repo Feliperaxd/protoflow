@@ -1,10 +1,15 @@
 from pydantic import BaseModel, EmailStr
 
+from app.modules.users.enums import UserDocumentType
+
 
 class RegisterRequest(BaseModel):
     name: str
     email: EmailStr
     password: str
+    phone: str | None = None
+    document_type: UserDocumentType | None = None
+    document_number: str | None = None
 
 
 class LoginRequest(BaseModel):
